@@ -5,10 +5,46 @@
         body {
           font: 10px sans-serif;
         }
+        
+        .message_box {
+            position: absolute;
+            background-color:rgba(0, 128, 255, 0.4);
+            width: 100%;
+            height: 100%;
+            z-index:    10;
+            top:        0; 
+            left:       0; 
+            text-align: center;
+        }
+        
+        .message_box div {
+            width: 80%;
+            height: 80%px;
+            padding: 20px;
+            background: white;
+            display: inline-block;
+            margin-top: 100px;
+            font-size: 18px;
+        }
+        
+        
+        p { text-align: justify; }
+      
+        .start_button {
+            padding: 20px;
+            background: rgba(0, 128, 255, 0.4);
+            font-weight: bold;
+            font-size: 26px;
+            text-align: center;
+        }
+        .start_button:hover {
+            background: rgba(0, 128, 255, 0.2);
+        }
 
         .header {
           width: 100%;
           text-align: center;
+          bottom-padding: 10px;
         }
         
         .kpiblock {
@@ -21,7 +57,9 @@
             font: 40px sans-serif;
             display: inline-block;
             width: 300px;
+            color: gray;
         }
+        .bignumber span { color: black; }
         
         .experiments {
             text-align: center;
@@ -30,9 +68,9 @@
         .exp_box {
             display: inline-block;
             font-size: 24px;
-            color: rgba(0, 128, 255, 0.4);
+            color: rgba(0, 128, 255, 0.8);
             border: 1px solid rgba(0, 128, 255, 0.4);
-            margin: 2px;
+            margin: 6px;
         }
         
         table {
@@ -161,7 +199,7 @@ var Experiment = function(id) {
         var d = $(document.createElement('table')).append($(document.createElement('tr')).attr('class','header')
             .append($(document.createElement('td')).append('Variant'))
             .append($(document.createElement('td')).append('Visitors'))
-            .append($(document.createElement('td')).append('Bookings'))
+            .append($(document.createElement('td')).append('Conversions'))
             .append($(document.createElement('td')).append('Conversion'))
             .append($(document.createElement('td')).attr('width','90px').append('Conf. Interval'))
             .append($(document.createElement('td')).append('Improvement'))
@@ -239,7 +277,7 @@ function init() {
     EXPERIMENTS     = 10; // $("#exp").val();
     VARIANTS        = 2;
     VISITORS_PER_DAY = 1000;
-    TOTAL_VISITORS = 500000;
+    TOTAL_VISITORS = 250000;
 
     // Conversion rate of mock A experiments
     CONVERSION_RATE_A = 0.05; // $("#conv").val();
@@ -257,8 +295,9 @@ function next_round() {
     
     $("#level").text(level);
     $("#score").text(score);
+    $("#time").text(time.toLocaleString());
     
-    CONVERSION_RATE_B = CONVERSION_RATE_A * (Math.random() < 0.5 ? (1+1/Math.pow(2,level)) : (1-1/Math.pow(2,level)));
+    CONVERSION_RATE_B = CONVERSION_RATE_A * (Math.random() < 0.5 ? (1+1/Math.pow(2,level-1)) : (1-1/Math.pow(2,level-1)));
     
     // Reset experiments.
     for (var i = 0; i < EXPERIMENTS; ++i) { e[i].reset(); }
@@ -338,6 +377,38 @@ function recursive_experiment_loop() {
     $("#time").text(time.toLocaleString());
     for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
     if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 100);
+    if (time <= 0) {
+        $(".message_box div.intro").hide();
+        $(".message_box div.over").show();
+        $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
+        if (score > 6) {
+            $(".over h1").text("You Can See The Matrix!")
+            $("#perf_long").text("What you've achieved is statistically very improbable. You probably cheated, but you might also simply be The One. If you manage to do this a second time, we'd be very impressed.");
+        }
+        else if (level == 1) {
+            $(".over h1").text("Paradox Of Choice, hmm?")
+            $("#perf_long").text("Just remember that not making any decisions is also a choice. you might not have made any mistakes, but you've also not really added any value to the company. Perhaps you were sleeping?");
+        }
+        else if (level > 10 && score < 0) {
+            $(".over h1").text("Not Quite Worse Than Random")
+            $("#perf_long").text("Sure, you were decisive, but sometimes it is better to wait before you make a decision.");
+        }
+        else if (level > 1 && score == 0) {
+            $(".over h1").text("You Win Some, You Lose Some")
+            $("#perf_long").text("Maybe play again and stick to making good decisions only, hmkay?");
+        }
+        else if (score > 2 && score <= 6) {
+            $(".over h1").text("Great Job, No Really")
+            $("#perf_long").text("This is not an easy game. You should be proud you managed to get a positive score.");
+        }
+
+        else {
+            $(".over h1").text("Okay, I Guess")
+            $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win.");
+        }
+        
+        $(".message_box").show();
+    }
 }
 
 function paint_experiments() {
@@ -350,25 +421,56 @@ function paint_experiments() {
     $("table").click(function(e){choose_exp($(this).attr("id"));});
 }
 
+function start_game() {
+    $(".message_box").hide();
+    init();
+    paint_experiments();
+    recursive_experiment_loop();
+}
+
 $(document).ready(function() {
     document.addEventListener('keydown', function(event) {
         if(event.keyCode >= 48 && event.keyCode <= 57) {
             choose_exp(event.keyCode-48);
         }
     });
+    
+    $(".start_button").click(function(e){start_game()});
 
     init();
     paint_experiments();
-    recursive_experiment_loop();
 });
 
 </script>
     </head>
     <body>
+        <div class="message_box">
+            <div class="content intro">
+                <h1>So You Think You Can Test?</h1>
+                <p>Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
+                
+                <p>You will be presented with a series of ten independently simulated experiments. Only one of these is simulating a scenario where there is a difference in effect between base and variant. The other nine are so-called A/A experiments, with absolutely no difference between the two treatment groups.</p>
+                <p>Because of random fluctuations, combined with the fact that we observe the experiments as they are simulated, all ten result will seem to change over time. <b>Your job as a decision maker is to identify which of these ten experiments is <i>not</i> an A/A.</b></p>
+                                
+                <p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
+                                
+                <p>This is a game of chance, but not of chance alone. Good luck! <b>Ready? Set? Go!</b></p>
+                <p class="start_button">Click To Start</p>
+            </div>
+            <div class="content over">
+                <h1>Game Over!</h1>
+                <p>The game is over. Time to evaluate how well you've performed.</p>
+                <p><b id="perf_summary"></b></p>
+                
+                <p id="perf_long"></p>
+                <p class="start_button">Click To Start Again</p>
+            </div>
+        </div>
+    
         <div class="header">
             <span class="bignumber">Level <span id="level"></span></span>
             <span class="bignumber">Score <span id="score"></span></span>
-            <span class="bignumber">Time <span id="time"></span></span>
+            <span class="bignumber">Visitors <span id="time"></span></span>
         </div>
         
         <div class="experiments">
