@@ -27,6 +27,7 @@
             font-size: 18px;
         }
         
+        .message_box div.over { display: none; }
         
         p { text-align: justify; }
       
@@ -108,7 +109,7 @@
         <script src="jquery-ui.min.js"></script>
         <script src="statistics-distributions.js"></script>
         <script src="d3.v3.min.js" charset="utf-8"></script>
-<!-- 
+
         <script type="text/javascript">
           var _gaq = _gaq || [];
           _gaq.push(['_setAccount', 'UA-17073322-1']);
@@ -122,8 +123,6 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
           })();
         </script>
- -->
-        
         <script>
 //
 // Just set up some basics
@@ -277,7 +276,7 @@ function init() {
     EXPERIMENTS     = 10; // $("#exp").val();
     VARIANTS        = 2;
     VISITORS_PER_DAY = 1000;
-    TOTAL_VISITORS = 250000;
+    TOTAL_VISITORS = 500000;
 
     // Conversion rate of mock A experiments
     CONVERSION_RATE_A = 0.05; // $("#conv").val();
