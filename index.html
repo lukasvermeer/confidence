@@ -23,11 +23,9 @@
             padding: 20px;
             background: white;
             display: inline-block;
-            margin-top: 100px;
+            margin-top: 80px;
             font-size: 18px;
         }
-        
-        .message_box div.over { display: none; }
         
         p { text-align: justify; }
       
@@ -108,8 +106,6 @@
         <script src="jquery-1.9.1.min.js"></script>
         <script src="jquery-ui.min.js"></script>
         <script src="statistics-distributions.js"></script>
-        <script src="d3.v3.min.js" charset="utf-8"></script>
-
         <script type="text/javascript">
           var _gaq = _gaq || [];
           _gaq.push(['_setAccount', 'UA-17073322-1']);
@@ -292,7 +288,7 @@ function init() {
 function next_round() {
     level++;
     
-    $("#level").text(level);
+    $("#level").text((1/Math.pow(2,level-1)*100).toFixed(2) + "%");
     $("#score").text(score);
     $("#time").text(time.toLocaleString());
     
@@ -388,7 +384,7 @@ function recursive_experiment_loop() {
             $(".over h1").text("Paradox Of Choice, hmm?")
             $("#perf_long").text("Just remember that not making any decisions is also a choice. you might not have made any mistakes, but you've also not really added any value to the company. Perhaps you were sleeping?");
         }
-        else if (level > 10 && score < 0) {
+        else if (level > 5 && score < 0) {
             $(".over h1").text("Not Quite Worse Than Random")
             $("#perf_long").text("Sure, you were decisive, but sometimes it is better to wait before you make a decision.");
         }
@@ -396,14 +392,25 @@ function recursive_experiment_loop() {
             $(".over h1").text("You Win Some, You Lose Some")
             $("#perf_long").text("Maybe play again and stick to making good decisions only, hmkay?");
         }
-        else if (score > 2 && score <= 6) {
+        else if (score > 2 && score <= 4) {
             $(".over h1").text("Great Job, No Really")
             $("#perf_long").text("This is not an easy game. You should be proud you managed to get a positive score.");
         }
-
+        else if (score == 5 && level < 7) {
+            $(".over h1").text("That's Awesome! Can You Do Better?")
+            $("#perf_long").text("This is a very good score! Looks like you made all the right choices, but perhaps you can do even better than this if you make all the right choices just a little bit faster?");
+        }
+        else if (score == 5 && level >= 7) {
+            $(".over h1").text("Easy Does It")
+            $("#perf_long").text("This is a very good score! Looks like you made a few costly mistakes along the way. Perhaps you can do better if you wait just a little bit longer when you're not quite confident you're making the right decision?");
+        }
+        else if (score == 6) {
+            $(".over h1").text("Best Probable Score. Seriously.")
+            $("#perf_long").text("We've done the math, and the odds of getting a score even higher than this are absolutely astronomically small. This is as close as you'll ever be to beating this game, but perhaps you'd like to try just one more time?");
+        }
         else {
             $(".over h1").text("Okay, I Guess")
-            $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win.");
+            $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win, but you can probably do better.");
         }
         
         $(".message_box").show();
@@ -435,6 +442,7 @@ $(document).ready(function() {
     });
     
     $(".start_button").click(function(e){start_game()});
+    $(".message_box div.over").hide();
 
     init();
     paint_experiments();
@@ -453,8 +461,9 @@ $(document).ready(function() {
                                 
                 <p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
                                 
-                <p>This is a game of chance, but not of chance alone. Good luck! <b>Ready? Set? Go!</b></p>
+                <p>This is a game of chance, but not of chance alone. Good luck!</p>
                 <p class="start_button">Click To Start</p>
+                <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
             </div>
             <div class="content over">
                 <h1>Game Over!</h1>
@@ -463,11 +472,12 @@ $(document).ready(function() {
                 
                 <p id="perf_long"></p>
                 <p class="start_button">Click To Start Again</p>
+                <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
             </div>
         </div>
     
         <div class="header">
-            <span class="bignumber">Level <span id="level"></span></span>
+            <span class="bignumber">Effect <span id="level"></span></span>
             <span class="bignumber">Score <span id="score"></span></span>
             <span class="bignumber">Visitors <span id="time"></span></span>
         </div>
