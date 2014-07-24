@@ -4,38 +4,21 @@
 // on insufficient information.
 //
 
-var CONFIDENCE_RANGES = {
-    "80"   : 1.281552,
-    "85"   : 1.439531,
-    "90"   : 1.644854,
-    "95"   : 1.959964,
-    "99"   : 2.575829,
-    "99.9" : 3.290527
-};
-
 var e, score, level, time;
 
 var Experiment = function(id) {
     this.experiment_id = id;
     this.variants = 2;
-    this.conversion_rates = [CONVERSION_RATE_A, CONVERSION_RATE_A];
-    
+    this.effect = [1,1];
     this.visits = [0,0];
     this.conversions = [0,0];
     
-    this.run_sim = function(PARTICIPANTS) {
-        for (var participant = 0; participant <= PARTICIPANTS; ++participant) {
-            var v = Math.floor(Math.random() * this.variants);
-            
-            this.visits[v]++;
-            if (Math.random() <= this.conversion_rates[v]) {
-                this.conversions[v]++;
-            }
-        }
-    };
+    this.assign_variant = function() {
+        return Math.floor(Math.random() * this.variants); }
     
-    this.reset = function() {
-        this.conversion_rates = [CONVERSION_RATE_A, CONVERSION_RATE_A];
+    this.reset = function(e) {
+        this.effect[1] = e;
+        CONVERSION_RATE_B = CONVERSION_RATE * this.effect[1];
         this.visits = [0,0];
         this.conversions = [0,0];
     }
@@ -66,7 +49,7 @@ var Experiment = function(id) {
     
     this.get_confidence_delta = function(i) {
         var p = this.get_conversion(i);
-        return CONFIDENCE_RANGES["90"] * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
+        return 1.644854 * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
     }
 
     
@@ -142,20 +125,13 @@ var Experiment = function(id) {
 };
 
 function init() {
-    // Chisquare distribution levels
-    // var GTEST_CUTOFF_90 = chisqrdistr(1, .1); // 2.7105; // This means significance at .10 
-    // var GTEST_CUTOFF_95 = chisqrdistr(1, .05); // 3.8502; // This means significance at .05
-    P_VALUE = 0.1; // $("#pval").val();
+    P_VALUE = 0.1;
     GTEST_CUTOFF = chisqrdistr(1, P_VALUE);
-
-    // Number of mock experiments to run and how many variants to include per experiment
-    EXPERIMENTS     = 10; // $("#exp").val();
+    EXPERIMENTS     = 10;
     VARIANTS        = 2;
     VISITORS_PER_DAY = 1000;
     TOTAL_VISITORS = 500000;
-
-    // Conversion rate of mock A experiments
-    CONVERSION_RATE_A = 0.05; // $("#conv").val();
+    CONVERSION_RATE = 0.05;
   
     // Initialise experiment data.
     e = new Array();
@@ -172,14 +148,12 @@ function next_round() {
     $("#score").text(score);
     $("#time").text(time.toLocaleString());
     
-    CONVERSION_RATE_B = CONVERSION_RATE_A * (Math.random() < 0.5 ? (1+1/Math.pow(2,level-1)) : (1-1/Math.pow(2,level-1)));
-    
-    // Reset experiments.
-    for (var i = 0; i < EXPERIMENTS; ++i) { e[i].reset(); }
-    
     // Pick a winner.
     winner = Math.round(Math.random()*(EXPERIMENTS-1));
-    e[winner].conversion_rates = [CONVERSION_RATE_A, CONVERSION_RATE_B];
+    effect = (Math.random() < 0.5 ? (1+1/Math.pow(2,level-1)) : (1-1/Math.pow(2,level-1)));
+    
+    // Reset experiments.
+    for (var i = 0; i < EXPERIMENTS; ++i) { e[i].reset(winner == i ? effect : 1); }
 }
 
 function choose_exp(e) {
@@ -195,6 +169,96 @@ function choose_exp(e) {
     
         next_round();
     }
+}
+
+function sim_visitor() {
+    var c = CONVERSION_RATE;
+    
+    // assign to treatment for each exp and calculate aggregate effect size.
+    var a = [];
+    for (var i = 0; i < e.length; ++i) {
+        a[i] = e[i].assign_variant();
+        c = c * e[i].effect[a[i]];
+    }
+    
+    // converted or not.
+    b = false; if (Math.random() <= c) { b = true; }
+
+    // update exps to reflect.
+    for (var i = 0; i < e.length; ++i) {
+        e[i].visits[a[i]]++;
+        if (b) e[i].conversions[a[i]]++;
+    }
+}
+
+function run_experiments() {
+    for (var i = 0; i < VISITORS_PER_DAY; ++i) { sim_visitor(); }
+}
+
+function recursive_experiment_loop() {
+    run_experiments();
+    time -= VISITORS_PER_DAY;
+    $("#time").text(time.toLocaleString());
+    for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
+    if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 100);
+    if (time <= 0) { end_game(); }
+}
+
+function paint_experiments() {
+    var c = $(".experiments"); c.empty();
+    for (var i = 0; i < e.length; ++i) { c.append(e[i].paint()); }
+    $("table").click(function(e) { choose_exp($(this).attr("id")); } );
+}
+
+function start_game() {
+    $(".message_box").hide();
+    init();
+    paint_experiments();
+    recursive_experiment_loop();
+}
+
+function end_game() {
+    $(".message_box div.intro").hide();
+    $(".message_box div.over").show();
+    $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
+    if (score > 6) {
+        $(".over h1").text("You Can See The Matrix!")
+        $("#perf_long").text("What you've achieved is statistically very improbable. You probably cheated, but you might also simply be The One. If you manage to do this a second time, we'd be very impressed.");
+    }
+    else if (level == 1) {
+        $(".over h1").text("Paradox Of Choice, hmm?")
+        $("#perf_long").text("Just remember that not making any decisions is also a choice. you might not have made any mistakes, but you've also not really added any value to the company. Perhaps you were sleeping?");
+    }
+    else if (level > 5 && score < 0) {
+        $(".over h1").text("Not Quite Worse Than Random")
+        $("#perf_long").text("Sure, you were decisive, but sometimes it is better to wait before you make a decision.");
+    }
+    else if (level > 1 && score == 0) {
+        $(".over h1").text("You Win Some, You Lose Some")
+        $("#perf_long").text("Maybe play again and stick to making good decisions only, hmkay?");
+    }
+    else if (score > 2 && score <= 4) {
+        $(".over h1").text("Great Job, No Really")
+        $("#perf_long").text("This is not an easy game. You should be proud you managed to get a positive score.");
+    }
+    else if (score == 5 && level < 7) {
+        $(".over h1").text("That's Awesome! Can You Do Better?")
+        $("#perf_long").text("This is a very good score! Looks like you made all the right choices, but perhaps you can do even better than this if you make all the right choices just a little bit faster?");
+    }
+    else if (score == 5 && level >= 7) {
+        $(".over h1").text("Easy Does It")
+        $("#perf_long").text("This is a very good score! Looks like you made a few costly mistakes along the way. Perhaps you can do better if you wait just a little bit longer when you're not quite confident you're making the right decision?");
+    }
+    else if (score == 6) {
+        $(".over h1").text("Best Probable Score. Seriously.")
+        $("#perf_long").text("We've done the math, and the odds of getting a score even higher than this are absolutely astronomically small. This is as close as you'll ever be to beating this game, but perhaps you'd like to try just one more time?");
+    }
+    else {
+        $(".over h1").text("Okay, I Guess")
+        $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win, but you can probably do better.");
+    }
+    
+    $(".message_box").show();
 }
 
 // This takes an array of arrays of any size, and calculates
@@ -238,80 +302,6 @@ function calculate_g_test (data) {
     }
 
     return g_test;
-}
-
-function run_experiments() {
-    for (var i = 0; i < e.length; ++i) {
-        e[i].run_sim(VISITORS_PER_DAY);
-    }
-}
-
-function recursive_experiment_loop() {
-    run_experiments();
-    time -= VISITORS_PER_DAY;
-    $("#time").text(time.toLocaleString());
-    for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
-    if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 100);
-    if (time <= 0) {
-        $(".message_box div.intro").hide();
-        $(".message_box div.over").show();
-        $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
-        if (score > 6) {
-            $(".over h1").text("You Can See The Matrix!")
-            $("#perf_long").text("What you've achieved is statistically very improbable. You probably cheated, but you might also simply be The One. If you manage to do this a second time, we'd be very impressed.");
-        }
-        else if (level == 1) {
-            $(".over h1").text("Paradox Of Choice, hmm?")
-            $("#perf_long").text("Just remember that not making any decisions is also a choice. you might not have made any mistakes, but you've also not really added any value to the company. Perhaps you were sleeping?");
-        }
-        else if (level > 5 && score < 0) {
-            $(".over h1").text("Not Quite Worse Than Random")
-            $("#perf_long").text("Sure, you were decisive, but sometimes it is better to wait before you make a decision.");
-        }
-        else if (level > 1 && score == 0) {
-            $(".over h1").text("You Win Some, You Lose Some")
-            $("#perf_long").text("Maybe play again and stick to making good decisions only, hmkay?");
-        }
-        else if (score > 2 && score <= 4) {
-            $(".over h1").text("Great Job, No Really")
-            $("#perf_long").text("This is not an easy game. You should be proud you managed to get a positive score.");
-        }
-        else if (score == 5 && level < 7) {
-            $(".over h1").text("That's Awesome! Can You Do Better?")
-            $("#perf_long").text("This is a very good score! Looks like you made all the right choices, but perhaps you can do even better than this if you make all the right choices just a little bit faster?");
-        }
-        else if (score == 5 && level >= 7) {
-            $(".over h1").text("Easy Does It")
-            $("#perf_long").text("This is a very good score! Looks like you made a few costly mistakes along the way. Perhaps you can do better if you wait just a little bit longer when you're not quite confident you're making the right decision?");
-        }
-        else if (score == 6) {
-            $(".over h1").text("Best Probable Score. Seriously.")
-            $("#perf_long").text("We've done the math, and the odds of getting a score even higher than this are absolutely astronomically small. This is as close as you'll ever be to beating this game, but perhaps you'd like to try just one more time?");
-        }
-        else {
-            $(".over h1").text("Okay, I Guess")
-            $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win, but you can probably do better.");
-        }
-        
-        $(".message_box").show();
-    }
-}
-
-function paint_experiments() {
-    var c = $(".experiments");
-    c.empty();
-    for (var i = 0; i < e.length; ++i) {
-        c.append(e[i].paint());
-    }
-
-    $("table").click(function(e){choose_exp($(this).attr("id"));});
-}
-
-function start_game() {
-    $(".message_box").hide();
-    init();
-    paint_experiments();
-    recursive_experiment_loop();
 }
 
 $(document).ready(function() {
