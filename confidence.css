@@ -1,0 +1,100 @@
+body {
+  font: 10px sans-serif;
+}
+
+.message_box {
+    position: absolute;
+    background-color:rgba(0, 128, 255, 0.4);
+    width: 100%;
+    height: 100%;
+    z-index:    10;
+    top:        0; 
+    left:       0; 
+    text-align: center;
+}
+
+.message_box div {
+    width: 80%;
+    height: 80%px;
+    padding: 20px;
+    background: white;
+    display: inline-block;
+    margin-top: 80px;
+    font-size: 18px;
+}
+
+p { text-align: justify; }
+
+.start_button {
+    padding: 20px;
+    background: rgba(0, 128, 255, 0.4);
+    font-weight: bold;
+    font-size: 26px;
+    text-align: center;
+}
+.start_button:hover {
+    background: rgba(0, 128, 255, 0.2);
+}
+
+.header {
+  width: 100%;
+  text-align: center;
+  bottom-padding: 10px;
+}
+
+.kpiblock {
+    width: 120px;
+    text-align: center;
+    display: inline-block;
+}
+
+.bignumber {
+    font: 40px sans-serif;
+    display: inline-block;
+    width: 300px;
+    color: gray;
+}
+.bignumber span { color: black; }
+
+.experiments {
+    text-align: center;
+}
+
+.exp_box {
+    display: inline-block;
+    font-size: 24px;
+    color: rgba(0, 128, 255, 0.8);
+    border: 1px solid rgba(0, 128, 255, 0.4);
+    margin: 6px;
+}
+
+table {
+    padding: 5px;
+    font-size: 12px;
+}
+
+table:hover {
+    background-color: #ffff99;
+}
+
+tr.header {
+    background-color: rgba(0, 128, 255, 0.2);
+}
+tr.header td {
+    padding: 10px;
+}
+
+td {
+    text-align: right;
+}
+
+table.correct { background-color: green; }
+table.incorrect { background-color: red; }
+
+.ci {
+    height: 10px;
+    display: inline-block;
+}
+.ci.left { background-color: red; }
+.ci.middle { background-color: orange; }
+.ci.right { background-color: green; }
