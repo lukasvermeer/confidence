@@ -22,36 +22,53 @@
     </head>
     <body>
         <div class="message_box">
+            <!-- A general introduction to the game. -->
             <div class="content intro">
                 <h1>So You Think You Can Test?</h1>
                 <p>Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
-                
-                <p>You will be presented with a series of ten independently simulated experiments. Only one of these is simulating a scenario where there is a difference in effect between base and variant. The other nine are so-called A/A experiments, with absolutely no difference between the two treatment groups.</p>
-                <p>Because of random fluctuations, combined with the fact that we observe the experiments as they are simulated, all ten result will seem to change over time. <b>Your job as a decision maker is to identify which of these ten experiments is <i>not</i> an A/A.</b></p>
-                                
-                <p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
-                                
-                <p>This is a game of chance, but not of chance alone. Good luck!</p>
-                <p class="start_button">Click To Start</p>
+                <p class="button arcade_mode">Arcade-mode <small>(fast-paced time-based action)</small></p>
+                <p class="button sim_mode">Simulation-mode <small>(realistic turn-based simulation)</small></p>
                 <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
             </div>
+            <!-- Game rules for Arcade-mode. -->
+            <div class="content arcade_intro">
+                <h1>Arcade-mode</h1>
+                <p>You will be presented with a series of ten independently simulated experiments. Only one of these is simulating a scenario where there is a difference in effect between base and variant. The other nine are so-called A/A experiments, with absolutely no difference between the two treatment groups.</p>
+                <p>Because of random fluctuations, combined with the fact that we observe the experiments as they are simulated, all ten result will seem to change over time. <b>Your job as a decision maker is to identify which of these ten experiments is <i>not</i> an A/A.</b></p>
+                <p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
+                <p>This is a game of chance, but not of chance alone. Good luck!</p>
+                <p class="button arcade_start">Start</p>
+            </div>
+            <!-- Game rules for Simulation-mode. -->
+            <div class="content sim_intro">
+                <h1>Simulation-mode</h1>
+                <p>Work in progress. Sorry. :-)</p>         
+                <p>This is a game of chance, but not of chance alone. Good luck!</p>
+                <p class="button sim_start">No Start</p>
+            </div>
+            <!-- End game feedback. -->
             <div class="content over">
                 <h1>Game Over!</h1>
                 <p>The game is over. Time to evaluate how well you've performed.</p>
                 <p><b id="perf_summary"></b></p>
-                
                 <p id="perf_long"></p>
-                <p class="start_button">Click To Start Again</p>
+                <p class="button reset">Click To Play Again</p>
                 <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
             </div>
         </div>
     
-        <div class="header">
+        <div class="header arcade">
             <span class="bignumber">Effect <span id="level"></span></span>
             <span class="bignumber">Score <span id="score"></span></span>
             <span class="bignumber">Visitors <span id="time"></span></span>
         </div>
-        
+
+        <div class="header sim">
+            <span class="bignumber">Day <span id="day"></span></span>
+            <span class="bignumber">Conversion <span id="conversion"></span></span>
+            <span class="bignumber">Score <span id="score"></span></span>
+        </div>
+
         <div class="experiments">
         </div>
     </body>

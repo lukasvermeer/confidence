@@ -200,7 +200,7 @@ function recursive_experiment_loop() {
     time -= VISITORS_PER_DAY;
     $("#time").text(time.toLocaleString());
     for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
-    if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 100);
+    if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 10);
     if (time <= 0) { end_game(); }
 }
 
@@ -210,15 +210,18 @@ function paint_experiments() {
     $("table").click(function(e) { choose_exp($(this).attr("id")); } );
 }
 
-function start_game() {
+function start_arcade_game() {
     $(".message_box").hide();
+    $(".sim").hide();
+    $(".arcade").show();
     init();
     paint_experiments();
     recursive_experiment_loop();
 }
 
 function end_game() {
-    $(".message_box div.intro").hide();
+    $(".message_box div").hide();
+    $(".message_box").show();
     $(".message_box div.over").show();
     $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
     if (score > 6) {
@@ -257,8 +260,6 @@ function end_game() {
         $(".over h1").text("Okay, I Guess")
         $("#perf_long").text("Keep in mind that this game is all about a trade off. You cannot win, but you can probably do better.");
     }
-    
-    $(".message_box").show();
 }
 
 // This takes an array of arrays of any size, and calculates
@@ -310,9 +311,24 @@ $(document).ready(function() {
             choose_exp(event.keyCode-48);
         }
     });
-    
-    $(".start_button").click(function(e){start_game()});
-    $(".message_box div.over").hide();
+    $(".message_box div").hide();
+    $(".message_box div.intro").show();
+
+    $(".button.arcade_mode").click(function(e){
+        $(".message_box div").hide();
+        $(".message_box div.arcade_intro").show();
+    });
+    $(".button.arcade_start").click(function(e){ start_arcade_game(); });
+    $(".button.sim_mode").click(function(e){
+        $(".message_box div").hide();
+        $(".message_box div.sim_intro").show();
+    });
+    $(".button.sim_start").click(function(e){ start_sim_game(); });
+
+    $(".button.reset").click(function(e){
+        $(".message_box div").hide();
+        $(".message_box div.intro").show();
+    });
 
     init();
     paint_experiments();

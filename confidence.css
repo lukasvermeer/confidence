@@ -19,21 +19,26 @@ body {
     padding: 20px;
     background: white;
     display: inline-block;
-    margin-top: 80px;
-    font-size: 18px;
+    margin-top: 40px;
+    font-size: 16px;
 }
 
 p { text-align: justify; }
 
-.start_button {
+.button {
     padding: 20px;
     background: rgba(0, 128, 255, 0.4);
     font-weight: bold;
     font-size: 26px;
     text-align: center;
 }
-.start_button:hover {
+.button:hover {
     background: rgba(0, 128, 255, 0.2);
+}
+
+.button small {
+    font-weight: normal;
+    color: grey;
 }
 
 .header {
