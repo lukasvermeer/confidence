@@ -4,6 +4,18 @@
 // on insufficient information.
 //
 
+P_VALUE = 0.1;
+GTEST_CUTOFF = chisqrdistr(1, P_VALUE);
+EXPERIMENTS     = 10;
+VARIANTS        = 2;
+VISITORS_PER_DAY_ARCADE = 1000;
+VISITORS_PER_DAY_SIM = 1000000;
+TOTAL_VISITORS = 500000;
+TOTAL_DAYS = 91;
+CONVERSION_RATE = 0.05;
+AVERAGE_EFFECT = -0.05;
+AVERAGE_EFFECT_STDDEV = 0.5;
+
 var e, score, level, time;
 
 var Experiment = function(id) {
@@ -62,7 +74,7 @@ var Experiment = function(id) {
             .append($(document.createElement('td')).attr('width','90px').append('Conf. Interval'))
             .append($(document.createElement('td')).append('Improvement'))
             .append($(document.createElement('td')).append('G-Test'))
-        ).attr("id", this.experiment_id);
+        );
     
         for (var i = 0; i < this.variants; i++) {
             d.append($(document.createElement('tr'))
@@ -80,8 +92,12 @@ var Experiment = function(id) {
                 .append($(document.createElement('td')).append(i == 0 ? "" : Math.round(this.get_certainty()) + "%"))
             );
         }
-        
-        var r = $(document.createElement('div')).attr('class','exp_box').append("Experiment " + this.experiment_id).append(d);
+        var o = $(document.createElement('div')).attr('class','exp_box_overlay')
+                    .append($(document.createElement('p')).append("FULL ON").attr("class","sim fo exp_button"))
+                    .append($(document.createElement('p')).append("STOP").attr("class","sim stop exp_button"))
+                    .append($(document.createElement('p')).attr("class","sim feedback"));
+                    
+        var r = $(document.createElement('div')).attr('class','exp_box').attr("id", this.experiment_id).append(o).append("Experiment " + this.experiment_id).append(d);
         
         return r;
     };
@@ -103,45 +119,28 @@ var Experiment = function(id) {
         var ci_scale = ci_pixels / (ci_max - ci_min);
         
         for (var i = 0; i < this.variants; ++i) {
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") td:nth-child(2)").text(this.visits[i].toLocaleString());
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") td:nth-child(3)").text(this.conversions[i].toLocaleString());
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") td:nth-child(4)").text((this.get_conversion(i)*100).toFixed(2) + "% \xB1" + (this.get_confidence_delta(i)*100).toFixed(2));
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") td:nth-child(2)").text(this.visits[i].toLocaleString());
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") td:nth-child(3)").text(this.conversions[i].toLocaleString());
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") td:nth-child(4)").text((this.get_conversion(i)*100).toFixed(2) + "% \xB1" + (this.get_confidence_delta(i)*100).toFixed(2));
             
             var c = this.get_conversion(i);
             var d = this.get_confidence_delta(i);
             ci_low = c - d;
             ci_high = c + d;
             
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") .ci.left_pad").width(Math.max(0,ci_low-ci_min)*ci_scale);
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") .ci.left").width(Math.max(0,Math.min(overlap_min,ci_high)-ci_low)*ci_scale);
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") .ci.middle").width(Math.max(0, overlap_max - overlap_min)*ci_scale);
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") .ci.right").width(Math.max(0,ci_high-Math.max(overlap_max,ci_low))*ci_scale);
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") .ci.right_pad").width(Math.max(0,ci_max-ci_high)*ci_scale);
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") .ci.left_pad").width(Math.max(0,ci_low-ci_min)*ci_scale);
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") .ci.left").width(Math.max(0,Math.min(overlap_min,ci_high)-ci_low)*ci_scale);
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") .ci.middle").width(Math.max(0, overlap_max - overlap_min)*ci_scale);
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") .ci.right").width(Math.max(0,ci_high-Math.max(overlap_max,ci_low))*ci_scale);
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") .ci.right_pad").width(Math.max(0,ci_max-ci_high)*ci_scale);
             
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") td:nth-child(6)").text(i == 0 ? "" : ((this.get_conversion(i)/this.get_conversion(0)-1)*100).toFixed(2) + "%");
-            $("#"+this.experiment_id+" tr:nth-child("+(i+2)+") td:nth-child(7)").text(i == 0 ? "" : Math.round(this.get_certainty()) + "%");          
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") td:nth-child(6)").text(i == 0 ? "" : ((this.get_conversion(i)/this.get_conversion(0)-1)*100).toFixed(2) + "%");
+            $("#"+this.experiment_id+" table tr:nth-child("+(i+2)+") td:nth-child(7)").text(i == 0 ? "" : Math.round(this.get_certainty()) + "%");          
         }
     }
 };
 
-function init() {
-    P_VALUE = 0.1;
-    GTEST_CUTOFF = chisqrdistr(1, P_VALUE);
-    EXPERIMENTS     = 10;
-    VARIANTS        = 2;
-    VISITORS_PER_DAY = 1000;
-    TOTAL_VISITORS = 500000;
-    CONVERSION_RATE = 0.05;
-  
-    // Initialise experiment data.
-    e = new Array();
-    for (var i = 0; i < EXPERIMENTS; ++i) { e[i] = new Experiment(i); }
-    
-    score = 0; level = 0; time = TOTAL_VISITORS;
-    next_round();
-}
-
-function next_round() {
+function next_round_arcade() {
     level++;
     
     $("#level").text((1/Math.pow(2,level-1)*100).toFixed(2) + "%");
@@ -156,23 +155,22 @@ function next_round() {
     for (var i = 0; i < EXPERIMENTS; ++i) { e[i].reset(winner == i ? effect : 1); }
 }
 
-function choose_exp(e) {
-    if (time > 0) {
-        if(winner==e) { 
-            $("#"+winner).switchClass("", "correct", 100).switchClass( "correct", "", 100 );;
-            score++; 
-        } 
-        else {
-            $("#"+winner).switchClass("", "incorrect", 100).switchClass( "incorrect", "", 100 );;
-            score--;
-        }
+function next_round_sim() {
+    run_experiments(VISITORS_PER_DAY_SIM);
+    day--;
     
-        next_round();
-    }
+    $("#conversion").text((conversion*100).toFixed(2) + "%");
+    $("#conversions").text(conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.'));
+    $("#day").text(day);
+    
+    for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
+    
+    $(".exp_box_overlay .exp_button").show()
+    $(".exp_box_overlay .feedback").hide()
 }
 
 function sim_visitor() {
-    var c = CONVERSION_RATE;
+    var c = conversion;
     
     // assign to treatment for each exp and calculate aggregate effect size.
     var a = [];
@@ -182,7 +180,7 @@ function sim_visitor() {
     }
     
     // converted or not.
-    b = false; if (Math.random() <= c) { b = true; }
+    b = false; if (Math.random() <= c) { b = true; conversions++; }
 
     // update exps to reflect.
     for (var i = 0; i < e.length; ++i) {
@@ -191,13 +189,13 @@ function sim_visitor() {
     }
 }
 
-function run_experiments() {
-    for (var i = 0; i < VISITORS_PER_DAY; ++i) { sim_visitor(); }
+function run_experiments(v) {
+    for (var i = 0; i < v; ++i) { sim_visitor(); }
 }
 
 function recursive_experiment_loop() {
-    run_experiments();
-    time -= VISITORS_PER_DAY;
+    run_experiments(VISITORS_PER_DAY_ARCADE);
+    time -= VISITORS_PER_DAY_ARCADE;
     $("#time").text(time.toLocaleString());
     for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
     if (time > 0) timeoutID = window.setTimeout(recursive_experiment_loop, 10);
@@ -207,20 +205,75 @@ function recursive_experiment_loop() {
 function paint_experiments() {
     var c = $(".experiments"); c.empty();
     for (var i = 0; i < e.length; ++i) { c.append(e[i].paint()); }
-    $("table").click(function(e) { choose_exp($(this).attr("id")); } );
+    $(".exp_box_overlay").click(function(e) { choose_exp($(this).parent().attr("id")); } );
+    $(".exp_box_overlay .fo").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), true); } );
+    $(".exp_box_overlay .stop").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), false); } );
 }
 
 function start_arcade_game() {
     $(".message_box").hide();
+    $(".exp_box_overlay").show();
     $(".sim").hide();
     $(".arcade").show();
-    init();
-    paint_experiments();
+
+    // Initialise experiment data.
+    e = new Array();
+    for (var i = 0; i < EXPERIMENTS; ++i) { e[i] = new Experiment(i); }
+    score = 0; level = 0; time = TOTAL_VISITORS; conversion = CONVERSION_RATE;
+    
+    next_round_arcade();
+    paint_experiments(); 
+    $(".sim").hide(); // extra hide because repaint. ugly. :-/
     recursive_experiment_loop();
+}
+
+function start_sim_game() {
+    $(".message_box").hide();
+    $(".exp_box_overlay").show();
+    $(".sim").show();
+    $(".arcade").hide();
+
+    // Initialise experiment data.
+    e = new Array();
+    for (var i = 0; i < EXPERIMENTS; ++i) { e[i] = new Experiment(i); }
+    for (var i = 0; i < EXPERIMENTS; ++i) { e[i].reset(1 + (normRand() * AVERAGE_EFFECT_STDDEV + AVERAGE_EFFECT) / 100); }
+
+    conversions = 0; day = TOTAL_DAYS; conversion = CONVERSION_RATE;
+
+    paint_experiments();
+    next_round_sim();
+}
+
+function choose_exp(e) {
+    if (time > 0) {
+        if(winner==e) { 
+            $("#"+winner+" .exp_box_overlay").switchClass("", "correct", 100).switchClass( "correct", "", 250 );;
+            score++; 
+        } 
+        else {
+            $("#"+winner+" .exp_box_overlay").switchClass("", "incorrect", 100).switchClass( "incorrect", "", 250 );;
+            score--;
+        }
+    
+        next_round_arcade();
+    }
+}
+
+function sim_choose_exp(exp, fullon) {
+    // apply change to conversion
+    if (fullon) { conversion = e[exp].effect[1] * conversion; }
+    $("#conversion").text((conversion*100).toFixed(2) + "%");
+    // block for remainder of the round
+    $("#"+exp+" .exp_box_overlay .exp_button").hide()
+    // provide more feedback
+    $("#"+exp+" .exp_box_overlay .feedback").show().html("You decided to "+ (fullon ? "put full on" : "stop")+" this experiment.<br />The real effect of this experiment was "+((e[exp].effect[1]-1)*100).toFixed(2)+"%.");
+    // reset experiment
+    e[exp].reset(1 + (normRand() * AVERAGE_EFFECT_STDDEV + AVERAGE_EFFECT) / 100);
 }
 
 function end_game() {
     $(".message_box div").hide();
+    $(".exp_box_overlay").hide();
     $(".message_box").show();
     $(".message_box div.over").show();
     $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
@@ -305,12 +358,30 @@ function calculate_g_test (data) {
     return g_test;
 }
 
+// Returns normally distributed random numbers
+function normRand() {
+    var x1, x2, rad;
+ 
+    do {
+        x1 = 2 * Math.random() - 1;
+        x2 = 2 * Math.random() - 1;
+        rad = x1 * x1 + x2 * x2;
+    } while(rad >= 1 || rad == 0);
+ 
+    var c = Math.sqrt(-2 * Math.log(rad) / rad);
+ 
+    return x1 * c;
+};
+
 $(document).ready(function() {
     document.addEventListener('keydown', function(event) {
         if(event.keyCode >= 48 && event.keyCode <= 57) {
             choose_exp(event.keyCode-48);
         }
     });
+    $(".sim").hide();
+    $(".arcade").hide();
+
     $(".message_box div").hide();
     $(".message_box div.intro").show();
 
@@ -330,6 +401,9 @@ $(document).ready(function() {
         $(".message_box div.intro").show();
     });
 
-    init();
-    paint_experiments();
+    $(".button.next.sim").click(function(e){
+        next_round_sim();
+    });
+    
+    //start_sim_game();
 });

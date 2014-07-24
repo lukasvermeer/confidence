@@ -26,20 +26,47 @@ body {
 p { text-align: justify; }
 
 .button {
-    padding: 20px;
+    padding: 15px;
     background: rgba(0, 128, 255, 0.4);
     font-weight: bold;
-    font-size: 26px;
+    font-size: 22px;
     text-align: center;
 }
 .button:hover {
     background: rgba(0, 128, 255, 0.2);
 }
-
 .button small {
     font-weight: normal;
     color: grey;
 }
+
+.exp_button {
+    padding: 5px;
+    margin: 7px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    color: white;
+}
+.exp_button.fo {
+    background: green;
+}
+.exp_button.stop {
+    background: red;
+}
+.exp_button:hover {
+    opacity: 0.8;
+}
+
+.feedback {
+    padding: 5px;
+    margin: 7px;
+    font-size: 23px;
+    text-align: center;
+    color: white;
+    background: black;
+}
+
 
 .header {
   width: 100%;
@@ -54,9 +81,9 @@ p { text-align: justify; }
 }
 
 .bignumber {
-    font: 40px sans-serif;
+    font: 30px sans-serif;
     display: inline-block;
-    width: 300px;
+    width: 400px;
     color: gray;
 }
 .bignumber span { color: black; }
@@ -67,10 +94,26 @@ p { text-align: justify; }
 
 .exp_box {
     display: inline-block;
+    position: relative;
     font-size: 24px;
     color: rgba(0, 128, 255, 0.8);
     border: 1px solid rgba(0, 128, 255, 0.4);
-    margin: 6px;
+    margin: 3px;
+}
+
+.exp_box_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background-color:rgba(0, 128, 255, 0.2);
+}
+.exp_box_overlay:hover {
+    opacity: 1;
 }
 
 table {
@@ -93,8 +136,10 @@ td {
     text-align: right;
 }
 
-table.correct { background-color: green; }
-table.incorrect { background-color: red; }
+.correct { background-color: green; opacity: 1; }
+.correct:hover { background-color: green; opacity: 1; }
+.incorrect { background-color: red; opacity: 1; }
+.incorrect:hover { background-color: red; opacity: 1; }
 
 .ci {
     height: 10px;
