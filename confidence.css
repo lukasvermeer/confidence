@@ -95,7 +95,7 @@ p { text-align: justify; }
 .exp_box {
     display: inline-block;
     position: relative;
-    font-size: 24px;
+    font-size: 18px;
     color: rgba(0, 128, 255, 0.8);
     border: 1px solid rgba(0, 128, 255, 0.4);
     margin: 3px;
@@ -127,6 +127,13 @@ p { text-align: justify; }
     background-color:rgba(0, 128, 255, 0.8);
 }
 
+.runtime {
+    font-size: small;
+    vertical-align: middle;
+    color: black;
+    --padding: 10px;
+}
+
 table {
     padding: 5px;
     font-size: 12px;
@@ -137,6 +144,8 @@ tr.header {
 }
 tr.header td {
     padding: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 td {
@@ -157,3 +166,44 @@ td {
 .ci.middle { background-color: orange; }
 .ci.right.base { background-color: orange; }
 .ci.right:not(.base) { background-color: green; }
+
+.waiting {
+    position: absolute;
+    background-color:rgba(128, 128, 128, 0.8);
+    width: 100%;
+    height: 100%;
+    z-index:    100;
+    top:        0;
+    left:       0;
+    text-align: center;
+    cursor: wait;
+    color: white;
+    font-size: xx-large;
+    display: table;
+}
+.waiting span {
+  display: table-cell; 
+  vertical-align: middle; 
+  text-align: center; 
+}
+
+.wham {
+    position: absolute;
+    background-color:rgba(128, 128, 128, 0.8);
+    width: 100%;
+    height: 100%;
+    z-index:    100;
+    top:        0;
+    left:       0;
+    text-align: center;
+    font-weight: bold;
+    line-height: 90%;
+    color: white;
+    font-size: 200px;
+    display: table;
+}
+.wham span {
+  display: table-cell; 
+  vertical-align: middle; 
+  text-align: center; 
+}
