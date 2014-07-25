@@ -152,6 +152,8 @@ td {
     height: 10px;
     display: inline-block;
 }
-.ci.left { background-color: red; }
+.ci.left.base { background-color: orange; }
+.ci.left:not(.base) { background-color: red; }
 .ci.middle { background-color: orange; }
-.ci.right { background-color: green; }
+.ci.right.base { background-color: orange; }
+.ci.right:not(.base) { background-color: green; }
