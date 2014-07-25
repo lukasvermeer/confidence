@@ -101,7 +101,7 @@ p { text-align: justify; }
     margin: 3px;
 }
 
-.exp_box_overlay {
+.exp_box_hoverlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -112,17 +112,24 @@ p { text-align: justify; }
     height: 100%;
     background-color:rgba(0, 128, 255, 0.2);
 }
-.exp_box_overlay:hover {
+.exp_box_hoverlay:hover {
     opacity: 1;
+}
+
+.exp_box_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background-color:rgba(0, 128, 255, 0.8);
 }
 
 table {
     padding: 5px;
     font-size: 12px;
-}
-
-table:hover {
-    background-color: #ffff99;
 }
 
 tr.header {

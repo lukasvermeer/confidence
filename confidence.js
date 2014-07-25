@@ -15,6 +15,7 @@ TOTAL_DAYS = 91;
 CONVERSION_RATE = 0.05;
 AVERAGE_EFFECT = -0.05;
 AVERAGE_EFFECT_STDDEV = 0.5;
+DEV_CAPACITY = 1;
 
 var e, score, level, time;
 
@@ -24,11 +25,19 @@ var Experiment = function(id) {
     this.effect = [1,1];
     this.visits = [0,0];
     this.conversions = [0,0];
+    this.active = false;
     
     this.assign_variant = function() {
-        return Math.floor(Math.random() * this.variants); }
+        if (!this.active) return 0;
+        return Math.floor(Math.random() * this.variants);
+    }
+    
+    this.end_experiment = function() {
+        this.active = false;
+    }
     
     this.reset = function(e) {
+        this.active = true;
         this.effect[1] = e;
         CONVERSION_RATE_B = CONVERSION_RATE * this.effect[1];
         this.visits = [0,0];
@@ -92,12 +101,15 @@ var Experiment = function(id) {
                 .append($(document.createElement('td')).append(i == 0 ? "" : Math.round(this.get_certainty()) + "%"))
             );
         }
-        var o = $(document.createElement('div')).attr('class','exp_box_overlay')
+        var h = $(document.createElement('div')).attr('class','exp_box_hoverlay')
                     .append($(document.createElement('p')).append("FULL ON").attr("class","sim fo exp_button"))
-                    .append($(document.createElement('p')).append("STOP").attr("class","sim stop exp_button"))
+                    .append($(document.createElement('p')).append("STOP").attr("class","sim stop exp_button"));
+
+        var o = $(document.createElement('div')).attr('class','exp_box_overlay sim')
                     .append($(document.createElement('p')).attr("class","sim feedback"));
+
                     
-        var r = $(document.createElement('div')).attr('class','exp_box').attr("id", this.experiment_id).append(o).append("Experiment " + this.experiment_id).append(d);
+        var r = $(document.createElement('div')).attr('class','exp_box').attr("id", this.experiment_id).append(h).append(o).append("Experiment " + this.experiment_id).append(d);
         
         return r;
     };
@@ -163,10 +175,13 @@ function next_round_sim() {
     $("#conversions").text(conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.'));
     $("#day").text(day);
     
-    for (var i = 0; i < e.length; ++i) { e[i].paint_update(); }
-    
-    $(".exp_box_overlay .exp_button").show()
-    $(".exp_box_overlay .feedback").hide()
+    for (var i = 0; i < e.length; ++i) { 
+        if (e[i].active) {
+            e[i].paint_update(); 
+            $("#"+i+" .exp_box_overlay").hide()
+            $("#"+i+" .exp_box_hoverlay").show()
+        }
+    }
 }
 
 function sim_visitor() {
@@ -184,8 +199,10 @@ function sim_visitor() {
 
     // update exps to reflect.
     for (var i = 0; i < e.length; ++i) {
-        e[i].visits[a[i]]++;
-        if (b) e[i].conversions[a[i]]++;
+        if (e[i].active) {
+            e[i].visits[a[i]]++;
+            if (b) e[i].conversions[a[i]]++;
+        }
     }
 }
 
@@ -205,14 +222,14 @@ function recursive_experiment_loop() {
 function paint_experiments() {
     var c = $(".experiments"); c.empty();
     for (var i = 0; i < e.length; ++i) { c.append(e[i].paint()); }
-    $(".exp_box_overlay").click(function(e) { choose_exp($(this).parent().attr("id")); } );
-    $(".exp_box_overlay .fo").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), true); } );
-    $(".exp_box_overlay .stop").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), false); } );
+    $(".exp_box_hoverlay").click(function(e) { choose_exp($(this).parent().attr("id")); } );
+    $(".exp_box_hoverlay .fo").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), true); } );
+    $(".exp_box_hoverlay .stop").click(function(e) { sim_choose_exp($(this).parent().parent().attr("id"), false); } );
 }
 
 function start_arcade_game() {
     $(".message_box").hide();
-    $(".exp_box_overlay").show();
+    $(".exp_box_hoverlay").show();
     $(".sim").hide();
     $(".arcade").show();
 
@@ -229,7 +246,7 @@ function start_arcade_game() {
 
 function start_sim_game() {
     $(".message_box").hide();
-    $(".exp_box_overlay").show();
+    $(".exp_box_hoverlay").show();
     $(".sim").show();
     $(".arcade").hide();
 
@@ -247,11 +264,11 @@ function start_sim_game() {
 function choose_exp(e) {
     if (time > 0) {
         if(winner==e) { 
-            $("#"+winner+" .exp_box_overlay").switchClass("", "correct", 100).switchClass( "correct", "", 250 );;
+            $("#"+winner+" .exp_box_hoverlay").switchClass("", "correct", 100).switchClass( "correct", "", 250 );;
             score++; 
         } 
         else {
-            $("#"+winner+" .exp_box_overlay").switchClass("", "incorrect", 100).switchClass( "incorrect", "", 250 );;
+            $("#"+winner+" .exp_box_hoverlay").switchClass("", "incorrect", 100).switchClass( "incorrect", "", 250 );;
             score--;
         }
     
@@ -264,16 +281,19 @@ function sim_choose_exp(exp, fullon) {
     if (fullon) { conversion = e[exp].effect[1] * conversion; }
     $("#conversion").text((conversion*100).toFixed(2) + "%");
     // block for remainder of the round
-    $("#"+exp+" .exp_box_overlay .exp_button").hide()
+    $("#"+exp+" .exp_box_hoverlay").hide()
     // provide more feedback
+    $("#"+exp+" .exp_box_overlay").show()
     $("#"+exp+" .exp_box_overlay .feedback").show().html("You decided to "+ (fullon ? "put full on" : "stop")+" this experiment.<br />The real effect of this experiment was "+((e[exp].effect[1]-1)*100).toFixed(2)+"%.");
     // reset experiment
-    e[exp].reset(1 + (normRand() * AVERAGE_EFFECT_STDDEV + AVERAGE_EFFECT) / 100);
+    e[exp].end_experiment();
+    //e[exp].reset(1 + (normRand() * AVERAGE_EFFECT_STDDEV + AVERAGE_EFFECT) / 100);
 }
 
 function end_game() {
     $(".message_box div").hide();
     $(".exp_box_overlay").hide();
+    $(".exp_box_hoverlay").hide();
     $(".message_box").show();
     $(".message_box div.over").show();
     $("#perf_summary").text("You made " + (level-1) + " decisions and scored a total of " + score + " points." + (score>4?" That's awesome!":""));
