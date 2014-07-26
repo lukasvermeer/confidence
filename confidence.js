@@ -322,13 +322,13 @@ function sim_choose_exp(exp, fullon) {
     else if (!fullon && e[exp].days > 1) {
         $('.fatality').show('scale', { percent: 100 }, 300).fadeOut();
     }
-    if (fullon && e[exp].effect[1] < 1) {
+    if (fullon && e[exp].get_conversion(1) < e[exp].get_conversion(0) && e[exp].is_significant()) {
         $('.hurting').show('scale', { percent: 100 }, 300).fadeOut();
     }
-    else if (fullon && !e[exp].is_significant()) {
+    else if (fullon && e[exp].get_conversion(1) > e[exp].get_conversion(0) && !e[exp].is_significant()) {
         $('.just_under_conclusivity').show('scale', { percent: 100 }, 300).fadeOut();
     }
-    else if (fullon && e[exp].is_significant() && e[exp].effect[1] <= 1) {
+    else if (fullon && e[exp].get_conversion(1) > e[exp].get_conversion(0) && e[exp].is_significant() && e[exp].effect[1] <= 1) {
         $('.false_positive').show('scale', { percent: 100 }, 300).fadeOut();
     }
 }
