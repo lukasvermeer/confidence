@@ -237,49 +237,6 @@ function end_game() {
     }
 }
 
-// This takes an array of arrays of any size, and calculates
-// the raw g-test value.  It assumes a square matrix of arguments.
-function calculate_g_test (data) {
-    var rows = data.length;
-    var columns = data[0].length;
-
-    // Initialize our subtotals
-    var row_totals = [];
-    for (var i = 0; i < rows; i++) {
-        row_totals[i] = 0;
-    }
-
-    var column_totals = [];
-    for (var j = 0; j < columns; j++) {
-        column_totals[j] = 0;
-    }
-
-    var total = 0;
-
-    // First we calculate the totals for the row and the column
-    for (var i = 0; i < rows; i++) {
-        for (var j = 0; j < columns; j++) {
-            var entry = data[i][j] - 0;  // - 0 ensures numeric
-            row_totals[i]    += entry;
-            column_totals[j] += entry;
-            total            += entry;
-        }
-    }
-
-    // Now we calculate the g-test contribution from each entry.
-    var g_test = 0;;
-    for (var i = 0; i < rows; i++) {
-        for (var j = 0; j < columns; j++) {
-            var expected = row_totals[i] * column_totals[j] / total;
-            var seen     = data[i][j];
-
-            g_test      += 2 * seen * Math.log( seen / expected );
-        }
-    }
-
-    return g_test;
-}
-
 // Returns normally distributed random numbers
 function normRand() {
     var x1, x2, rad;
