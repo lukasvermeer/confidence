@@ -89,11 +89,10 @@ var Experiment = function(id) {
         var o = $('<div>').attr('class','exp_box_overlay sim')
                     .append($('<p>').attr('class','sim feedback'));
 
-                    
         var r = $('<div>').attr('class','exp_box').attr('id', this.experiment_id)
                     .append(h)
                     .append(o)
-                    .append('Experiment ' + this.experiment_id)
+                    .append($('<span>').attr('class','exp_name').text('Experiment ' + this.experiment_id))
                     .append($('<div>').attr('class','sim runtime'))
                     .append(d);
         

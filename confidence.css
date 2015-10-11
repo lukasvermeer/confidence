@@ -95,11 +95,14 @@ p { text-align: justify; }
 .exp_box {
     display: inline-block;
     position: relative;
-    font-size: 18px;
-    color: rgba(0, 128, 255, 0.8);
     border: 1px solid rgba(0, 128, 255, 0.4);
     margin: 3px;
 }
+
+.exp_name {
+    font-size: 18px;
+    color: rgba(0, 128, 255, 0.8);
+}   
 
 .exp_box_hoverlay {
     position: absolute;
