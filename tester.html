@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>AB Result Display Scratchpad</title>
+        <link rel="stylesheet" type="text/css" href="confidence.css">
+        <script src="jquery-1.9.1.min.js"></script>
+        <script src="jquery-ui.min.js"></script>
+        <script src="statistics-distributions.js"></script>
+        <script src="experiment.js"></script>
+        <script src="tester.js"></script>
+        <style>
+            .sim { display: none; }
+            .exp_name { display: none; }
+            .exp_box_hoverlay { display: none; }
+        </style>
+    </head>
+    <body>
+        <h1 class="experiments">AB Result Display Scratchpad</h1>
+        <!-- <p>Generate a random result, or use the text fields to alter the parameters to meet your own use case.</p> -->
+        <p class="experiments">
+            B traffic <input id="base_traffic" value="10000"/> 
+            B conversions <input id="base_conversions" value="500"/>
+        </p>
+        <p class="experiments">
+            V traffic <input id="var_traffic" value="10000"/> 
+            V conversions <input id="var_conversions" value="560"/>
+        </p>
+        <div class="experiments" id="experiment"></div>
+    </body>
+</html>
