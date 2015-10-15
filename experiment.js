@@ -29,10 +29,18 @@ var Experiment = function(id) {
         return this.conversions[i]/this.visits[i];
     }
 
+    this.get_lift = function(i) {
+        return this.get_conversion(i) - this.get_conversion(0);
+    }
+
+    this.get_relative_lift = function(i) {
+        return this.get_conversion(i) / this.get_conversion(0) - 1;
+    }
+
     this.get_g_test = function() {
         var data_all = [];
         for (var i = 0; i < this.variants; i++) {
-            data_all.push( [this.visits[i], this.conversions[i]] );
+            data_all.push( [this.visits[i]-this.conversions[i], this.conversions[i]] );
         }
         return calculate_g_test(data_all);
     };
@@ -48,10 +56,20 @@ var Experiment = function(id) {
     this.get_certainty = function() {
         return round_to_precision( 100 * (1-this.get_p()), 2);
     };
-    
+
     this.get_confidence_delta = function(i) {
         var p = this.get_conversion(i);
         return 1.644854 * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
+    }
+
+    this.get_lift_confidence_delta = function(i) {
+        var p = this.get_conversion(i);
+        var q = this.get_conversion(0);
+        return 1.644854 * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
+    }
+
+    this.get_relative_lift_confidence_delta = function(i) {
+        return this.get_lift_confidence_delta(i) * this.get_relative_lift(i) / this.get_lift(i);
     }
 
     
@@ -78,7 +96,7 @@ var Experiment = function(id) {
                     .append($('<div>').attr('class','ci middle').attr('width','20px'))
                     .append($('<div>').attr('class','ci right '+(i == 0 ? 'base' : '')))
                     .append($('<div>').attr('class','ci right_pad')))
-                .append($('<td>').append(i == 0 ? '' : ((this.get_conversion(i)/this.get_conversion(0)-1)*100).toFixed(2) + '%'))
+                .append($('<td>').append(i == 0 ? '' : (this.get_lift(i)).toFixed(2) + '%'))
                 .append($('<td>').append(i == 0 ? '' : Math.round(this.get_certainty()) + '%'))
             );
         }
@@ -131,8 +149,8 @@ var Experiment = function(id) {
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right').width(Math.max(0,ci_high-Math.max(overlap_max,ci_low))*ci_scale);
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right_pad').width(Math.max(0,ci_max-ci_high)*ci_scale);
             
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(6)').text(i == 0 ? '' : ((this.get_conversion(i)/this.get_conversion(0)-1)*100).toFixed(2) + '%');
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(7)').text(i == 0 ? '' : Math.round(this.get_certainty()) + '%');          
+            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(6)').text(i == 0 ? '' : (this.get_relative_lift(i)*100).toFixed(2) + '% \xB1' + (this.get_relative_lift_confidence_delta(i)*100).toFixed(2));
+            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(7)').text(i == 0 ? '' : Math.round(this.get_certainty()) + '%');
         }
         $('#'+this.experiment_id+' .runtime').text('runtime: ' + this.days + ' days.');
     }
