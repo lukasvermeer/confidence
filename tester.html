@@ -6,7 +6,7 @@
         <script src="jquery/jquery-ui.min.js"></script>
         <script src="statistics-distributions.js"></script>
         <script src="experiment.js"></script>
-        <script src="tester.js"></script>
+        <script type="text/javascript" src="vue/vue.js"></script>
         <style>
             .sim { display: none; }
             .exp_name { display: none; }
@@ -14,16 +14,51 @@
         </style>
     </head>
     <body>
-        <h1 class="experiments">AB Result Display Scratchpad</h1>
-        <!-- <p>Generate a random result, or use the text fields to alter the parameters to meet your own use case.</p> -->
-        <p class="experiments">
-            B traffic <input id="base_traffic" value="10000"/> 
-            B conversions <input id="base_conversions" value="500"/>
-        </p>
-        <p class="experiments">
-            V traffic <input id="var_traffic" value="10000"/> 
-            V conversions <input id="var_conversions" value="560"/>
-        </p>
-        <div class="experiments" id="experiment"></div>
+    	<div id="app-tester">
+			<h1 class="experiments">AB Result Display Scratchpad</h1>
+
+			<p class="experiments">
+				B traffic <input v-model="b.traffic"/> 
+				B conversions <input v-model="b.conversions"/>
+			</p>
+			<p class="experiments">
+				V traffic <input v-model="v.traffic"/> 
+				V conversions <input v-model="v.conversions"/>
+			</p>
+
+			<div class="experiments" id="experiment"></div>
+		</div>
+
+        <script type="text/javascript">
+			tester = new Vue({
+				el: '#app-tester',
+				data: {
+					b: { traffic: 10000, conversions: 500 },
+					v: { traffic: 10000, conversions: 560 },
+				},
+				mounted: function() {
+					this.show_results();
+				},
+				computed: {
+					experiment: function() {
+						e = new Experiment(0);
+						e.visits = [this.b.traffic, this.v.traffic];
+						e.conversions = [this.b.conversions, this.v.conversions];
+						return e;
+					}
+				},
+				methods: {
+					show_results: function() {
+						$("#experiment").empty().append(this.experiment.paint());
+						this.experiment.paint_update();
+					}
+				},
+				watch: {
+					experiment: function(val) {
+						this.show_results();
+					}
+				}
+			});
+		</script>
     </body>
 </html>
