@@ -75,13 +75,13 @@ var Experiment = function(id) {
     
     this.paint = function() {
         var d = $('<table>').append($('<tr>').attr('class','header')
-            .append($('<td>').append('Variant'))
+            .append($('<td>').append(''))
             .append($('<td>').append('Visitors'))
             .append($('<td>').append('Conversions'))
-            .append($('<td>').append('Conversion'))
+            .append($('<td>').append('Rate'))
             .append($('<td>').attr('width','90px').append('Conf. Interval'))
-            .append($('<td>').append('Improvement'))
-            .append($('<td>').append('G-Test'))
+            .append($('<td>').append('Change'))
+            .append($('<td>').append('Significance'))
         );
     
         for (var i = 0; i < this.variants; i++) {
@@ -136,7 +136,7 @@ var Experiment = function(id) {
         for (var i = 0; i < this.variants; ++i) {
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(2)').text(this.visits[i].toLocaleString());
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(3)').text(this.conversions[i].toLocaleString());
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(4)').text((this.get_conversion(i)*100).toFixed(2) + '% \xB1' + (this.get_confidence_delta(i)*100).toFixed(2));
+            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(4)').html((this.get_conversion(i)*100).toFixed(2) + '% <span class="muted">\xB1' + (this.get_confidence_delta(i)*100).toFixed(2) + '</span>');
             
             var c = this.get_conversion(i);
             var d = this.get_confidence_delta(i);
@@ -149,7 +149,7 @@ var Experiment = function(id) {
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right').width(Math.max(0,ci_high-Math.max(overlap_max,ci_low))*ci_scale);
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right_pad').width(Math.max(0,ci_max-ci_high)*ci_scale);
             
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(6)').text(i == 0 ? '' : (this.get_relative_lift(i)*100).toFixed(2) + '% \xB1' + (this.get_relative_lift_confidence_delta(i)*100).toFixed(2));
+            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(6)').html(i == 0 ? '' : (this.get_relative_lift(i)*100).toFixed(2) + '% <span class="muted">\xB1' + (this.get_relative_lift_confidence_delta(i)*100).toFixed(2) + '</span>');
             $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(7)').text(i == 0 ? '' : Math.round(this.get_certainty()) + '%');
         }
         $('#'+this.experiment_id+' .runtime').text('runtime: ' + this.days + ' days.');

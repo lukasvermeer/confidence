@@ -24,6 +24,7 @@ body {
 }
 
 p { text-align: justify; }
+.muted { color: grey; }
 
 .button {
     padding: 15px;
@@ -95,7 +96,7 @@ p { text-align: justify; }
 .exp_box {
     display: inline-block;
     position: relative;
-    border: 1px solid rgba(0, 128, 255, 0.4);
+    border: 1px solid rgba(128, 128, 128, 0.4);
     margin: 3px;
 }
 
@@ -143,12 +144,11 @@ table {
 }
 
 tr.header {
-    background-color: rgba(0, 128, 255, 0.2);
+    background-color: rgba(128, 128, 128, 0.2);
 }
 tr.header td {
-    padding: 10px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding: 4px;
+	width: 100px;
 }
 
 td {
