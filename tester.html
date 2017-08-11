@@ -24,8 +24,6 @@
 				V traffic <input v-model="v.traffic" type="number"/> 
 				V conversions <input v-model="v.conversions" type="number"/>
 			</p>
-
-			<div class="experiments" id="experiment"></div>
 			
 			<p class="experiments">
 				<experiment :e="experiment"></experiment>
@@ -39,9 +37,6 @@
 					b: { traffic: 10000, conversions: 500 },
 					v: { traffic: 10000, conversions: 560 },
 				},
-				mounted: function() {
-					this.show_results();
-				},
 				computed: {
 					experiment: function() {
 						e = new Experiment(0);
@@ -50,17 +45,6 @@
 						return e;
 					}
 				},
-				methods: {
-					show_results: function() {
-						$("#experiment").empty().append(this.experiment.paint());
-						this.experiment.paint_update();
-					}
-				},
-				watch: {
-					experiment: function(val) {
-						this.show_results();
-					}
-				}
 			});
 		</script>
     </body>
