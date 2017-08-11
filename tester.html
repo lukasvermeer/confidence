@@ -2,10 +2,10 @@
     <head>
         <title>AB Result Display Scratchpad</title>
         <link rel="stylesheet" type="text/css" href="confidence.css">
-        <script src="jquery/jquery-1.9.1.min.js"></script>
-        <script src="statistics-distributions.js"></script>
-        <script src="experiment.js"></script>
+        <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
         <script type="text/javascript" src="vue/vue.js"></script>
+        <script type="text/javascript" src="statistics-distributions.js"></script>
+        <script type="text/javascript" src="experiment.js"></script>
         <style>
             .sim { display: none; }
             .exp_name { display: none; }
@@ -17,15 +17,19 @@
 			<h1 class="experiments">AB Result Display Scratchpad</h1>
 
 			<p class="experiments">
-				B traffic <input v-model="b.traffic"/> 
-				B conversions <input v-model="b.conversions"/>
+				B traffic <input v-model="b.traffic" type="number"/> 
+				B conversions <input v-model="b.conversions" type="number"/>
 			</p>
 			<p class="experiments">
-				V traffic <input v-model="v.traffic"/> 
-				V conversions <input v-model="v.conversions"/>
+				V traffic <input v-model="v.traffic" type="number"/> 
+				V conversions <input v-model="v.conversions" type="number"/>
 			</p>
 
 			<div class="experiments" id="experiment"></div>
+			
+			<p class="experiments">
+				<experiment :e="experiment"></experiment>
+			</p>
 		</div>
 
         <script type="text/javascript">
@@ -41,8 +45,8 @@
 				computed: {
 					experiment: function() {
 						e = new Experiment(0);
-						e.visits = [this.b.traffic, this.v.traffic];
-						e.conversions = [this.b.conversions, this.v.conversions];
+						e.visits = [parseInt(this.b.traffic), parseInt(this.v.traffic)];
+						e.conversions = [parseInt(this.b.conversions), parseInt(this.v.conversions)];
 						return e;
 					}
 				},

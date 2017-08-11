@@ -198,3 +198,43 @@ function calculate_g_test (data) {
 
     return g_test;
 };
+
+Vue.component('experiment', {
+	template: `
+		<div class="exp_box" :id="e.experiment_id">
+			<div class="exp_box_hoverlay">
+				<p class="sim fo exp_button">FULL ON</p>
+				<p class="sim stop exp_button">STOP</p>
+			</div>
+			<div class="exp_box_overlay sim">
+				<p class="sim feedback"></p>
+			</div>
+			<span class="exp_name">Experiment 0</span>
+			<div class="sim runtime">runtime: {{ e.days }} days.</div>
+			<table>
+				<tbody>
+					<tr class="header">
+						<td></td>
+						<td>Visitors</td>
+						<td>Conversions</td>
+						<td>Rate</td>
+						<td>Change</td>
+						<td>Significance</td>
+					</tr>
+					<tr v-for="(v,i) in e.variants">
+						<td v-if="i == 0"><b>Base</b></td>
+						<td v-if="i > 0"><b>Variant {{i}}</b></td>
+						<td>{{ e.visits[i].toLocaleString() }}</td>
+						<td>{{ e.conversions[i].toLocaleString() }}</td>
+						<td>{{ (e.get_conversion(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span></td>
+						<td v-if="i > 0">{{ (e.get_relative_lift(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_relative_lift_confidence_delta(i)*100).toFixed(2) }}</span></td>
+						<td v-if="i > 0">{{ Math.round(e.get_certainty()) }}%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	`,
+	props: {
+		e: {},
+	}
+});
