@@ -210,3 +210,27 @@ td {
   vertical-align: middle; 
   text-align: center; 
 }
+
+.significant.good        {background-color: #CEE5C3;}
+.highly-significant.good {background-color: #55AF32;}
+.significant.bad         {background-color: #F5BEBF;}
+.highly-significant.bad  {background-color: #E52923;}
+.significant.ugly        {background-color: #d6bde0;}
+.highly-significant.ugly {background-color: #8e4eab;}
+
+svg .bg                     {fill: rgb(225, 229, 234); stroke: #C3CBD5; border-radius: 0; }
+svg .bg_less                {stroke-dasharray: 0,50,18,50; }
+svg .bg_more                {stroke-dasharray: 0,50,18,50,18; }
+svg .bg_significant_bad     {fill: #f5bebf; stroke: #EE9192; }
+svg .bg_significant_good    {fill: #cee5c3; stroke: #A7D194; }
+svg .bg_significant_ugly    {fill: #d6bde0; stroke: #8e4eab; }
+
+svg .ci_svg                 {stroke-width: 0; opacity: 0.7; }
+svg .ci_svg:hover           {opacity: 1; }
+svg .ci_inconclusive        {fill: rgba(53,94,151,1); }
+svg .ci_significant_good    {fill: #55af32 !important; }
+svg .ci_significant_bad     {fill: #e52923 !important; }
+svg .ci_significant_ugly    {fill: #761b9e !important; }
+
+svg .est                    {stroke: white; stroke-width: 4px; stroke-linecap: round; stroke-dasharray: 0, 7; stroke-dashoffset: -6;}
+svg .line                   {stroke: white; stroke-width: 4px; opacity: 1; }

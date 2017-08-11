@@ -31,6 +31,9 @@
 		</div>
 
         <script type="text/javascript">
+	        P_VALUE = 0.1;
+			GTEST_CUTOFF = chisqrdistr(1, P_VALUE);
+
 			tester = new Vue({
 				el: '#app-tester',
 				data: {
