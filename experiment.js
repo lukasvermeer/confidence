@@ -69,6 +69,9 @@ var Experiment = function(id) {
     }
 
     this.get_relative_lift_confidence_delta = function(i) {
+    	// After speaking with Raphael, I now realise this is not correct.
+    	// However, fixing it is non-trivial, so adding a note for later.
+    	// TODO Correctly compute CI around relative lift.
         return this.get_lift_confidence_delta(i) * this.get_relative_lift(i) / this.get_lift(i);
     }
 
