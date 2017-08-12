@@ -261,7 +261,7 @@ Vue.component('experiment', {
 			return Math.max(Math.abs(this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)), Math.abs(this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i)));
 		},
 		ci: function(i) {
-			return [e.get_relative_lift(i) - e.get_relative_lift_confidence_delta(i), e.get_relative_lift(i) + e.get_relative_lift_confidence_delta(i)];
+			return [this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i), this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)];
 		},
 		transpose: function(scale, value) {
 			return (scale + value) / (scale*2) * this.ci_width;

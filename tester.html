@@ -17,12 +17,12 @@
 			<h1 class="experiments">AB Result Display Scratchpad</h1>
 
 			<p class="experiments">
-				B traffic <input v-model="b.traffic" type="number"/> 
-				B conversions <input v-model="b.conversions" type="number"/>
+				B traffic <input v-model="input.b.traffic" type="number"/> 
+				B conversions <input v-model="input.b.conversions" type="number"/>
 			</p>
 			<p class="experiments">
-				V traffic <input v-model="v.traffic" type="number"/> 
-				V conversions <input v-model="v.conversions" type="number"/>
+				V traffic <input v-model="input.v.traffic" type="number"/> 
+				V conversions <input v-model="input.v.conversions" type="number"/>
 			</p>
 			
 			<p class="experiments">
@@ -34,17 +34,19 @@
 			tester = new Vue({
 				el: '#app-tester',
 				data: {
-					b: { traffic: 10000, conversions: 500 },
-					v: { traffic: 10000, conversions: 560 },
+					input: {
+						b: { traffic: 10000, conversions: 500 },
+						v: { traffic: 10000, conversions: 560 }
+					},
+					e: new Experiment(0)
 				},
 				computed: {
-					experiment: function() {
-						e = new Experiment(0);
-						e.visits = [parseInt(this.b.traffic), parseInt(this.v.traffic)];
-						e.conversions = [parseInt(this.b.conversions), parseInt(this.v.conversions)];
-						return e;
+					experiment: function(val) {
+						this.e.visits = [parseInt(this.input.b.traffic), parseInt(this.input.v.traffic)];
+						this.e.conversions = [parseInt(this.input.b.conversions), parseInt(this.input.v.conversions)];
+						return this.e;
 					}
-				},
+				}
 			});
 		</script>
     </body>
