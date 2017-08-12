@@ -160,16 +160,6 @@ td {
 .incorrect { background-color: red; opacity: 1; }
 .incorrect:hover { background-color: red; opacity: 1; }
 
-.ci {
-    height: 10px;
-    display: inline-block;
-}
-.ci.left.base { background-color: orange; }
-.ci.left:not(.base) { background-color: red; }
-.ci.middle { background-color: orange; }
-.ci.right.base { background-color: orange; }
-.ci.right:not(.base) { background-color: green; }
-
 .waiting {
     position: absolute;
     background-color:rgba(128, 128, 128, 0.8);
