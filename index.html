@@ -4,71 +4,325 @@
         <link rel="stylesheet" type="text/css" href="confidence.css">
         <script src="jquery/jquery-1.9.1.min.js"></script>
         <script src="jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="vue/vue.js"></script>
         <script src="statistics-distributions.js"></script>
         <script src="experiment.js"></script>
-        <script src="confidence.js"></script>
     </head>
     <body>
-        <div class="message_box">
-            <!-- A general introduction to the game. -->
-            <div class="content intro">
-                <h1>So You Think You Can Test?</h1>
-                <p>Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
-                <p class="button arcade_mode">Arcade-mode <small>(fast-paced time-based action)</small></p>
-                <p class="button sim_mode">Simulation-mode <small>(realistic turn-based simulation)</small></p>
-                <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
-            </div>
-            <!-- Game rules for Arcade-mode. -->
-            <div class="content arcade_intro">
-                <h1>Arcade-mode</h1>
-                <p>You will be presented with a series of ten independently simulated experiments. Only one of these is simulating a scenario where there is a difference in effect between base and variant. The other nine are so-called A/A experiments, with absolutely no difference between the two treatment groups.</p>
-                <p>Because of random fluctuations, combined with the fact that we observe the experiments as they are simulated, all ten result will seem to change over time. <b>Your job as a decision maker is to identify which of these ten experiments is <i>not</i> an A/A.</b></p>
-                <p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
-                <p>This is a game of chance, but not of chance alone. Good luck!</p>
-                <p class="button arcade_start">Start</p>
-            </div>
-            <!-- Game rules for Simulation-mode. -->
-            <div class="content sim_intro">
-                <h1>Simulation-mode</h1>
-                <p>This game is nowhere near finished. Please only play to get an idea of current status.</p>
-                <p>This description is also work in progress. :-)</p>
-                <p>This is a game of chance, but not of chance alone. Good luck!</p>
-                <p class="button sim_start">No Start</p>
-            </div>
-            <!-- End game feedback. -->
-            <div class="content over">
-                <h1>Game Over!</h1>
-                <p>The game is over. Time to evaluate how well you've performed.</p>
-                <p><b id="perf_summary"></b></p>
-                <p id="perf_long"></p>
-                <p class="button reset">Click To Play Again</p>
-                <small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
-            </div>
-        </div>
-    
-        <div class="header arcade">
-            <span class="bignumber">Effect <span id="level"></span></span>
-            <span class="bignumber">Score <span id="score"></span></span>
-            <span class="bignumber">Visitors <span id="time"></span></span>
+		<div id="app-confidence">
+			<div class="message_box" v-if="game_state != 'play'">
+
+				<!-- A general introduction to the game. -->
+				<div class="content intro" v-if="game_mode == ''">
+					<h1>So You Think You Can Test?</h1>
+					<p>Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
+					<p class="button arcade_mode" v-on:click="game_mode = 'arcade'">Arcade-mode <small>(fast-paced time-based action)</small></p>
+					<p class="button sim_mode" v-on:click="game_mode = 'sim'">Simulation-mode <small>(realistic turn-based simulation)</small></p>
+					<small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
+				</div>
+
+				<!-- Game rules for Arcade-mode. -->
+				<div class="content arcade_intro" v-if="game_mode == 'arcade' && game_state == ''">
+					<h1>Arcade-mode</h1>
+					<p>You will be presented with a series of ten independently simulated experiments. Only one of these is simulating a scenario where there is a difference in effect between base and variant. The other nine are so-called A/A experiments, with absolutely no difference between the two treatment groups.</p>
+					<p>Because of random fluctuations, combined with the fact that we observe the experiments as they are simulated, all ten result will seem to change over time. <b>Your job as a decision maker is to identify which of these ten experiments is <i>not</i> an A/A.</b></p>
+					<p>Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
+					<p>This is a game of chance, but not of chance alone. Good luck!</p>
+					<p class="button arcade_start" v-on:click="start_arcade_game">Start</p>
+				</div>
+
+				<!-- Game rules for Simulation-mode. -->
+				<div class="content sim_intro" v-if="game_mode == 'sim' && game_state == ''">
+					<h1>Simulation-mode</h1>
+					<p>This game is nowhere near finished. Please only play to get an idea of current status.</p>
+					<p>This description is also work in progress. :-)</p>
+					<p>This is a game of chance, but not of chance alone. Good luck!</p>
+					<p class="button sim_start" v-on:click="start_sim_game">No Start</p>
+				</div>
+
+				<!-- End game feedback. -->
+				<div class="content over" v-if="game_mode == 'arcade' && game_state == 'eval'">
+					<h1>
+						<span v-if="level == 1">Paradox Of Choice, hmm?</span>
+						<span v-if="score < 0">Worse Than Random</span>
+						<span v-if="level > 1 && score == 0">You Win Some, You Lose Some</span>
+						<span v-if="score > 0 && score <= 2">Okay, I Guess</span>
+						<span v-if="score > 2 && score <= 4">Great Job, No Really</span>
+						<span v-if="score == 5 && level < 7">That's Awesome! Can You Do Better?</span>
+						<span v-if="score == 5 && level >= 7">Easy Does It</span>
+						<span v-if="score == 6">Best Probable Score. Seriously.</span>
+						<span v-if="score > 6">You Can See The Matrix!</span>
+					</h1>
+					<p>The game is over. Time to evaluate how well you've performed.</p>
+					<p><b id="perf_summary">You made {{level-1}} decisions and scored a total of {{score}} points. <span v-if="score>4">That's awesome!</span></b></p>
+					<p id="perf_long">
+						<span v-if="level == 1">Just remember that not making any decisions is also a choice. you might not have made any mistakes, but you've also not really added any value to the company. Perhaps you were sleeping?</span>
+						<span v-if="score < 0">Sure, you were decisive, but sometimes it is better to wait before you make a decision.</span>
+						<span v-if="level > 1 && score == 0">Maybe play again and stick to making good decisions only, hmkay?</span>
+						<span v-if="score > 0 && score <= 2">Keep in mind that this game is all about a trade off. You cannot win, but you can probably do better.</span>
+						<span v-if="score > 2 && score <= 4">This is not an easy game. You should be proud you managed to get a positive score.</span>
+						<span v-if="score == 5 && level < 7">This is a very good score! Looks like you made all the right choices, but perhaps you can do even better than this if you make all the right choices just a little bit faster?</span>
+						<span v-if="score == 5 && level >= 7">This is a very good score! Looks like you made a few costly mistakes along the way. Perhaps you can do better if you wait just a little bit longer when you\'re not quite confident you're making the right decision?</span>
+						<span v-if="score == 6">We've done the math, and the odds of getting a score even higher than this are absolutely astronomically small. This is as close as you'll ever be to beating this game, but perhaps you'd like to try just one more time?</span>
+						<span v-if="score > 6">What you've achieved is statistically very improbable. You probably cheated, but you might also simply be The One. If you manage to do this a second time, we'd be very impressed.</span>
+					</p>
+					<p class="button reset" v-on:click="game_mode = '';  game_state = '';">Click To Play Again</p>
+					<small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small>
+				</div>
+			</div>
+
+			<!-- Scores header for Arcade-mode. -->
+			<div class="header arcade" v-if="game_mode == 'arcade' && game_state == 'play'">
+				<span class="bignumber">Effect <span>{{(1/Math.pow(2,level-1)*100).toFixed(2) + '%'}}</span></span>
+				<span class="bignumber">Score <span>{{score}}</span></span>
+				<span class="bignumber">Visitors <span>{{time.toLocaleString()}}</span></span>
+			</div>
+
+			<!-- Scores header for Simulation-mode. -->
+			<div class="header sim" v-if="game_mode == 'sim' && game_state == 'play'">
+				<span class="bignumber">Day <span>{{day + '/' + TOTAL_DAYS}}</span></span>
+				<span class="bignumber">Conversion <span>{{(conversion*100).toFixed(2) + '%'}}</span></span>
+				<span class="bignumber">Score <span>{{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}</span></span>
+			</div>
+
+			<!-- Experiments display for Arcade-mode. -->
+			<div v-if="game_state == 'play' && game_mode == 'arcade'" class="experiments">
+				<a v-on:click="choose_exp(i)" v-for="(exp,i) in e">
+					<experiment :e="exp" show_header></experiment>
+				</a>
+			</div>
+
+			<!-- Experiments display for Simulation-mode. -->
+			<div v-if="game_state == 'play' && game_mode == 'sim'" class="experiments">
+				<span v-for="(exp,i) in e">
+					<experiment :e="exp" show_header show_controls></experiment>
+				</span>
+				
+				<p class="button next sim" v-if="game_mode == 'sim' && game_state == 'play'" v-on:click="next_round_sim()">Wait Another Day</p>
+			</div>
+
+			<!-- Full screen overlays. -->
+			<div class="waiting"><span>please wait</span></div>
+			<div class="wham hurting"><span>firing<br />offense</span></div>
+			<div class="wham instant_kill"><span>instant kill</span></div>
+			<div class="wham fatality"><span>fatality</span></div>
+			<div class="wham false_positive"><span>false positive</span></div>
+			<div class="wham just_under_conclusivity"><span>just<br />under<br />conclusivity</span></div>
         </div>
 
-        <div class="header sim">
-            <span class="bignumber">Day <span id="day"></span></span>
-            <span class="bignumber">Conversion <span id="conversion"></span></span>
-            <span class="bignumber">Score <span id="conversions"></span></span>
-        </div>
+        <script type="text/javascript">
+			const EventBus = new Vue();
+			
+			//
+			// Decision making under uncertainty is complicated business. This game aims to make 
+			// decision makers more aware of the complex trade off between indecision and acting 
+			// on insufficient information.
+			//
+			confidence = new Vue({
+				el: '#app-confidence',
+				data: {
+					EXPERIMENTS: 10,
+					VARIANTS: 2,
+					VISITORS_PER_DAY_ARCADE: 1000,
+					VISITORS_PER_DAY_SIM: 100000,
+					TOTAL_VISITORS: 500000,
+					TOTAL_DAYS: 28,
+					CONVERSION_RATE: 0.05,
+					AVERAGE_EFFECT: -0.5,
+					AVERAGE_EFFECT_STDDEV: 0.5,
+					DEV_CAPACITY: 2,
+					
+					e: [],
+					score: 0, 
+					level: 0, 
+					time: 0,
+					day: 0,
+					conversion: 0,
+					conversions: 0,
+					winner: 0,
+					game_mode: '',
+					game_state: '',
+				},
+				mounted: function() {
+					EventBus.$on('experimentAction', params => {
+						this.sim_choose_exp(params.exp.experiment_id, params.method == 'fullon');
+					});
+				},
+				methods: {
+					start_arcade_game: function() {
+						this.game_mode = 'arcade';
+						this.game_state = 'play';
+											    
+					    // Initialise experiment data.
+						this.e = new Array();
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e.push(new Experiment(i)); }
+						this.score = 0; this.level = 0; this.time = this.TOTAL_VISITORS; this.conversion = this.CONVERSION_RATE;
+	
+						this.next_round_arcade();
+						this.recursive_experiment_loop();
+					},
+					next_round_arcade: function() {
+						this.level++;
+		
+						// Pick a winner.
+						this.winner = Math.round(Math.random()*(this.EXPERIMENTS-1));
+						effect = (Math.random() < 0.5 ? (1+1/Math.pow(2,this.level-1)) : (1-1/Math.pow(2,this.level-1)));
+	
+						// Reset experiments.
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e[i].reset(this.winner == i ? effect : 1); }
+					},
+					next_round_sim: function() {
+						if (this.day < this.TOTAL_DAYS) {
+							$(".waiting").show();
+							setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
+						}
+					},
+					next_round_sim_deferred: function() {
+ 						this.run_experiments(this.VISITORS_PER_DAY_SIM);
+ 						this.day++;
 
-        <div class="experiments">
-        </div>
-        
-        <p class="button next sim">Wait Another Day</p>
-        
-        <div class="waiting"><span>please wait</span></div>
-        
-        <div class="wham hurting"><span>firing<br />offense</span></div>
-        <div class="wham instant_kill"><span>instant kill</span></div>
-        <div class="wham fatality"><span>fatality</span></div>
-        <div class="wham false_positive"><span>false positive</span></div>
-        <div class="wham just_under_conclusivity"><span>just<br />under<br />conclusivity</span></div>
+						var dc = this.DEV_CAPACITY;
+	
+						for (var i = 0; i < this.e.length; ++i) { 
+							if (this.e[i].active) {
+								this.e[i].days++;
+								$('#'+i+' .exp_box_overlay').hide();
+								$('#'+i+' .exp_box_hoverlay').show();
+							}
+							else {
+								if (dc > 0) {
+									this.e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100);
+									$('#'+i+' .exp_box_overlay .feedback').show().html('New experiment started.<br />Data available tomorrow.');
+									dc--;
+								}
+								else {
+									$('#'+i+' .exp_box_overlay .feedback').show().html('Prioritised on backlog.<br />No development capacity.');
+								}
+							}
+						}
+ 						$(".waiting").hide();
+					},
+					sim_visitor: function() {
+						var c = this.conversion;
+	
+						// assign to treatment for each exp and calculate aggregate effect size.
+						var a = [];
+						for (var i = 0; i < this.e.length; ++i) {
+							a[i] = this.e[i].assign_variant();
+							c = c * this.e[i].effect[a[i]];
+						}
+	
+						// converted or not.
+						b = false; if (Math.random() <= c) { b = true; this.conversions++; }
+
+						// update exps to reflect.
+						for (var i = 0; i < this.e.length; ++i) {
+							if (this.e[i].active) {
+								this.e[i].visits[a[i]]++;
+								if (b) this.e[i].conversions[a[i]]++;
+							}
+						}
+					},
+					run_experiments: function(v) {
+						for (var i = 0; i < v; ++i) { this.sim_visitor(); }
+						
+						// This is super nasty. I wish there was a nicer way to ensure Vue updates.
+						for (var i = 0; i < this.e.length; ++i) {
+							this.e[i].visits.splice(0,1,this.e[i].visits[0]);
+							this.e[i].conversions.splice(0,1,this.e[i].conversions[0]);
+						}
+					},
+					recursive_experiment_loop: function() {
+						this.run_experiments(this.VISITORS_PER_DAY_ARCADE);
+						this.time -= this.VISITORS_PER_DAY_ARCADE;
+						
+						if (this.time > 0) {
+							// This feels kinda nasty. Would be nice to use relative instead of global reference.
+							this.timeoutID = window.setTimeout(function(){ confidence.recursive_experiment_loop(); }, 10);
+						}
+						if (this.time <= 0) {
+							this.game_state = 'eval';
+						}
+					},
+					start_sim_game: function() {
+						this.game_mode = 'sim';
+						this.game_state = 'play';
+						
+						// Initialise experiment data.
+						this.e = new Array();
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e.push(new Experiment(i)); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100); }
+
+						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
+
+						this.next_round_sim();
+					},
+					choose_exp: function(e) {
+						if (this.time > 0) {
+							if(this.winner==e) { 
+								$('#exp'+this.winner+' .exp_box_hoverlay').switchClass('', 'correct', 100).switchClass( 'correct', '', 250 );;
+								this.score++; 
+							} 
+							else {
+								$('#exp'+this.winner+' .exp_box_hoverlay').switchClass('', 'incorrect', 100).switchClass( 'incorrect', '', 250 );;
+								this.score--;
+							}
+	
+							this.next_round_arcade();
+						}
+					},
+					sim_choose_exp: function(exp, fullon) {
+						// apply change to conversion
+						if (fullon) { this.conversion = this.e[exp].effect[1] * this.conversion; }
+
+						// reset experiment
+						this.e[exp].end_experiment();
+						if (!fullon && this.e[exp].days == 1) {
+							$('.instant_kill').show('scale', { percent: 100 }, 300).fadeOut();
+						}
+						else if (!fullon && this.e[exp].days > 1) {
+							$('.fatality').show('scale', { percent: 100 }, 300).fadeOut();
+						}
+						if (fullon && this.e[exp].get_conversion(1) < this.e[exp].get_conversion(0) && this.e[exp].is_significant()) {
+							$('.hurting').show('scale', { percent: 100 }, 300).fadeOut();
+						}
+						else if (fullon && this.e[exp].get_conversion(1) > this.e[exp].get_conversion(0) && !this.e[exp].is_significant()) {
+							$('.just_under_conclusivity').show('scale', { percent: 100 }, 300).fadeOut();
+						}
+						else if (fullon && this.e[exp].get_conversion(1) > this.e[exp].get_conversion(0) && this.e[exp].is_significant() && this.e[exp].effect[1] <= 1) {
+							$('.false_positive').show('scale', { percent: 100 }, 300).fadeOut();
+						}
+					},
+					normRand: function() {
+						// Returns normally distributed random numbers
+						var x1, x2, rad;
+ 
+						do {
+							x1 = 2 * Math.random() - 1;
+							x2 = 2 * Math.random() - 1;
+							rad = x1 * x1 + x2 * x2;
+						} while(rad >= 1 || rad == 0);
+ 
+						var c = Math.sqrt(-2 * Math.log(rad) / rad);
+ 
+						return x1 * c;
+					}
+				}
+			});
+
+			$(document).ready(function() {
+				document.addEventListener('keydown', function(event) {
+					if(event.keyCode >= 48 && event.keyCode <= 57) {
+						confidence.choose_exp(event.keyCode-48);
+					}
+					if(event.keyCode == 32) {
+						confidence.next_round_sim();
+					}
+				});
+				
+				$(".waiting").hide()
+				$(".wham").hide()
+			});
+		</script>
     </body>
 </html>

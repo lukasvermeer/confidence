@@ -4,7 +4,7 @@ var Experiment = function(id) {
     this.effect = [1,1];
     this.visits = [0,0];
     this.conversions = [0,0];
-    this.active = false;
+    this.active = true;
     this.days = 0;
     
 	this.P_VALUE = 0.1;
@@ -22,7 +22,6 @@ var Experiment = function(id) {
     this.reset = function(e) {
         this.active = true;
         this.effect[1] = e;
-        CONVERSION_RATE_B = CONVERSION_RATE * this.effect[1];
         this.visits = [0,0];
         this.conversions = [0,0];
         this.days = 0;
@@ -77,89 +76,6 @@ var Experiment = function(id) {
     	// TODO Correctly compute CI around relative lift.
         return this.get_lift_confidence_delta(i) * this.get_relative_lift(i) / this.get_lift(i);
     }
-
-    
-    this.paint = function() {
-        var d = $('<table>').append($('<tr>').attr('class','header')
-            .append($('<td>').append(''))
-            .append($('<td>').append('Visitors'))
-            .append($('<td>').append('Conversions'))
-            .append($('<td>').append('Rate'))
-            .append($('<td>').attr('width','90px').append('Conf. Interval'))
-            .append($('<td>').append('Change'))
-            .append($('<td>').append('Significance'))
-        );
-    
-        for (var i = 0; i < this.variants; i++) {
-            d.append($('<tr>')
-                .append($('<td>').append($('<b>').append(i == 0 ? 'Base' : 'Variant')))
-                .append($('<td>').append(this.visits[i]))
-                .append($('<td>').append(this.conversions[i]))
-                .append($('<td>').append((this.get_conversion(i)*100).toFixed(2) + '%'))
-                .append($('<td>')
-                    .append($('<div>').attr('class','ci left_pad'))
-                    .append($('<div>').attr('class','ci left '+(i == 0 ? 'base' : '')))
-                    .append($('<div>').attr('class','ci middle').attr('width','20px'))
-                    .append($('<div>').attr('class','ci right '+(i == 0 ? 'base' : '')))
-                    .append($('<div>').attr('class','ci right_pad')))
-                .append($('<td>').append(i == 0 ? '' : (this.get_lift(i)).toFixed(2) + '%'))
-                .append($('<td>').append(i == 0 ? '' : Math.round(this.get_certainty()) + '%'))
-            );
-        }
-        var h = $('<div>').attr('class','exp_box_hoverlay')
-                    .append($('<p>').append('FULL ON').attr('class','sim fo exp_button'))
-                    .append($('<p>').append('STOP').attr('class','sim stop exp_button'));
-
-        var o = $('<div>').attr('class','exp_box_overlay sim')
-                    .append($('<p>').attr('class','sim feedback'));
-
-        var r = $('<div>').attr('class','exp_box').attr('id', this.experiment_id)
-                    .append(h)
-                    .append(o)
-                    .append($('<span>').attr('class','exp_name').text('Experiment ' + this.experiment_id))
-                    .append($('<div>').attr('class','sim runtime'))
-                    .append(d);
-        
-        return r;
-    };
-    
-    this.paint_update = function() {
-        ci_min = 1; ci_max = 0; overlap_min = 0; overlap_max = 1; ci_pixels = 100;
-                
-        for (var i = 0; i < this.variants; ++i) {
-            var c = this.get_conversion(i);
-            var d = this.get_confidence_delta(i);
-            
-            ci_min = Math.min(ci_min, c - d);
-            ci_max = Math.max(ci_max, c + d);
-            
-            overlap_min = Math.max(overlap_min, c - d);
-            overlap_max = Math.min(overlap_max, c + d);
-        }
-        
-        var ci_scale = ci_pixels / (ci_max - ci_min);
-        
-        for (var i = 0; i < this.variants; ++i) {
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(2)').text(this.visits[i].toLocaleString());
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(3)').text(this.conversions[i].toLocaleString());
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(4)').html((this.get_conversion(i)*100).toFixed(2) + '% <span class="muted">\xB1' + (this.get_confidence_delta(i)*100).toFixed(2) + '</span>');
-            
-            var c = this.get_conversion(i);
-            var d = this.get_confidence_delta(i);
-            ci_low = c - d;
-            ci_high = c + d;
-            
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.left_pad').width(Math.max(0,ci_low-ci_min)*ci_scale);
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.left').width(Math.max(0,Math.min(overlap_min,ci_high)-ci_low)*ci_scale);
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.middle').width(Math.max(0, overlap_max - overlap_min)*ci_scale);
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right').width(Math.max(0,ci_high-Math.max(overlap_max,ci_low))*ci_scale);
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') .ci.right_pad').width(Math.max(0,ci_max-ci_high)*ci_scale);
-            
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(6)').html(i == 0 ? '' : (this.get_relative_lift(i)*100).toFixed(2) + '% <span class="muted">\xB1' + (this.get_relative_lift_confidence_delta(i)*100).toFixed(2) + '</span>');
-            $('#'+this.experiment_id+' table tr:nth-child('+(i+2)+') td:nth-child(7)').text(i == 0 ? '' : Math.round(this.get_certainty()) + '%');
-        }
-        $('#'+this.experiment_id+' .runtime').text('runtime: ' + this.days + ' days.');
-    }
 };
 
 // This takes an array of arrays of any size, and calculates
@@ -207,16 +123,18 @@ function calculate_g_test (data) {
 
 Vue.component('experiment', {
 	template: `
-		<div class="exp_box" :id="e.experiment_id">
-			<div class="exp_box_hoverlay" v-if="show_controls">
-				<p class="sim fo exp_button">FULL ON</p>
-				<p class="sim stop exp_button">STOP</p>
+		<div class="exp_box" :id="'exp'+e.experiment_id">
+			<div class="exp_box_hoverlay">
+				<p class="sim fo exp_button" v-if="show_controls && e.active" v-on:click="emitAction('fullon')">FULL ON</p>
+				<p class="sim stop exp_button" v-if="show_controls && e.active" v-on:click="emitAction('stop')">STOP</p>
 			</div>
-			<div class="exp_box_overlay sim" v-if="show_controls">
-				<p class="sim feedback"></p>
+			<div class="exp_box_overlay sim" v-if="!e.active">
+				<p class="sim feedback">
+					The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.
+				</p>
 			</div>
-			<span class="exp_name" v-if="show_controls">Experiment 0</span>
-			<div class="sim runtime" v-if="show_controls">runtime: {{ e.days }} days.</div>
+			<span class="exp_name" v-if="show_header">Experiment {{e.experiment_id}}</span>
+			<div class="sim runtime" v-if="show_header">runtime: {{ e.days }} days.</div>
 			<table>
 				<tbody>
 					<tr class="header">
@@ -253,9 +171,11 @@ Vue.component('experiment', {
 		</div>
 	`,
 	props: {
-		show_controls: { type: Boolean, default: false },
-		e: {},
-		ci_width: { type: Number, default: 100 }
+		show_controls:	{ type: Boolean, default: false },
+		show_feedback:	{ type: Boolean, default: false },
+		show_header:	{ type: Boolean, default: false },
+		e:				{},
+		ci_width:		{ type: Number, default: 100 }
 	},
 	methods: {
 		ci_scale: function(i) {
@@ -278,6 +198,9 @@ Vue.component('experiment', {
 		},
 		can_do_mle: function(i) {
 			return !isNaN(this.e.get_relative_lift(i)) && isFinite(this.e.get_relative_lift(i));
-		}
+		},
+		emitAction: function(a) {
+			EventBus.$emit('experimentAction', { exp: this.e, method: a });
+		},
 	},
 });
