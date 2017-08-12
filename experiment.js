@@ -208,15 +208,15 @@ function calculate_g_test (data) {
 Vue.component('experiment', {
 	template: `
 		<div class="exp_box" :id="e.experiment_id">
-			<div class="exp_box_hoverlay">
+			<div class="exp_box_hoverlay" v-if="show_controls">
 				<p class="sim fo exp_button">FULL ON</p>
 				<p class="sim stop exp_button">STOP</p>
 			</div>
-			<div class="exp_box_overlay sim">
+			<div class="exp_box_overlay sim" v-if="show_controls">
 				<p class="sim feedback"></p>
 			</div>
-			<span class="exp_name">Experiment 0</span>
-			<div class="sim runtime">runtime: {{ e.days }} days.</div>
+			<span class="exp_name" v-if="show_controls">Experiment 0</span>
+			<div class="sim runtime" v-if="show_controls">runtime: {{ e.days }} days.</div>
 			<table>
 				<tbody>
 					<tr class="header">
@@ -253,6 +253,7 @@ Vue.component('experiment', {
 		</div>
 	`,
 	props: {
+		show_controls: { type: Boolean, default: false },
 		e: {},
 		ci_width: { type: Number, default: 100 }
 	},
