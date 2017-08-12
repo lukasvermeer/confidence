@@ -141,6 +141,7 @@ p { text-align: justify; }
 table {
     padding: 5px;
     font-size: 12px;
+    line-height: 18px;
 }
 
 tr.header {
@@ -148,11 +149,14 @@ tr.header {
 }
 tr.header td {
     padding: 4px;
-	width: 100px;
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
 }
 
 td {
     text-align: right;
+    vertical-align: top; 
 }
 
 .correct { background-color: green; opacity: 1; }

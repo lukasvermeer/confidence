@@ -127,20 +127,21 @@ Vue.component('experiment-table', {
 			<tbody>
 				<tr class="header">
 					<td></td>
-					<td>Visitors</td>
-					<td>Conversions</td>
+					<td>Users</td>
+					<td>Sales</td>
 					<td>Rate</td>
 					<td>Change</td>
-					<td>Confidence</td>
-					<td>Significance</td>
+					<td>Significant</td>
 				</tr>
 				<tr v-for="(v,i) in e.variants">
 					<td v-if="i == 0"><b>Base</b></td>
 					<td v-if="i > 0"><b>Variant {{i}}</b></td>
 					<td>{{ e.visits[i].toLocaleString() }}</td>
 					<td>{{ e.conversions[i].toLocaleString() }}</td>
-					<td>{{ (e.get_conversion(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span></td>
-					<td v-if="i > 0">{{ (e.get_relative_lift(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_relative_lift_confidence_delta(i)*100).toFixed(2) }}</span></td>
+					<td>
+						{{ (e.get_conversion(i)*100).toFixed(2) }}%<br />
+						<span class="muted">\xB1&nbsp;{{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span>
+					</td>
 					<td v-if="i > 0">
 						<span class="confidence-interval-display">
 							<svg :width="ci_width" height="18">
@@ -150,9 +151,13 @@ Vue.component('experiment-table', {
 								<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
 								<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_lift(i))" y1="3" :x2="transpose(ci_scale(i), e.get_relative_lift(i))" y2="15" class="est"></line>
 							</svg>
+							<div>{{ (e.get_relative_lift(i)*100).toFixed(2) }}% <span class="muted">\xB1&nbsp;{{ (e.get_relative_lift_confidence_delta(i)*100).toFixed(2) }}</span></div>
 						</span>
 					</td>
-					<td v-if="i > 0">{{ Math.round(e.get_certainty()) }}%</td>
+					<td v-if="i > 0">
+						{{e.is_significant() ? 'Yes' : 'No' }}<br />
+						<span class="muted">{{ Math.round(e.get_certainty()) }}%</span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
