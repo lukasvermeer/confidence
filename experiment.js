@@ -7,6 +7,9 @@ var Experiment = function(id) {
     this.active = false;
     this.days = 0;
     
+	this.P_VALUE = 0.1;
+	this.GTEST_CUTOFF = chisqrdistr(1, this.P_VALUE);
+    
     this.assign_variant = function() {
         if (!this.active) return 0;
         return Math.floor(Math.random() * this.variants);
@@ -46,7 +49,7 @@ var Experiment = function(id) {
     };
     
     this.is_significant = function() {
-        return this.get_g_test() >= GTEST_CUTOFF;
+        return this.get_g_test() >= this.GTEST_CUTOFF;
     };
     
     this.get_p = function() {

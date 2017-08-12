@@ -4,8 +4,6 @@
 // on insufficient information.
 //
 
-P_VALUE = 0.1;
-GTEST_CUTOFF = chisqrdistr(1, P_VALUE);
 EXPERIMENTS     = 10;
 VARIANTS        = 2;
 VISITORS_PER_DAY_ARCADE = 1000;
