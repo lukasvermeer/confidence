@@ -241,8 +241,8 @@ Vue.component('experiment', {
 									<line :x1="ci_width/2" y1="0" :x2="ci_width/2" y2="18" class="line"></line>
 									<rect x="-2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_less:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) < 0)}"></rect>
 									<rect :x="ci_width/2+2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_more:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) > 0)}"></rect>
-									<rect :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
-									<line :x1="transpose(ci_scale(i), e.get_relative_lift(i))" y1="3" :x2="transpose(ci_scale(i), e.get_relative_lift(i))" y2="15" class="est"></line>
+									<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
+									<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_lift(i))" y1="3" :x2="transpose(ci_scale(i), e.get_relative_lift(i))" y2="15" class="est"></line>
 								</svg>
 							</span>
 						</td>
@@ -259,7 +259,13 @@ Vue.component('experiment', {
 	},
 	methods: {
 		ci_scale: function(i) {
-			return Math.max(Math.abs(this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)), Math.abs(this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i)));
+			if (this.can_do_ci(i)) {
+				return Math.max(Math.abs(this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)), Math.abs(this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i)));
+			} else if (this.can_do_mle(i)) {
+				return Math.abs(this.e.get_relative_lift(i));
+			} else {
+				return undefined;
+			}
 		},
 		ci: function(i) {
 			return [this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i), this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)];
@@ -267,5 +273,11 @@ Vue.component('experiment', {
 		transpose: function(scale, value) {
 			return (scale + value) / (scale*2) * this.ci_width;
 		},
+		can_do_ci: function(i) {
+			return !isNaN(this.ci(i)[0]) && !isNaN(this.ci(i)[1]);
+		},
+		can_do_mle: function(i) {
+			return !isNaN(this.e.get_relative_lift(i)) && isFinite(this.e.get_relative_lift(i));
+		}
 	},
 });
