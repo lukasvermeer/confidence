@@ -20,9 +20,11 @@
 				V conversions <input v-model="input.v.conversions" type="number"/>
 			</p>
 			
-			<p class="experiments">
-				<experiment :e="experiment"></experiment>
-			</p>
+			<center>
+				<div class="exp_box">
+					<experiment-table :e="experiment"></experiment-table>
+				</div>
+			</center>
 		</div>
 
         <script type="text/javascript">

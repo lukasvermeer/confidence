@@ -88,14 +88,31 @@
 			<!-- Experiments display for Arcade-mode. -->
 			<div v-if="game_state == 'play' && game_mode == 'arcade'" class="experiments">
 				<a v-on:click="choose_exp(i)" v-for="(exp,i) in e">
-					<experiment :e="exp" show_header></experiment>
+					<div class="exp_box" :id="'exp'+exp.experiment_id">
+						<div class="exp_box_hoverlay"></div>
+						<span class="exp_name">Experiment {{exp.experiment_id}}</span>
+						<experiment-table :e="exp"></experiment-table>
+					</div>
 				</a>
 			</div>
 
 			<!-- Experiments display for Simulation-mode. -->
 			<div v-if="game_state == 'play' && game_mode == 'sim'" class="experiments">
 				<span v-for="(exp,i) in e">
-					<experiment :e="exp" show_header show_controls></experiment>
+					<div class="exp_box" :id="'exp'+exp.experiment_id">
+						<div class="exp_box_hoverlay">
+							<p class="sim fo exp_button" v-if="exp.active" v-on:click="sim_choose_exp(i, true)">FULL ON</p>
+							<p class="sim stop exp_button" v-if="exp.active" v-on:click="sim_choose_exp(i, false)">STOP</p>
+						</div>
+						<div class="exp_box_overlay sim" v-if="!exp.active">
+							<p class="sim feedback">
+								The real effect of this experiment was {{((exp.effect[1]-1)*100).toFixed(2)}}%.
+							</p>
+						</div>
+						<span class="exp_name">Experiment {{exp.experiment_id}}</span>
+						<div class="sim runtime">runtime: {{ exp.days }} days.</div>
+						<experiment-table :e="exp"></experiment-table>
+					</div>
 				</span>
 				
 				<p class="button next sim" v-if="game_mode == 'sim' && game_state == 'play'" v-on:click="next_round_sim()">Wait Another Day</p>
@@ -111,8 +128,6 @@
         </div>
 
         <script type="text/javascript">
-			const EventBus = new Vue();
-			
 			//
 			// Decision making under uncertainty is complicated business. This game aims to make 
 			// decision makers more aware of the complex trade off between indecision and acting 
@@ -142,11 +157,6 @@
 					winner: 0,
 					game_mode: '',
 					game_state: '',
-				},
-				mounted: function() {
-					EventBus.$on('experimentAction', params => {
-						this.sim_choose_exp(params.exp.experiment_id, params.method == 'fullon');
-					});
 				},
 				methods: {
 					start_arcade_game: function() {

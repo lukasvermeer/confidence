@@ -121,59 +121,43 @@ function calculate_g_test (data) {
     return g_test;
 };
 
-Vue.component('experiment', {
+Vue.component('experiment-table', {
 	template: `
-		<div class="exp_box" :id="'exp'+e.experiment_id">
-			<div class="exp_box_hoverlay">
-				<p class="sim fo exp_button" v-if="show_controls && e.active" v-on:click="emitAction('fullon')">FULL ON</p>
-				<p class="sim stop exp_button" v-if="show_controls && e.active" v-on:click="emitAction('stop')">STOP</p>
-			</div>
-			<div class="exp_box_overlay sim" v-if="!e.active">
-				<p class="sim feedback">
-					The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.
-				</p>
-			</div>
-			<span class="exp_name" v-if="show_header">Experiment {{e.experiment_id}}</span>
-			<div class="sim runtime" v-if="show_header">runtime: {{ e.days }} days.</div>
-			<table>
-				<tbody>
-					<tr class="header">
-						<td></td>
-						<td>Visitors</td>
-						<td>Conversions</td>
-						<td>Rate</td>
-						<td>Change</td>
-						<td>Confidence</td>
-						<td>Significance</td>
-					</tr>
-					<tr v-for="(v,i) in e.variants">
-						<td v-if="i == 0"><b>Base</b></td>
-						<td v-if="i > 0"><b>Variant {{i}}</b></td>
-						<td>{{ e.visits[i].toLocaleString() }}</td>
-						<td>{{ e.conversions[i].toLocaleString() }}</td>
-						<td>{{ (e.get_conversion(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span></td>
-						<td v-if="i > 0">{{ (e.get_relative_lift(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_relative_lift_confidence_delta(i)*100).toFixed(2) }}</span></td>
-						<td v-if="i > 0">
-							<span class="confidence-interval-display">
-								<svg :width="ci_width" height="18">
-									<line :x1="ci_width/2" y1="0" :x2="ci_width/2" y2="18" class="line"></line>
-									<rect x="-2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_less:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) < 0)}"></rect>
-									<rect :x="ci_width/2+2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_more:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) > 0)}"></rect>
-									<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
-									<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_lift(i))" y1="3" :x2="transpose(ci_scale(i), e.get_relative_lift(i))" y2="15" class="est"></line>
-								</svg>
-							</span>
-						</td>
-						<td v-if="i > 0">{{ Math.round(e.get_certainty()) }}%</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<table>
+			<tbody>
+				<tr class="header">
+					<td></td>
+					<td>Visitors</td>
+					<td>Conversions</td>
+					<td>Rate</td>
+					<td>Change</td>
+					<td>Confidence</td>
+					<td>Significance</td>
+				</tr>
+				<tr v-for="(v,i) in e.variants">
+					<td v-if="i == 0"><b>Base</b></td>
+					<td v-if="i > 0"><b>Variant {{i}}</b></td>
+					<td>{{ e.visits[i].toLocaleString() }}</td>
+					<td>{{ e.conversions[i].toLocaleString() }}</td>
+					<td>{{ (e.get_conversion(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span></td>
+					<td v-if="i > 0">{{ (e.get_relative_lift(i)*100).toFixed(2) }}% <span class="muted">\xB1 {{ (e.get_relative_lift_confidence_delta(i)*100).toFixed(2) }}</span></td>
+					<td v-if="i > 0">
+						<span class="confidence-interval-display">
+							<svg :width="ci_width" height="18">
+								<line :x1="ci_width/2" y1="0" :x2="ci_width/2" y2="18" class="line"></line>
+								<rect x="-2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_less:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) < 0)}"></rect>
+								<rect :x="ci_width/2+2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_more:1, bg_significant_ugly:(e.is_significant() && e.get_relative_lift(i) > 0)}"></rect>
+								<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
+								<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_lift(i))" y1="3" :x2="transpose(ci_scale(i), e.get_relative_lift(i))" y2="15" class="est"></line>
+							</svg>
+						</span>
+					</td>
+					<td v-if="i > 0">{{ Math.round(e.get_certainty()) }}%</td>
+				</tr>
+			</tbody>
+		</table>
 	`,
 	props: {
-		show_controls:	{ type: Boolean, default: false },
-		show_feedback:	{ type: Boolean, default: false },
-		show_header:	{ type: Boolean, default: false },
 		e:				{},
 		ci_width:		{ type: Number, default: 100 }
 	},
@@ -198,9 +182,6 @@ Vue.component('experiment', {
 		},
 		can_do_mle: function(i) {
 			return !isNaN(this.e.get_relative_lift(i)) && isFinite(this.e.get_relative_lift(i));
-		},
-		emitAction: function(a) {
-			EventBus.$emit('experimentAction', { exp: this.e, method: a });
 		},
 	},
 });
