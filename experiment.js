@@ -166,6 +166,7 @@ Vue.component('experiment-table', {
 			if (this.can_do_ci(i)) {
 				return Math.max(Math.abs(this.e.get_relative_lift(i) + this.e.get_relative_lift_confidence_delta(i)), Math.abs(this.e.get_relative_lift(i) - this.e.get_relative_lift_confidence_delta(i)));
 			} else if (this.can_do_mle(i)) {
+				if (this.e.get_relative_lift(i) == 0) return 1;
 				return Math.abs(this.e.get_relative_lift(i));
 			} else {
 				return undefined;
