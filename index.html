@@ -109,6 +109,12 @@
 								The real effect of this experiment was {{((exp.effect[1]-1)*100).toFixed(2)}}%.
 							</p>
 						</div>
+						<div class="exp_box_overlay sim" v-if="exp.active && exp.days == 0">
+							<p class="sim feedback">
+								New experiment started.<br />
+								No data yet.
+							</p>
+						</div>
 						<span class="exp_name">Experiment {{exp.experiment_id}}</span>
 						<div class="sim runtime">runtime: {{ exp.days }} days.</div>
 						<experiment-table :e="exp"></experiment-table>
@@ -196,17 +202,11 @@
 						for (var i = 0; i < this.e.length; ++i) { 
 							if (this.e[i].active) {
 								this.e[i].days++;
-								$('#'+i+' .exp_box_overlay').hide();
-								$('#'+i+' .exp_box_hoverlay').show();
 							}
 							else {
 								if (dc > 0) {
 									this.e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100);
-									$('#'+i+' .exp_box_overlay .feedback').show().html('New experiment started.<br />Data available tomorrow.');
 									dc--;
-								}
-								else {
-									$('#'+i+' .exp_box_overlay .feedback').show().html('Prioritised on backlog.<br />No development capacity.');
 								}
 							}
 						}
