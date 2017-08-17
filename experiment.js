@@ -31,10 +31,6 @@ var Experiment = function(id) {
         return this.conversions[i]/this.visits[i];
     }
 
-    this.get_lift = function(i) {
-        return this.get_conversion(i) - this.get_conversion(0);
-    }
-
     this.get_g_test = function() {
         var data_all = [];
         for (var i = 0; i < this.variants; i++) {
@@ -59,11 +55,13 @@ var Experiment = function(id) {
         var p = this.get_conversion(i);
         return 1.644854 * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
     }
-
-    this.get_lift_confidence_delta = function(i) {
-        var p = this.get_conversion(i);
+    
+    this.get_absolute_effect = function(i) {
+    	var p = this.get_conversion(i);
         var q = this.get_conversion(0);
-        return 1.644854 * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
+        var z = 1.644854 * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
+        
+        return [ p - q, [p - q - z, p - q + z]];
     }
     
 	this.get_relative_effect = function(i) {
