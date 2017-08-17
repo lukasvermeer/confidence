@@ -119,7 +119,7 @@
 			</div>
 
 			<!-- Full screen overlays. -->
-			<div class="waiting"><span>please wait</span></div>
+			<div class="waiting" v-if="game_mode == 'sim' && game_state == 'waiting'"><span>please wait</span></div>
 			<div class="wham hurting"><span>firing<br />offense</span></div>
 			<div class="wham instant_kill"><span>instant kill</span></div>
 			<div class="wham fatality"><span>fatality</span></div>
@@ -183,7 +183,7 @@
 					},
 					next_round_sim: function() {
 						if (this.day < this.TOTAL_DAYS) {
-							$(".waiting").show();
+							this.game_state = 'waiting';
 							setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
 						}
 					},
@@ -210,7 +210,7 @@
 								}
 							}
 						}
- 						$(".waiting").hide();
+						this.game_state = 'play';
 					},
 					sim_visitor: function() {
 						var c = this.conversion;
@@ -330,7 +330,6 @@
 					}
 				});
 				
-				$(".waiting").hide()
 				$(".wham").hide()
 			});
 		</script>
