@@ -26,10 +26,6 @@ var Experiment = function(id) {
         this.conversions = [0,0];
         this.days = 0;
     }
-    
-    this.get_conversion = function(i) {
-        return this.conversions[i]/this.visits[i];
-    }
 
     this.get_g_test = function() {
         var data_all = [];
@@ -51,11 +47,13 @@ var Experiment = function(id) {
         return round_to_precision( 100 * (1-this.get_p()), 2);
     };
 
-    this.get_confidence_delta = function(i) {
-        var p = this.get_conversion(i);
-        return 1.644854 * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
+    this.get_mean = function(i) {
+    	var p = this.conversions[i]/this.visits[i];
+        var q = 1.644854 * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
+        
+        return [p, [p - q, p + q]];
     }
-    
+
     this.get_absolute_effect = function(i) {
     	var p = this.get_conversion(i);
         var q = this.get_conversion(0);
@@ -65,11 +63,11 @@ var Experiment = function(id) {
     }
     
 	this.get_relative_effect = function(i) {
-		var avg_base = this.get_conversion(0);
+		var avg_base = this.get_mean(0)[0];
 		var obs_base = this.visits[0];
 		var stdev_base = Math.sqrt(avg_base * ( 1 - avg_base )) / Math.sqrt(obs_base);
 
-		var avg_var = this.get_conversion(i);
+		var avg_var = this.get_mean(i)[0];
 		var obs_var = this.visits[i];
 		var stdev_var = Math.sqrt(avg_var * ( 1 - avg_var )) / Math.sqrt(obs_var);
 
@@ -152,10 +150,7 @@ Vue.component('experiment-table', {
 					<td v-if="i > 0"><b>Variant {{i}}</b></td>
 					<td>{{ e.visits[i].toLocaleString() }}</td>
 					<td>{{ e.conversions[i].toLocaleString() }}</td>
-					<td>
-						{{ (e.get_conversion(i)*100).toFixed(2) }}%<br />
-						<span class="muted">\xB1&nbsp;{{ (e.get_confidence_delta(i)*100).toFixed(2) }}</span>
-					</td>
+					<td>{{ (e.get_mean(i)[0]*100).toFixed(2) }}%</td>
 					<td v-if="i > 0">
 						<span class="confidence-interval-display">
 							<svg :width="ci_width" height="18">
