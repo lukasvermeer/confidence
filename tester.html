@@ -1,27 +1,28 @@
 <html>
     <head>
         <title>AB Result Display Scratchpad</title>
-        <link rel="stylesheet" type="text/css" href="confidence.css">
+        <link rel="stylesheet" type="text/css" href="confidence_bootstrap.css">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
         <script type="text/javascript" src="vue/vue.js"></script>
         <script type="text/javascript" src="statistics-distributions.js"></script>
         <script type="text/javascript" src="experiment.js"></script>
     </head>
     <body>
-    	<div id="app-tester">
-			<h1 class="experiments">AB Result Display Scratchpad</h1>
+    	<div id="app-tester" class="container">
+    		<center>
+				<h1>AB Result Display Scratchpad</h1>
 
-			<p class="experiments">
-				B traffic <input v-model="input.b.traffic" type="number"/> 
-				B conversions <input v-model="input.b.conversions" type="number"/>
-			</p>
-			<p class="experiments">
-				V traffic <input v-model="input.v.traffic" type="number"/> 
-				V conversions <input v-model="input.v.conversions" type="number"/>
-			</p>
+				<p>
+					B traffic <input v-model="input.b.traffic" type="number"/> 
+					B conversions <input v-model="input.b.conversions" type="number"/>
+				</p>
+				<p>
+					V traffic <input v-model="input.v.traffic" type="number"/> 
+					V conversions <input v-model="input.v.conversions" type="number"/>
+				</p>
 			
-			<center>
-				<div class="exp_box">
+				<div class="col-md-offset-3 col-md-6">
 					<experiment-table :e="experiment"></experiment-table>
 				</div>
 			</center>

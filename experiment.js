@@ -135,22 +135,26 @@ function calculate_g_test (data) {
 
 Vue.component('experiment-table', {
 	template: `
-		<table>
-			<tbody>
-				<tr class="header">
-					<td></td>
-					<td>Users</td>
-					<td>Sales</td>
-					<td>Rate</td>
-					<td>Change</td>
-					<td>Significant</td>
+		<table class="table table-condensed table-striped">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Users</th>
+					<th>Sales</th>
+					<th>Rate</th>
+					<th>Change</th>
+					<th>Significant</th>
 				</tr>
+			</thead>
+			<tbody>
 				<tr v-for="(v,i) in e.variants">
-					<td v-if="i == 0"><b>Base</b></td>
-					<td v-if="i > 0"><b>Variant {{i}}</b></td>
+					<th v-if="i == 0">Base</th>
+					<th v-if="i > 0">Variant {{i}}</th>
 					<td>{{ e.visits[i].toLocaleString() }}</td>
 					<td>{{ e.conversions[i].toLocaleString() }}</td>
 					<td>{{ (e.get_mean(i)[0]*100).toFixed(2) }}%</td>
+					<td v-if="i == 0" class="text-muted">-</td>
+					<td v-if="i == 0" class="text-muted">-</td>
 					<td v-if="i > 0">
 						<span class="confidence-interval-display">
 							<svg :width="ci_width" height="18">
@@ -160,12 +164,12 @@ Vue.component('experiment-table', {
 								<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
 								<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_effect(i)[0])" y1="3" :x2="transpose(ci_scale(i), e.get_relative_effect(i)[0])" y2="15" class="est"></line>
 							</svg>
-							<div><small>{{ (e.get_relative_effect(i)[0]*100).toFixed(2) }}% [<span class="muted" v-for="(ci,i) in e.get_relative_effect(i)[1]"><span v-if="i>0">,</span>{{(ci*100).toFixed(2)}}</span>]</small></div>
+							<div><small>{{ (e.get_relative_effect(i)[0]*100).toFixed(2) }}% [<span class="text-muted" v-for="(ci,i) in e.get_relative_effect(i)[1]"><span v-if="i>0">,</span>{{(ci*100).toFixed(2)}}</span>]</small></div>
 						</span>
 					</td>
 					<td v-if="i > 0">
 						{{e.is_significant() ? 'Yes' : 'No' }}<br />
-						<span class="muted">{{ Math.round(e.get_certainty()) }}%</span>
+						<small><span class="text-muted">{{ Math.round(e.get_certainty()) }}%</span></small>
 					</td>
 				</tr>
 			</tbody>

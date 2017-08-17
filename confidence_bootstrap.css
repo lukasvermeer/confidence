@@ -1,0 +1,14 @@
+.significant.ugly        {background-color: #d6bde0;}
+
+svg .bg                     {fill: rgb(225, 229, 234); stroke: #C3CBD5; border-radius: 0; }
+svg .bg_less                {stroke-dasharray: 0,50,18,50; }
+svg .bg_more                {stroke-dasharray: 0,50,18,50,18; }
+svg .bg_significant_ugly    {fill: #d6bde0; stroke: #8e4eab; }
+
+svg .ci_svg                 {stroke-width: 0; opacity: 0.7; }
+svg .ci_svg:hover           {opacity: 1; }
+svg .ci_inconclusive        {fill: rgba(53,94,151,1); }
+svg .ci_significant_ugly    {fill: #761b9e !important; }
+
+svg .est                    {stroke: white; stroke-width: 4px; stroke-linecap: round; stroke-dasharray: 0, 7; stroke-dashoffset: -6;}
+svg .line                   {stroke: white; stroke-width: 4px; opacity: 1; }

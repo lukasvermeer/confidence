@@ -24,7 +24,7 @@ body {
 }
 
 p { text-align: justify; }
-.muted { color: grey; }
+.text-muted { color: grey; }
 
 .button {
     padding: 15px;
@@ -144,13 +144,13 @@ table {
     line-height: 18px;
 }
 
-tr.header {
+thead {
     background-color: rgba(128, 128, 128, 0.2);
 }
-tr.header td {
+thead th {
     padding: 4px;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 8px;
+	padding-right: 8px;
 	text-align: center;
 }
 
