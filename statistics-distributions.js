@@ -458,7 +458,7 @@ function log10 ($n) {
  
 function max () {
 	var $max = arguments[0];
-	for (var $i = 0; i < arguments.length; i++) {
+	for (var $i = 0; $i < arguments.length; $i++) {
                 if ($max < arguments[$i])
                         $max = arguments[$i];
 	}	
