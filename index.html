@@ -87,7 +87,7 @@
 
 			<!-- Experiments display for Arcade-mode. -->
 			<div v-if="game_state == 'play' && game_mode == 'arcade'" class="experiments">
-				<a v-on:click="choose_exp(i)" v-for="(exp,i) in e">
+				<a v-on:click="choose_exp(i)" v-for="(exp,i) in summary_statistics">
 					<div class="exp_box" :id="'exp'+exp.experiment_id">
 						<div class="exp_box_hoverlay"></div>
 						<span class="exp_name">Experiment {{exp.experiment_id}}</span>
@@ -98,7 +98,7 @@
 
 			<!-- Experiments display for Simulation-mode. -->
 			<div v-if="game_state == 'play' && game_mode == 'sim'" class="experiments">
-				<span v-for="(exp,i) in e">
+				<span v-for="(exp,i) in summary_statistics">
 					<div class="exp_box" :id="'exp'+exp.experiment_id">
 						<div class="exp_box_hoverlay">
 							<p class="sim fo exp_button" v-if="exp.active" v-on:click="sim_choose_exp(i, true)">FULL ON</p>
@@ -139,6 +139,8 @@
 			// decision makers more aware of the complex trade off between indecision and acting 
 			// on insufficient information.
 			//
+			var e = [];
+			
 			confidence = new Vue({
 				el: '#app-confidence',
 				data: {
@@ -153,7 +155,7 @@
 					AVERAGE_EFFECT_STDDEV: 0.5,
 					DEV_CAPACITY: 2,
 					
-					e: [],
+					summary_statistics: [],
 					score: 0, 
 					level: 0, 
 					time: 0,
@@ -165,13 +167,21 @@
 					game_state: '',
 				},
 				methods: {
+					update_summary_statistics: function() {
+						this.summary_statistics = e;
+
+						// This is super nasty. I wish there was a nicer way to ensure Vue updates.
+						for (var i = 0; i < this.summary_statistics.length; ++i) {
+							this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
+						}
+					},
 					start_arcade_game: function() {
 						this.game_mode = 'arcade';
 						this.game_state = 'play';
 											    
 					    // Initialise experiment data.
-						this.e = new Array();
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e.push(new Experiment(i)); }
+						e = new Array();
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e.push(new Experiment(i)); }
 						this.score = 0; this.level = 0; this.time = this.TOTAL_VISITORS; this.conversion = this.CONVERSION_RATE;
 	
 						this.next_round_arcade();
@@ -185,7 +195,7 @@
 						effect = (Math.random() < 0.5 ? (1+1/Math.pow(2,this.level-1)) : (1-1/Math.pow(2,this.level-1)));
 	
 						// Reset experiments.
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e[i].reset(this.winner == i ? effect : 1); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(this.winner == i ? effect : 1); }
 					},
 					next_round_sim: function() {
 						if (this.day < this.TOTAL_DAYS) {
@@ -199,13 +209,13 @@
 
 						var dc = this.DEV_CAPACITY;
 	
-						for (var i = 0; i < this.e.length; ++i) { 
-							if (this.e[i].active) {
-								this.e[i].days++;
+						for (var i = 0; i < e.length; ++i) { 
+							if (e[i].active) {
+								e[i].days++;
 							}
 							else {
 								if (dc > 0) {
-									this.e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100);
+									e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100);
 									dc--;
 								}
 							}
@@ -217,30 +227,25 @@
 	
 						// assign to treatment for each exp and calculate aggregate effect size.
 						var a = [];
-						for (var i = 0; i < this.e.length; ++i) {
-							a[i] = this.e[i].assign_variant();
-							c = c * this.e[i].effect[a[i]];
+						for (var i = 0; i < e.length; ++i) {
+							a[i] = e[i].assign_variant();
+							c = c * e[i].effect[a[i]];
 						}
 	
 						// converted or not.
 						b = false; if (Math.random() <= c) { b = true; this.conversions++; }
 
 						// update exps to reflect.
-						for (var i = 0; i < this.e.length; ++i) {
-							if (this.e[i].active) {
-								this.e[i].visits[a[i]]++;
-								if (b) this.e[i].conversions[a[i]]++;
+						for (var i = 0; i < e.length; ++i) {
+							if (e[i].active) {
+								e[i].visits[a[i]]++;
+								if (b) e[i].conversions[a[i]]++;
 							}
 						}
 					},
 					run_experiments: function(v) {
 						for (var i = 0; i < v; ++i) { this.sim_visitor(); }
-						
-						// This is super nasty. I wish there was a nicer way to ensure Vue updates.
-						for (var i = 0; i < this.e.length; ++i) {
-							this.e[i].visits.splice(0,1,this.e[i].visits[0]);
-							this.e[i].conversions.splice(0,1,this.e[i].conversions[0]);
-						}
+						this.update_summary_statistics();
 					},
 					recursive_experiment_loop: function() {
 						this.run_experiments(this.VISITORS_PER_DAY_ARCADE);
@@ -259,9 +264,9 @@
 						this.game_state = 'play';
 						
 						// Initialise experiment data.
-						this.e = new Array();
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e.push(new Experiment(i)); }
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { this.e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100); }
+						e = new Array();
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e.push(new Experiment(i)); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100); }
 
 						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
 
@@ -283,23 +288,23 @@
 					},
 					sim_choose_exp: function(exp, fullon) {
 						// apply change to conversion
-						if (fullon) { this.conversion = this.e[exp].effect[1] * this.conversion; }
+						if (fullon) { this.conversion = e[exp].effect[1] * this.conversion; }
 
 						// reset experiment
-						this.e[exp].end_experiment();
-						if (!fullon && this.e[exp].days == 1) {
+						e[exp].end_experiment();
+						if (!fullon && e[exp].days == 1) {
 							$('.instant_kill').show('scale', { percent: 100 }, 300).fadeOut();
 						}
-						else if (!fullon && this.e[exp].days > 1) {
+						else if (!fullon && e[exp].days > 1) {
 							$('.fatality').show('scale', { percent: 100 }, 300).fadeOut();
 						}
-						if (fullon && this.e[exp].get_mean(1)[0] < this.e[exp].get_mean(0)[0] && this.e[exp].is_significant()) {
+						if (fullon && e[exp].get_mean(1)[0] < e[exp].get_mean(0)[0] && e[exp].is_significant()) {
 							$('.hurting').show('scale', { percent: 100 }, 300).fadeOut();
 						}
-						else if (fullon && this.e[exp].get_mean(1)[0] > this.e[exp].get_mean(0)[0] && !this.e[exp].is_significant()) {
+						else if (fullon && e[exp].get_mean(1)[0] > e[exp].get_mean(0)[0] && !e[exp].is_significant()) {
 							$('.just_under_conclusivity').show('scale', { percent: 100 }, 300).fadeOut();
 						}
-						else if (fullon && this.e[exp].get_mean(1)[0] > this.e[exp].get_mean(0)[0] && this.e[exp].is_significant() && this.e[exp].effect[1] <= 1) {
+						else if (fullon && e[exp].get_mean(1)[0] > e[exp].get_mean(0)[0] && e[exp].is_significant() && e[exp].effect[1] <= 1) {
 							$('.false_positive').show('scale', { percent: 100 }, 300).fadeOut();
 						}
 					},
