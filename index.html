@@ -2,11 +2,11 @@
     <head>
         <title>So You Think You Can Test?</title>
         <link rel="stylesheet" type="text/css" href="confidence.css">
-        <script src="jquery/jquery-1.9.1.min.js"></script>
-        <script src="jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="jquery/jquery-ui.min.js"></script>
         <script type="text/javascript" src="vue/vue.js"></script>
-        <script src="statistics-distributions.js"></script>
-        <script src="experiment.js"></script>
+        <script type="text/javascript" src="jstat/jstat.min.js"></script>
+        <script type="text/javascript" src="experiment.js"></script>
     </head>
     <body>
 		<div id="app-confidence">
@@ -215,7 +215,7 @@
 							}
 							else {
 								if (dc > 0) {
-									e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100);
+									e[i].reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
 									dc--;
 								}
 							}
@@ -266,7 +266,7 @@
 						// Initialise experiment data.
 						e = new Array();
 						for (var i = 0; i < this.EXPERIMENTS; ++i) { e.push(new Experiment(i)); }
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(1 + (this.normRand() * this.AVERAGE_EFFECT_STDDEV + this.AVERAGE_EFFECT) / 100); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100); }
 
 						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
 
@@ -307,20 +307,6 @@
 						else if (fullon && e[exp].get_mean(1)[0] > e[exp].get_mean(0)[0] && e[exp].is_significant() && e[exp].effect[1] <= 1) {
 							$('.false_positive').show('scale', { percent: 100 }, 300).fadeOut();
 						}
-					},
-					normRand: function() {
-						// Returns normally distributed random numbers
-						var x1, x2, rad;
- 
-						do {
-							x1 = 2 * Math.random() - 1;
-							x2 = 2 * Math.random() - 1;
-							rad = x1 * x1 + x2 * x2;
-						} while(rad >= 1 || rad == 0);
- 
-						var c = Math.sqrt(-2 * Math.log(rad) / rad);
- 
-						return x1 * c;
 					}
 				}
 			});
