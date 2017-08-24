@@ -123,7 +123,7 @@
 						<div class="panel-body" v-if="exp.active && exp.days == 0">
 							<center><h3>New experiment started. No data yet.</h3></center>
 						</div>
-						<experiment-table :e="exp" v-if="exp.active && exp.days > 0"></experiment-table>
+						<experiment-table :e="exp" :ci_scale_min="0.1" v-if="exp.active && exp.days > 0"></experiment-table>
 					</div>
 				</div>
 				<p><button class="btn btn-lg btn-primary btn-block" v-if="game_mode == 'sim' && game_state == 'play'" v-on:click="next_round_sim()">Wait Another Day</button></p>

@@ -177,12 +177,13 @@ Vue.component('experiment-table', {
 	`,
 	props: {
 		e:				{},
-		ci_width:		{ type: Number, default: 140 }
+		ci_width:		{ type: Number, default: 140 },
+		ci_scale_min:	{ type: Number, default: 0 },
 	},
 	methods: {
 		ci_scale: function(i) {
 			if (this.can_do_ci(i)) {
-				return Math.max(this.e.get_relative_effect(i)[1].reduce(function(a,b){return Math.max(Math.abs(a),Math.abs(b))}));
+				return Math.max(this.ci_scale_min, this.e.get_relative_effect(i)[1].reduce(function(a,b){return Math.max(Math.abs(a),Math.abs(b))}));
 			} else if (this.can_do_mle(i)) {
 				if (this.e.get_relative_effect(i)[0] == 0) return 1;
 				return Math.abs(this.e.get_relative_effect(i)[0]);
