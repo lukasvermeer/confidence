@@ -143,16 +143,16 @@ Vue.component('experiment-table', {
 					<th>Sales</th>
 					<th>Rate</th>
 					<th>Change</th>
-					<th>Significant</th>
+					<th>Sig.</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(v,i) in e.variants">
 					<th v-if="i == 0">Base</th>
-					<th v-if="i > 0">Variant {{i}}</th>
-					<td>{{ e.visits[i].toLocaleString() }}</td>
-					<td>{{ e.conversions[i].toLocaleString() }}</td>
-					<td>{{ (e.get_mean(i)[0]*100).toFixed(2) }}%</td>
+					<th v-if="i > 0">Var {{i}}</th>
+					<td width="90">{{ e.visits[i].toLocaleString() }}</td>
+					<td width="90">{{ e.conversions[i].toLocaleString() }}</td>
+					<td width="90">{{ (e.get_mean(i)[0]*100).toFixed(2) }}%</td>
 					<td v-if="i == 0" class="text-muted">-</td>
 					<td v-if="i == 0" class="text-muted">-</td>
 					<td v-if="i > 0">
@@ -177,7 +177,7 @@ Vue.component('experiment-table', {
 	`,
 	props: {
 		e:				{},
-		ci_width:		{ type: Number, default: 100 }
+		ci_width:		{ type: Number, default: 140 }
 	},
 	methods: {
 		ci_scale: function(i) {
