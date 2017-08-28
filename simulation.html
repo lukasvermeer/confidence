@@ -1,0 +1,166 @@
+<html>
+    <head>
+        <title>So You Think You Can Test? - Simulation-mode</title>
+        <link rel="stylesheet" type="text/css" href="confidence.css">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+
+        <script type="text/javascript" src="vue/vue.js"></script>
+        <script type="text/javascript" src="jstat/jstat.min.js"></script>
+        <script type="text/javascript" src="experiment.js"></script>
+    </head>
+    <body>
+		<div id="app-confidence" class="container">
+			<div v-if="game_state != 'play'" class="row">
+				<!-- A general introduction to the game. -->
+				<div class="col-md-offset-2 col-md-8">
+					<h1>So You Think You Can Test?</h1>
+					<p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
+
+					<h2>Simulation-mode</h2>
+					<p class="text-justify">This game is nowhere near finished. Please only play to get an idea of current status, or because you like playing unfinished games with no victory conditions.</p>
+					<p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+					<p><button class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
+					<p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
+					<p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
+				</div>
+			</div>
+
+			<!-- Scores header for Simulation-mode. -->
+			<div class="row" v-if="game_state == 'play'">
+				<div class="col-md-4 text-center"><h2>Day {{day}}</h2></div>
+				<div class="col-md-4 text-center"><h2>Conversion {{(conversion*100).toFixed(2) + '%'}}</h2></div>
+				<div class="col-md-4 text-center"><h2>Score {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}</h2></div>
+			</div>
+
+			<!-- Experiments display for Simulation-mode. -->
+			<div v-if="game_state == 'play'">
+				<div class="col-md-6" v-for="(exp,i) in summary_statistics">
+					<div class="panel panel-default" style="height: 162px">
+						<div class="panel-heading">
+							<b>Experiment {{exp.experiment_id}}</b>
+							<span v-if="exp.active">(running for {{ exp.days }} days)</span>
+							<div class="btn-toolbar pull-right">
+								<div class="btn-group btn-group-xs">
+									<button type="button" class="btn btn-danger" v-if="exp.active" v-on:click="sim_choose_exp(i, false)">Stop</button>
+								</div>
+								<div class="btn-group btn-group-xs">
+									<button type="button" class="btn btn-success" v-if="exp.active" v-on:click="sim_choose_exp(i, true)">Ship</button>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body" v-if="!exp.active">
+							<center><h3>The real effect of this experiment was {{((exp.effect[1]-1)*100).toFixed(2)}}%.</h3></center>
+						</div>
+						<div class="panel-body" v-if="exp.active && exp.days == 0">
+							<center><h3>New experiment started. No data yet.</h3></center>
+						</div>
+						<experiment-table :e="exp" :ci_scale_min="0.1" v-if="exp.active && exp.days > 0"></experiment-table>
+					</div>
+				</div>
+				<p><button class="btn btn-lg btn-primary btn-block" v-if="game_state == 'play'" v-on:click="next_round_sim()">Wait Another Day</button></p>
+			</div>
+        </div>
+
+        <script type="text/javascript">
+			//
+			// Decision making under uncertainty is complicated business. This game aims to make
+			// decision makers more aware of the complex trade off between indecision and acting
+			// on insufficient information.
+			//
+			var e = [];
+
+			confidence = new Vue({
+				el: '#app-confidence',
+				data: {
+					EXPERIMENTS: 8,
+					VISITORS_PER_DAY_SIM: 100000,
+					CONVERSION_RATE: 0.05,
+					AVERAGE_EFFECT: -0.25,
+					AVERAGE_EFFECT_STDDEV: 0.5,
+					DEV_CAPACITY: 2,
+
+					summary_statistics: [],
+					day: 0,
+					conversion: 0,
+					conversions: 0,
+					game_state: '',
+				},
+				methods: {
+					update_summary_statistics: function() {
+						this.summary_statistics = e;
+
+						// This is super nasty. I wish there was a nicer way to ensure Vue updates.
+						for (var i = 0; i < this.summary_statistics.length; ++i) {
+							this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
+						}
+					},
+					next_round_sim: function() {
+						setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
+					},
+					next_round_sim_deferred: function() {
+ 						this.run_experiments(this.VISITORS_PER_DAY_SIM);
+ 						this.day++;
+
+						var dc = this.DEV_CAPACITY;
+
+						for (var i = 0; i < e.length; ++i) {
+							if (e[i].active) {
+								e[i].days++;
+							}
+							else {
+								if (dc > 0) {
+									e[i].reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
+									dc--;
+								}
+							}
+						}
+					},
+					sim_visitor: function() {
+						var c = this.conversion;
+
+						// assign to treatment for each exp and calculate aggregate effect size.
+						var a = [];
+						for (var i = 0; i < e.length; ++i) {
+							a[i] = e[i].assign_variant();
+							c = c * e[i].effect[a[i]];
+						}
+
+						// converted or not.
+						b = false; if (Math.random() <= c) { b = true; this.conversions++; }
+
+						// update exps to reflect.
+						for (var i = 0; i < e.length; ++i) {
+							if (e[i].active) {
+								e[i].visits[a[i]]++;
+								if (b) e[i].conversions[a[i]]++;
+							}
+						}
+					},
+					run_experiments: function(v) {
+						for (var i = 0; i < v; ++i) { this.sim_visitor(); }
+						this.update_summary_statistics();
+					},
+					start_sim_game: function() {
+						this.game_state = 'play';
+
+						// Initialise experiment data.
+						e = new Array();
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e.push(new Experiment(i)); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100); }
+
+						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
+
+						this.next_round_sim();
+					},
+					sim_choose_exp: function(exp, fullon) {
+						// apply change to conversion
+						if (fullon) { this.conversion = e[exp].effect[1] * this.conversion; }
+
+						// reset experiment
+						e[exp].end_experiment();
+					}
+				}
+			});
+		</script>
+    </body>
+</html>
