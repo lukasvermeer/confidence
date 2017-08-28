@@ -13,6 +13,16 @@ svg .ci_significant_ugly    {fill: #761b9e !important; }
 svg .est                    {stroke: white; stroke-width: 4px; stroke-linecap: round; stroke-dasharray: 0, 7; stroke-dashoffset: -6;}
 svg .line                   {stroke: white; stroke-width: 4px; opacity: 1; }
 
+.progress {
+    transform: translateZ(0);
+}
+
+.progress-bar {
+    transform-origin: 0 0;
+    /*transition: translate3d 0.6s ease !important;*/
+    width: 100% !important;
+}
+
 .panel-hover:hover {
     border-color: #337ab7;
 }
