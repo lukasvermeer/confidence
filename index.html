@@ -66,7 +66,7 @@
 			</div>
 			<div class="row" v-if="game_state == 'play'">
 				<div class="progress">
-					<div class="progress-bar" role="progressbar" :aria-valuenow="(time/TOTAL_VISITORS*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{width: (time/TOTAL_VISITORS*100).toFixed(0)+'%'}"></div>
+					<div class="progress-bar" role="progressbar" :aria-valuenow="progressNumRounded" aria-valuemin="0" aria-valuemax="100" :style="progressStyle"></div>
 				</div>
 			</div>
 
@@ -104,6 +104,19 @@
 					time: 0,
 					winner: 0,
 					game_state: '',
+				},
+				computed: {
+					progressNum: function () {
+						return (this.time/this.TOTAL_VISITORS*100);
+					},
+					progressNumRounded: function () {
+						return this.progressNum.toFixed(0);
+					},
+					progressStyle: function () {
+						return {
+							transform: 'translate3d(' + (this.progressNum - 100) + '%, 0, 0)'
+						}
+					}
 				},
 				methods: {
 					update_summary_statistics: function() {
