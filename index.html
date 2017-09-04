@@ -1,17 +1,47 @@
 <html>
-    <head>
-        <title>So You Think You Can Test? - Arcade-mode</title>
-        <link rel="stylesheet" type="text/css" href="confidence.css">
-        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<head>
+		<title>So You Think You Can Test? - Arcade-mode</title>
+		<link rel="stylesheet" type="text/css" href="confidence.css">
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
-        <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
-        <script type="text/javascript" src="vue/vue.js"></script>
-        <script type="text/javascript" src="jstat/jstat.min.js"></script>
-        <script type="text/javascript" src="experiment.js"></script>
-    </head>
-    <body>
+		<script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="vue/vue.js"></script>
+		<script type="text/javascript" src="jstat/jstat.min.js"></script>
+		<script type="text/javascript" src="experiment.js"></script>
+	</head>
+	<body>
 		<div id="app-confidence-arcade" class="container">
-			<div v-if="game_state != 'play'" class="row">
+			<!-- In game feedback -->
+			<div class="modal" id="feedback" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-body" v-if="winner == selected">
+							<h1 class="text-center">Correct!</h1>
+							<p class="text-center lead">Experiment {{selected}} was indeed not an A/A.</p>
+							<experiment-table v-if="selected >= 0" :e="summary_statistics[selected]"></experiment-table>
+							<p class="text-center ">The simulated effect was {{effect.toLocaleString('en', {style: 'percent'})}} relative uplift.</p>
+							<p class="text-center lead">You now have {{score}} points. Get ready for the next round!</p>
+						</div>
+						<div class="modal-body" v-if="winner != selected">
+							<h1 class="text-center">Oh noes!</h1>
+							<p class="text-center lead">Experiment {{selected}} was in fact an A/A.</p>
+							<experiment-table v-if="selected >= 0" :e="summary_statistics[selected]"></experiment-table>
+							<p class="text-center" v-if="selected >= 0 && summary_statistics[selected].is_significant()">Although the observed effect was significant, the simulated effect was in fact zero.</p>
+							<p class="text-center" v-if="selected >= 0 && !summary_statistics[selected].is_significant()">There was no simulated effect, and the observed result was not significant.</p>
+							<p class="text-center lead">The real A/B was experiment {{winner}}.</p>
+							<experiment-table :e="summary_statistics[winner]"></experiment-table>
+							<p class="text-center">The simulated effect was {{effect.toLocaleString('en', {style: 'percent'})}} relative uplift.</p>
+							<p class="text-center lead">You now have {{score}} points. Get ready for the next round!</p>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-lg btn-primary btn-block" v-on:click="next_round_arcade"><b>Next</b><br /><small>press space to continue</small></button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div v-if="game_state != 'play' && game_state != 'break'" class="row">
 				<!-- A general introduction to the game. -->
 				<div class="col-md-offset-2 col-md-8" v-if="game_state == ''">
 					<h1>So You Think You Can Test?</h1>
@@ -59,19 +89,19 @@
 			</div>
 
 			<!-- Scores header for Arcade-mode. -->
-			<div class="row" v-if="game_state == 'play'">
+			<div class="row" v-if="game_state == 'play' || game_state == 'break'">
 				<div class="col-md-4 text-center"><h2>Effect {{(1/Math.pow(2,level-1)*100).toFixed(2) + '%'}}</h2></div>
 				<div class="col-md-4 text-center"><h2>Score {{score}}</h2></div>
 				<div class="col-md-4 text-center"><h2>Visitors {{time.toLocaleString()}}</h2></div>
 			</div>
-			<div class="row" v-if="game_state == 'play'">
+			<div class="row" v-if="game_state == 'play' || game_state == 'break'">
 				<div class="progress">
 					<div class="progress-bar" role="progressbar" :aria-valuenow="progressNumRounded" aria-valuemin="0" aria-valuemax="100" :style="progressStyle"></div>
 				</div>
 			</div>
 
 			<!-- Experiments display for Arcade-mode. -->
-			<div v-if="game_state == 'play'">
+			<div v-if="game_state == 'play' || game_state == 'break'">
 				<div class="col-md-6" v-for="(exp,i) in summary_statistics">
 					<div class="panel panel-default panel-hover" v-on:click="choose_exp(i)">
 						<div class="panel-heading">
@@ -81,9 +111,9 @@
 					</div>
 				</div>
 			</div>
-    </div>
+		</div>
 
-        <script type="text/javascript">
+		<script type="text/javascript">
 			//
 			// Decision making under uncertainty is complicated business. This game aims to make
 			// decision makers more aware of the complex trade off between indecision and acting
@@ -103,7 +133,8 @@
 					score: 0,
 					level: 0,
 					time: 0,
-					winner: 0,
+					winner: -1,
+					selected: -1,
 					game_state: '',
 				},
 				computed: {
@@ -117,7 +148,10 @@
 						return {
 							transform: 'translate3d(' + (this.progressNum - 100) + '%, 0, 0)'
 						}
-					}
+					},
+					effect: function () {
+						return 1/Math.pow(2,this.level-1);
+					},
 				},
 				methods: {
 					update_summary_statistics: function() {
@@ -129,9 +163,9 @@
 						}
 					},
 					start_arcade_game: function() {
-						this.game_state = 'play';
+						this.game_state = 'break';
 
-					    // Initialise experiment data.
+						// Initialise experiment data.
 						e = new Array();
 						for (var i = 0; i < this.EXPERIMENTS; ++i) { e.push(new Experiment(i)); }
 						this.score = 0; this.level = 0; this.time = this.TOTAL_VISITORS;
@@ -140,14 +174,17 @@
 						this.recursive_experiment_loop();
 					},
 					next_round_arcade: function() {
+						if (this.game_state != 'break') return;
 						this.level++;
 
 						// Pick a winner.
 						this.winner = Math.round(Math.random()*(this.EXPERIMENTS-1));
-						effect = (Math.random() < 0.5 ? (1+1/Math.pow(2,this.level-1)) : (1-1/Math.pow(2,this.level-1)));
 
 						// Reset experiments.
-						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(this.winner == i ? effect : 1); }
+						for (var i = 0; i < this.EXPERIMENTS; ++i) { e[i].reset(this.winner == i ? 1+this.effect : 1); }
+
+						$('#feedback').modal('hide');
+						this.game_state = 'play';
 					},
 					sim_visitor: function() {
 						var c = this.CONVERSION_RATE;
@@ -175,19 +212,23 @@
 						this.update_summary_statistics();
 					},
 					recursive_experiment_loop: function() {
-						this.run_experiments(this.VISITORS_PER_STEP);
-						this.time -= this.VISITORS_PER_STEP;
+						if (this.game_state == 'play') {
+							this.run_experiments(this.VISITORS_PER_STEP);
+							this.time -= this.VISITORS_PER_STEP;
+
+							if (this.time <= 0) {
+								this.game_state = 'eval';
+							}
+						}
 
 						if (this.time > 0) {
 							// This feels kinda nasty. Would be nice to use relative instead of global reference.
 							this.timeoutID = window.setTimeout(function(){ confidence.recursive_experiment_loop(); }, 10);
 						}
-						if (this.time <= 0) {
-							this.game_state = 'eval';
-						}
 					},
 					choose_exp: function(e) {
 						if (this.time > 0) {
+							this.selected = e;
 							if(this.winner==e) {
 								this.score++;
 							}
@@ -195,7 +236,8 @@
 								this.score--;
 							}
 
-							this.next_round_arcade();
+							this.game_state = 'break';
+							$('#feedback').modal('show');
 						}
 					},
 				}
@@ -206,8 +248,11 @@
 					if(event.keyCode >= 48 && event.keyCode <= 57) {
 						confidence.choose_exp(event.keyCode-48);
 					}
+					if(event.keyCode == 32) {
+						confidence.next_round_arcade();
+					}
 				});
 			});
 		</script>
-    </body>
+	</body>
 </html>
