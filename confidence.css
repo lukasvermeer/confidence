@@ -30,3 +30,7 @@ svg .line                   {stroke: white; stroke-width: 4px; opacity: 1; }
 	background-color: #337ab7;
 	color: white;
 }
+
+.nav {
+  margin-bottom: 20px;
+}
