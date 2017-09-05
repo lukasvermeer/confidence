@@ -1,14 +1,14 @@
 <html>
-    <head>
-        <title>So You Think You Can Test? - Simulation-mode</title>
-        <link rel="stylesheet" type="text/css" href="confidence.css">
-        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<head>
+		<title>So You Think You Can Test? - Simulation-mode</title>
+		<link rel="stylesheet" type="text/css" href="confidence.css">
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
-        <script type="text/javascript" src="vue/vue.js"></script>
-        <script type="text/javascript" src="jstat/jstat.min.js"></script>
-        <script type="text/javascript" src="experiment.js"></script>
-    </head>
-    <body>
+		<script type="text/javascript" src="vue/vue.js"></script>
+		<script type="text/javascript" src="jstat/jstat.min.js"></script>
+		<script type="text/javascript" src="experiment.js"></script>
+	</head>
+	<body>
 		<div id="app-confidence" class="container">
 			<div v-if="game_state != 'play'" class="row">
 				<!-- A general introduction to the game. -->
@@ -59,9 +59,9 @@
 				</div>
 				<p><button class="btn btn-lg btn-primary btn-block" v-if="game_state == 'play'" v-on:click="next_round_sim()">Wait Another Day</button></p>
 			</div>
-        </div>
+		</div>
 
-        <script type="text/javascript">
+		<script type="text/javascript">
 			//
 			// Decision making under uncertainty is complicated business. This game aims to make
 			// decision makers more aware of the complex trade off between indecision and acting
@@ -98,8 +98,8 @@
 						setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
 					},
 					next_round_sim_deferred: function() {
- 						this.run_experiments(this.VISITORS_PER_DAY_SIM);
- 						this.day++;
+						this.run_experiments(this.VISITORS_PER_DAY_SIM);
+						this.day++;
 
 						var dc = this.DEV_CAPACITY;
 
@@ -162,5 +162,5 @@
 				}
 			});
 		</script>
-    </body>
+	</body>
 </html>
