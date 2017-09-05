@@ -1,67 +1,67 @@
 var Experiment = function(id) {
-    this.experiment_id = id;
-    this.variants = 2;
-    this.effect = [1,1];
-    this.visits = [0,0];
-    this.conversions = [0,0];
-    this.active = true;
-    this.days = 0;
-    
+	this.experiment_id = id;
+	this.variants = 2;
+	this.effect = [1,1];
+	this.visits = [0,0];
+	this.conversions = [0,0];
+	this.active = true;
+	this.days = 0;
+
 	this.P_VALUE = 0.1;
 	this.GTEST_CUTOFF = jStat.chisquare.inv((1-this.P_VALUE), 1);
-    
-    this.assign_variant = function() {
-        if (!this.active) return 0;
-        return Math.floor(Math.random() * this.variants);
-    }
-    
-    this.end_experiment = function() {
-        this.active = false;
-    }
-    
-    this.reset = function(e) {
-        this.active = true;
-        this.effect[1] = e;
-        this.visits = [0,0];
-        this.conversions = [0,0];
-        this.days = 0;
-    }
 
-    this.get_g_test = function() {
-        var data_all = [];
-        for (var i = 0; i < this.variants; i++) {
-            data_all.push( [this.visits[i]-this.conversions[i], this.conversions[i]] );
-        }
-        return calculate_g_test(data_all);
-    };
-    
-    this.is_significant = function() {
-        return this.get_g_test() >= this.GTEST_CUTOFF;
-    };
-    
-    this.get_p = function() {
-	    return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants - 1));
-    };
+	this.assign_variant = function() {
+		if (!this.active) return 0;
+		return Math.floor(Math.random() * this.variants);
+	}
 
-    this.get_certainty = function() {
-        return (100 * (1-this.get_p())).toFixed(2);
-    };
+	this.end_experiment = function() {
+		this.active = false;
+	}
 
-    this.get_mean = function(i) {
-    	var p = this.conversions[i]/this.visits[i];
-        var q = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
-        
-        return [p, [p - q, p + q]];
-    }
+	this.reset = function(e) {
+		this.active = true;
+		this.effect[1] = e;
+		this.visits = [0,0];
+		this.conversions = [0,0];
+		this.days = 0;
+	}
 
-    this.get_absolute_effect = function(i) {
-    	var p = this.get_conversion(i);
-        var q = this.get_conversion(0);
-        var z = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
-        
-        return [ p - q, [p - q - z, p - q + z]];
-    }
-    
+	this.get_g_test = function() {
+		var data_all = [];
+		for (var i = 0; i < this.variants; i++) {
+			data_all.push( [this.visits[i]-this.conversions[i], this.conversions[i]] );
+		}
+		return calculate_g_test(data_all);
+	};
+
+	this.is_significant = function() {
+		return this.get_g_test() >= this.GTEST_CUTOFF;
+	};
+
+	this.get_p = function() {
+		return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants - 1));
+	};
+
+	this.get_certainty = function() {
+		return (100 * (1-this.get_p())).toFixed(2);
+	};
+
+	this.get_mean = function(i) {
+		var p = this.conversions[i]/this.visits[i];
+		var q = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
+
+		return [p, [p - q, p + q]];
+	}
+
+	this.get_absolute_effect = function(i) {
+		var p = this.get_conversion(i);
+		var q = this.get_conversion(0);
+		var z = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
+
+		return [ p - q, [p - q - z, p - q + z]];
+	}
+
 	this.get_relative_effect = function(i) {
 		var avg_base = this.get_mean(0)[0];
 		var obs_base = this.visits[0];
@@ -73,7 +73,7 @@ var Experiment = function(id) {
 
 		var zscore = jStat.studentt.inv(1-this.P_VALUE/2,1000000);
 		if (isNaN(avg_base) || isNaN(avg_var) || avg_base == 0 || obs_base == 0 || obs_var == 0) return [ NaN, [NaN, NaN]];
-		
+
 		var estimate = (avg_var - avg_base) / Math.abs(avg_base);
 		if (isNaN(stdev_base) || isNaN(stdev_var) || isNaN(obs_base) || isNaN(obs_var)) return [ estimate, [ NaN, NaN ]];
 
@@ -93,44 +93,44 @@ var Experiment = function(id) {
 // This takes an array of arrays of any size, and calculates
 // the raw g-test value.  It assumes a square matrix of arguments.
 function calculate_g_test (data) {
-    var rows = data.length;
-    var columns = data[0].length;
+	var rows = data.length;
+	var columns = data[0].length;
 
-    // Initialize our subtotals
-    var row_totals = [];
-    for (var i = 0; i < rows; i++) {
-        row_totals[i] = 0;
-    }
+	// Initialize our subtotals
+	var row_totals = [];
+	for (var i = 0; i < rows; i++) {
+		row_totals[i] = 0;
+	}
 
-    var column_totals = [];
-    for (var j = 0; j < columns; j++) {
-        column_totals[j] = 0;
-    }
+	var column_totals = [];
+	for (var j = 0; j < columns; j++) {
+		column_totals[j] = 0;
+	}
 
-    var total = 0;
+	var total = 0;
 
-    // First we calculate the totals for the row and the column
-    for (var i = 0; i < rows; i++) {
-        for (var j = 0; j < columns; j++) {
-            var entry = data[i][j] - 0;  // - 0 ensures numeric
-            row_totals[i]    += entry;
-            column_totals[j] += entry;
-            total            += entry;
-        }
-    }
+	// First we calculate the totals for the row and the column
+	for (var i = 0; i < rows; i++) {
+		for (var j = 0; j < columns; j++) {
+			var entry = data[i][j] - 0;  // - 0 ensures numeric
+			row_totals[i]    += entry;
+			column_totals[j] += entry;
+			total            += entry;
+		}
+	}
 
-    // Now we calculate the g-test contribution from each entry.
-    var g_test = 0;;
-    for (var i = 0; i < rows; i++) {
-        for (var j = 0; j < columns; j++) {
-            var expected = row_totals[i] * column_totals[j] / total;
-            var seen     = data[i][j];
+	// Now we calculate the g-test contribution from each entry.
+	var g_test = 0;;
+	for (var i = 0; i < rows; i++) {
+		for (var j = 0; j < columns; j++) {
+			var expected = row_totals[i] * column_totals[j] / total;
+			var seen     = data[i][j];
 
-            g_test      += 2 * seen * Math.log( seen / expected );
-        }
-    }
+			g_test      += 2 * seen * Math.log( seen / expected );
+		}
+	}
 
-    return g_test;
+	return g_test;
 };
 
 Vue.component('experiment-table', {
@@ -176,8 +176,8 @@ Vue.component('experiment-table', {
 		</table>
 	`,
 	props: {
-		e:				{},
-		ci_width:		{ type: Number, default: 140 },
+		e:						{},
+		ci_width:			{ type: Number, default: 140 },
 		ci_scale_min:	{ type: Number, default: 0 },
 	},
 	methods: {
