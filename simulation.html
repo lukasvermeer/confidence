@@ -79,6 +79,8 @@
 								<experiment-table :e="exp" :ci_scale_min="0.1" v-if="exp.active && exp.days > 0"></experiment-table>
 							</div>
 						</div>
+					</div>
+					<div class="row">
 						<div class="col-md-12">
 							<button class="btn btn-lg btn-primary btn-block" v-on:click="next_round_sim()">Wait Another Day</button>
 						</div>
@@ -115,13 +117,14 @@
 					backlog_headings: ['To be prioritized','Prioritized','In progress'],
 					backlog_topics: ['A','B','C','D','E'],
 					backlog_complexities: ['Low','Medium','High'],
+					backlog_index: 0,
 				},
 				mounted: function() {
-					for (var i = 0; i <= 10; i++) {
-						var e = new Experiment(i);
+					for (backlog_index = 0; backlog_index <= 6; backlog_index++) {
+						var e = new Experiment(backlog_index);
 						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
 						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
-						var b = Math.floor(Math.random() * this.backlog.length);
+						var b = Math.floor(Math.random() * (this.backlog.length - 1));
 						if (b == 2) { e.progress = (Math.random() * 100); }
 						this.backlog[b].push(e);
 					}
@@ -143,6 +146,34 @@
 						this.day++;
 
 						var dc = this.DEV_CAPACITY;
+
+						// Simulate developers.
+						for (var i = 0; i < dc; ++i) {
+							var dp = 20 + (Math.random()*20); // Developer points per developer per round.
+							while (dp > 0) {
+								if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress > 0) {
+									// There is a task and it needs work.
+									var t = Math.min(dp, this.backlog[2][i].effort - this.backlog[2][i].progress);
+									this.backlog[2][i].progress += t;
+									dp -= t;
+								} else {
+									if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress <= 0) {
+										// Task done.
+										this.backlog[2].splice(i,1);
+										// Add new task.
+										this.backlog[0].push(new Experiment(++backlog_index));
+									}
+									// Pick up new task. Prefer prioritized tasks.
+									var new_task = this.backlog[1].shift() || this.backlog[0].shift();
+									if (new_task) {
+										this.backlog[2].splice(i,0,new_task);
+									} else {
+										// Nothing to do.
+										dp = 0;
+									}
+								}
+							}
+						}
 
 						for (var i = 0; i < e.length; ++i) {
 							if (e[i].active) {

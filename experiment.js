@@ -10,6 +10,7 @@ var Experiment = function(id) {
 	this.name = 'Experiment '+this.experiment_id;
 	this.description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
 	this.metadata = {};
+	this.effort = 100;
 	this.progress = 0;
 
 	this.P_VALUE = 0.1;
@@ -233,7 +234,7 @@ Vue.component('backlog-item', {
 	},
 	computed: {
 		progressNumRounded: function () {
-			return this.e.progress.toFixed(0);
+			return (this.e.progress/this.e.effort*100).toFixed(0);
 		},
 		progressStyle: function () {
 			return {
