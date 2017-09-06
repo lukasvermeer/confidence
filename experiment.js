@@ -7,6 +7,11 @@ var Experiment = function(id) {
 	this.active = true;
 	this.days = 0;
 
+	this.name = 'Experiment '+this.experiment_id;
+	this.description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+	this.metadata = {};
+	this.progress = 0;
+
 	this.P_VALUE = 0.1;
 	this.GTEST_CUTOFF = jStat.chisquare.inv((1-this.P_VALUE), 1);
 
@@ -202,6 +207,38 @@ Vue.component('experiment-table', {
 		},
 		can_do_mle: function(i) {
 			return !isNaN(this.e.get_relative_effect(i)[0]) && isFinite(this.e.get_relative_effect(i)[0]);
+		},
+	},
+});
+
+Vue.component('backlog-item', {
+	template: `
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				{{e.name}}
+			</div>
+			<div class="panel-body">
+				<div class="progress" v-if="progressNumRounded > 0">
+					<div class="progress-bar" role="progressbar" :aria-valuenow="progressNumRounded" aria-valuemin="0" aria-valuemax="100" :style="progressStyle"></div>
+				</div>
+				<dl class="dl-horizontal">
+					<span v-for="(m,i) in e.metadata"><dt>{{i}}</dt><dd>{{m}}</dd></span>
+				</dl>
+				{{e.description}}
+			</div>
+		</div>
+		`,
+	props: {
+		e:	{},
+	},
+	computed: {
+		progressNumRounded: function () {
+			return this.e.progress.toFixed(0);
+		},
+		progressStyle: function () {
+			return {
+				width: this.progressNumRounded+'%'
+			}
 		},
 	},
 });

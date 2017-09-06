@@ -43,8 +43,14 @@
 
 				<div class="tab-content">
 					<!-- Backlog pane -->
-					<div role="tabpanel" class="tab-pane" id="backlog">
-						<div class="alert alert-info" role="alert">Your team does not use a backlog, yet ...</div>
+					<div role="tabpanel" class="tab-pane row" id="backlog">
+						<div class="alert alert-info" role="alert">Your team does not use this backlog, yet ...</div>
+						<div class="col-md-4" v-for="(b,i) in backlog">
+							<p class="text-center lead">{{backlog_headings[i]}}</p>
+							<div v-for="(exp,j) in b">
+								<backlog-item :e="exp"></backlog-item>
+							</div>
+						</div>
 					</div>
 
 					<!-- Experiments pane -->
@@ -104,6 +110,21 @@
 					conversion: 0,
 					conversions: 0,
 					game_state: '',
+
+					backlog: [[],[],[],],
+					backlog_headings: ['To be prioritized','Prioritized','In progress'],
+					backlog_topics: ['A','B','C','D','E'],
+					backlog_complexities: ['Low','Medium','High'],
+				},
+				mounted: function() {
+					for (var i = 0; i <= 10; i++) {
+						var e = new Experiment(i);
+						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
+						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
+						var b = Math.floor(Math.random() * this.backlog.length);
+						if (b == 2) { e.progress = (Math.random() * 100); }
+						this.backlog[b].push(e);
+					}
 				},
 				methods: {
 					update_summary_statistics: function() {
