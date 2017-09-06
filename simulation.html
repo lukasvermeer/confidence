@@ -44,7 +44,9 @@
 				<div class="tab-content">
 					<!-- Backlog pane -->
 					<div role="tabpanel" class="tab-pane row" id="backlog">
-						<div class="alert alert-info" role="alert">Your team does not use this backlog, yet ...</div>
+						<div class="col-md-12">
+							<div class="alert alert-info" role="alert">Your team does not use this backlog, yet ...</div>
+						</div>
 						<div class="col-md-4" v-for="(b,i) in backlog">
 							<p class="text-center lead">{{backlog_headings[i]}}</p>
 							<div v-for="(e,j) in b">
