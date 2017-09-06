@@ -74,6 +74,7 @@
 										</div>
 										<dl class="dl-horizontal">
 											<span v-for="(m,i) in e.metadata"><dt>{{i}}</dt><dd>{{m}}</dd></span>
+											<span v-if="settings.god_mode"><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
 										</dl>
 										{{e.description}}
 									</div>
@@ -147,6 +148,10 @@
 					backlog_topics: ['A','B','C','D','E'],
 					backlog_complexities: ['Low','Medium','High'],
 					backlog_index: 0,
+
+					settings: {
+						god_mode: false
+					}
 				},
 				mounted: function() {
 					for (i = 0; i <= 6; ++i) {
@@ -166,6 +171,7 @@
 						var e = new Experiment(++this.backlog_index);
 						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
 						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
+						e.reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
 						this.backlog[0].push(e);
 					},
 					prioritize_task: function(i) {
