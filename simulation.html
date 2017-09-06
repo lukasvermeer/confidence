@@ -120,13 +120,8 @@
 					backlog_index: 0,
 				},
 				mounted: function() {
-					for (backlog_index = 0; backlog_index <= 6; backlog_index++) {
-						var e = new Experiment(backlog_index);
-						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
-						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
-						var b = Math.floor(Math.random() * (this.backlog.length - 1));
-						if (b == 2) { e.progress = (Math.random() * 100); }
-						this.backlog[b].push(e);
+					for (i = 0; i <= 6; ++i) {
+						this.add_random_task();
 					}
 				},
 				methods: {
@@ -137,6 +132,12 @@
 						for (var i = 0; i < this.summary_statistics.length; ++i) {
 							this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
 						}
+					},
+					add_random_task: function() {
+						var e = new Experiment(++this.backlog_index);
+						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
+						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
+						this.backlog[0].push(e);
 					},
 					next_round_sim: function() {
 						setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
@@ -161,7 +162,7 @@
 										// Task done.
 										this.backlog[2].splice(i,1);
 										// Add new task.
-										this.backlog[0].push(new Experiment(++backlog_index));
+										this.add_random_task();
 									}
 									// Pick up new task. Prefer prioritized tasks.
 									var new_task = this.backlog[1].shift() || this.backlog[0].shift();
