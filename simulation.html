@@ -47,8 +47,26 @@
 						<div class="alert alert-info" role="alert">Your team does not use this backlog, yet ...</div>
 						<div class="col-md-4" v-for="(b,i) in backlog">
 							<p class="text-center lead">{{backlog_headings[i]}}</p>
-							<div v-for="(exp,j) in b">
-								<backlog-item :e="exp"></backlog-item>
+							<div v-for="(e,j) in b">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										{{e.name}}
+										<div class="btn-toolbar pull-right">
+											<div class="btn-group btn-group-xs" v-if="i == 0">
+												<button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
+											</div>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="progress" v-if="(e.progress/e.effort*100).toFixed(0) > 0" style="height: 2px">
+											<div class="progress-bar" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
+										</div>
+										<dl class="dl-horizontal">
+											<span v-for="(m,i) in e.metadata"><dt>{{i}}</dt><dd>{{m}}</dd></span>
+										</dl>
+										{{e.description}}
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -138,6 +156,11 @@
 						e.metadata['Topic'] = this.backlog_topics[Math.floor(Math.random() * this.backlog_topics.length)];
 						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
 						this.backlog[0].push(e);
+					},
+					prioritize_task: function(i) {
+						if (this.backlog[0][i]) {
+							this.backlog[1].push(this.backlog[0].splice(i,1)[0]);
+						}
 					},
 					next_round_sim: function() {
 						setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);

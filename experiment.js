@@ -211,35 +211,3 @@ Vue.component('experiment-table', {
 		},
 	},
 });
-
-Vue.component('backlog-item', {
-	template: `
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				{{e.name}}
-			</div>
-			<div class="panel-body">
-				<div class="progress" v-if="progressNumRounded > 0" style="height: 2px">
-					<div class="progress-bar" role="progressbar" :aria-valuenow="progressNumRounded" aria-valuemin="0" aria-valuemax="100" :style="progressStyle"></div>
-				</div>
-				<dl class="dl-horizontal">
-					<span v-for="(m,i) in e.metadata"><dt>{{i}}</dt><dd>{{m}}</dd></span>
-				</dl>
-				{{e.description}}
-			</div>
-		</div>
-		`,
-	props: {
-		e:	{},
-	},
-	computed: {
-		progressNumRounded: function () {
-			return (this.e.progress/this.e.effort*100).toFixed(0);
-		},
-		progressStyle: function () {
-			return {
-				width: this.progressNumRounded+'%'
-			}
-		},
-	},
-});
