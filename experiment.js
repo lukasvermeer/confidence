@@ -218,7 +218,7 @@ Vue.component('backlog-item', {
 				{{e.name}}
 			</div>
 			<div class="panel-body">
-				<div class="progress" v-if="progressNumRounded > 0">
+				<div class="progress" v-if="progressNumRounded > 0" style="height: 2px">
 					<div class="progress-bar" role="progressbar" :aria-valuenow="progressNumRounded" aria-valuemin="0" aria-valuemax="100" :style="progressStyle"></div>
 				</div>
 				<dl class="dl-horizontal">
