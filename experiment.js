@@ -163,12 +163,12 @@ Vue.component('experiment-table', {
 					<td v-if="i == 0" class="text-muted">-</td>
 					<td v-if="i > 0">
 						<span class="confidence-interval-display">
-							<svg :width="ci_width" height="18">
+							<svg :width="ci_width" :height="ci_height">
 								<line :x1="ci_width/2" y1="0" :x2="ci_width/2" y2="18" class="line"></line>
 								<rect x="-2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_less:1, bg_significant_ugly:(e.is_significant() && e.get_relative_effect(i)[0] < 0)}"></rect>
 								<rect :x="ci_width/2+2" :width="ci_width/2" y="0" height="18" rx="0" ry="0" :class="{bg:1, bg_more:1, bg_significant_ugly:(e.is_significant() && e.get_relative_effect(i)[0] > 0)}"></rect>
 								<rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
-								<line v-if="can_do_mle(i)" :x1="transpose(ci_scale(i), e.get_relative_effect(i)[0])" y1="3" :x2="transpose(ci_scale(i), e.get_relative_effect(i)[0])" y2="15" class="est"></line>
+								<circle v-if="can_do_mle(i)" r="1.5" :cx="transpose(ci_scale(i), e.get_relative_effect(i)[0])" :cy="ci_height/2" class="est"></line>
 							</svg>
 							<div><small>{{ (e.get_relative_effect(i)[0]*100).toFixed(2) }}% [<span class="text-muted" v-for="(ci,i) in e.get_relative_effect(i)[1]"><span v-if="i>0">,</span>{{(ci*100).toFixed(2)}}</span>]</small></div>
 						</span>
@@ -184,6 +184,7 @@ Vue.component('experiment-table', {
 	props: {
 		e:						{},
 		ci_width:			{ type: Number, default: 140 },
+		ci_height:			{ type: Number, default: 18 },
 		ci_scale_min:	{ type: Number, default: 0 },
 	},
 	methods: {
