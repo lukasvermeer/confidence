@@ -10,7 +10,7 @@ svg .ci_svg:hover           {opacity: 1; }
 svg .ci_inconclusive        {fill: rgba(53,94,151,1); }
 svg .ci_significant_ugly    {fill: #761b9e !important; }
 
-svg .est                    {stroke: white; stroke-width: 4px; stroke-linecap: round; stroke-dasharray: 0, 7; stroke-dashoffset: -6;}
+svg .est                    {fill: rgba(255,255,255,0.8); }
 svg .line                   {stroke: white; stroke-width: 4px; opacity: 1; }
 
 .panel-hover:hover {
