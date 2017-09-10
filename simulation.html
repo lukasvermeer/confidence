@@ -90,7 +90,7 @@
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										{{e.name}}
-										<span class="label label-default">{{e.metadata.Complexity}}</span>
+										<span class="label label-default" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
 										<span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
 										<div class="btn-toolbar pull-right">
 											<div class="btn-group btn-group-xs" v-if="i == 0">
@@ -102,8 +102,9 @@
 										<div class="progress" v-if="(e.progress/e.effort*100).toFixed(0) > 0" style="height: 2px">
 											<div class="progress-bar" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
 										</div>
-										<dl class="dl-horizontal">
-											<span v-if="settings.feedback_level > 2"><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
+										<dl class="dl-horizontal" v-if="settings.feedback_level > 2">
+											<span><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
+											<span><dt>Effort</dt><dd>{{(e.effort).toLocaleString('en')}}</dd></span>
 										</dl>
 										{{e.description}}
 									</div>
@@ -214,7 +215,10 @@
 				computed: {
 					backlog_colors: function() {
 						return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
-					}
+					},
+					complexity_colors: function() {
+						return this.backlog_complexities.map(function(e,i){return d3.schemeCategory20c[3-i]});
+					},
 				},
 				mounted: function() {
 					for (i = 0; i <= 6; ++i) {
@@ -233,7 +237,9 @@
 					add_random_task: function() {
 						var e = new Experiment(++this.backlog_index);
 						e.metadata['Topic'] = Math.floor(Math.random() * this.backlog_topics.length);
-						e.metadata['Complexity'] = this.backlog_complexities[Math.floor(Math.random() * this.backlog_complexities.length)];
+						var effort = Math.floor(Math.random() * this.backlog_complexities.length);
+						e.metadata['Complexity'] = effort;
+						e.effort = 50 + effort * 100;
 						e.reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
 						this.backlog[0].push(e);
 					},
