@@ -138,6 +138,7 @@
 									</div>
 								</div>
 								<experiment-table :e="exp" :ci_scale_min="0.1"></experiment-table>
+								<p class="text-center lead" v-if="settings.feedback_level > 2">The real effect of this experiment is {{((exp.effect[1]-1)*100).toFixed(2)}}%.</p>
 							</div>
 						</div>
 					</div>
@@ -155,9 +156,7 @@
 									<span>(running for {{ e.days }} days)</span>
 								</div>
 								<experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
-
-									<p class="text-center lead">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
-
+								<p class="text-center lead">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
 							</div>
 						</div>
 					</div>
