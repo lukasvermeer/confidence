@@ -113,6 +113,7 @@
 							<div class="panel panel-default">
 								<div class="panel-heading">
 									<b>Experiment {{exp.experiment_id}}</b>
+									<span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
 									<span>(running for {{ exp.days }} days)</span>
 									<div class="btn-toolbar pull-right">
 										<div class="btn-group btn-group-xs">
