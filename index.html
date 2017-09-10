@@ -45,7 +45,7 @@
 							<p class="text-center lead">You now have {{score}} points. Get ready for the next round!</p>
 						</div>
 						<div class="modal-footer">
-							<button class="btn btn-lg btn-primary btn-block" v-on:click="next_round_arcade"><b>Next</b><br /><small>press space to continue</small></button>
+							<button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="next_round_arcade"><b>Next</b><br /><small>press space to continue</small></button>
 						</div>
 					</div>
 				</div>
@@ -62,7 +62,7 @@
 					<p class="text-justify lead">Your job is to identify which of these experiments is not an A/A.</p>
 					<p class="text-justify">Once you are certain you've identified the right experiment, make your choice known by clicking (or by using the numeric keys "0" through "9"). With every subsequent level, the size of the simulated effect will diminish, making your task progressively more difficult. A point is awarded for correct decisions; mistakes will cost a point. When visitors reaches zero, the game is over.</p>
 					<p class="text-justify lead">This is a game of chance, but not of chance alone. Good luck!</p>
-					<p><button class="btn btn-lg btn-primary btn-block" v-on:click="start_arcade_game"><b>Start arcade-mode</b><br /><small>fast-paced time-based action</small></button></p>
+					<p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_arcade_game"><b>Start arcade-mode</b><br /><small>fast-paced time-based action</small></button></p>
 					<p><a href="simulation.html" class="btn btn-lg btn-default btn-block"><b>Switch to simulation-mode</b><br /><small>realistic turn-based simulation</small></a></p>
 
 					<p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
@@ -92,8 +92,8 @@
 						<span v-if="score == 6">We've done the math, and the odds of getting a score even higher than this are absolutely astronomically small. This is as close as you'll ever be to beating this game, but perhaps you'd like to try just one more time?</span>
 						<span v-if="score > 6">What you've achieved is statistically very improbable. You probably cheated, but you might also simply be The One. If you manage to do this a second time, we'd be very impressed.</span>
 					</p>
-					<p><button class="btn btn-lg btn-primary btn-block" v-on:click="start_arcade_game"><b>Thanks!</b><br /><small>let me try that one more time</small></button></p>
-					<p><button class="btn btn-lg btn-default btn-block" v-on:click="game_state = '';"><b>Hm. Okay.</b><br /><small>maybe I should read the instructions again</small></button></p>
+					<p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_arcade_game"><b>Thanks!</b><br /><small>let me try that one more time</small></button></p>
+					<p><button type="button" class="btn btn-lg btn-default btn-block" v-on:click="game_state = '';"><b>Hm. Okay.</b><br /><small>maybe I should read the instructions again</small></button></p>
 					<p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
 				</div>
 			</div>
