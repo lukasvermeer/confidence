@@ -153,6 +153,7 @@
 							<div v-for="(e,j) in h" class="panel panel-default">
 								<div class="panel-heading">
 									<b>Experiment {{e.experiment_id}}</b>
+									<span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
 									<span>(running for {{ e.days }} days)</span>
 								</div>
 								<experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
