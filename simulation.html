@@ -70,8 +70,8 @@
 				<!-- Scores header for Simulation-mode. -->
 				<div class="row">
 					<div class="col-md-4 text-center"><h2>Day {{day}}</h2></div>
-					<div class="col-md-4 text-center"><h2>Conversion {{(conversion*100).toFixed(2) + '%'}}</h2></div>
 					<div class="col-md-4 text-center"><h2>Score {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}</h2></div>
+					<div class="col-md-4 text-center"><h2><button class="btn btn-primary" v-on:click="next_round_sim()">Proceed to next day</button></h2></div>
 				</div>
 
 				<!-- Nav tabs -->
@@ -158,12 +158,6 @@
 								<experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
 								<p class="text-center lead">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
 							</div>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col-md-12">
-							<button class="btn btn-lg btn-primary btn-block" v-on:click="next_round_sim()">Wait Another Day</button>
 						</div>
 					</div>
 				</div>
