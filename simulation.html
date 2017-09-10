@@ -96,6 +96,9 @@
 											<div class="btn-group btn-group-xs" v-if="i == 0">
 												<button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
 											</div>
+											<div class="btn-group btn-group-xs">
+												<button type="button" class="btn btn-default" @click="delete_task(j,i)">Delete</button>
+											</div>
 										</div>
 									</div>
 									<div class="panel-body">
@@ -246,6 +249,12 @@
 					prioritize_task: function(i) {
 						if (this.backlog[0][i]) {
 							this.backlog[1].push(this.backlog[0].splice(i,1)[0]);
+						}
+					},
+					delete_task: function(i,b) {
+						if (this.backlog[b][i]) {
+							this.backlog[b].splice(i,1)[0];
+							this.add_random_task();
 						}
 					},
 					next_round_sim: function() {
