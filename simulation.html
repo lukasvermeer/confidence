@@ -42,6 +42,21 @@
 				</div>
 			</div>
 
+			<div class="modal" id="end_game" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-body">
+							<h1 class="text-center">The game is over</h1>
+							<p class="text-center lead">Your final score was {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}.</p>
+							<p class="text-justify">There is no prize ... yet. I did warn you this game was not finished, didn't I? Come back later; I'm sure there will be more.</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div v-if="game_state != 'play'" class="row">
 				<!-- A general introduction to the game. -->
 				<div class="col-md-offset-2 col-md-8">
@@ -52,14 +67,25 @@
 					<p class="text-justify">This game is nowhere near finished. Please only play to get an idea of current status, or because you like playing unfinished games with no victory conditions.</p>
 					<p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 					<p>
-						<div class="form-group well">
-	    				<label>Feedback level</label>
-							<p class="form-text text-muted">The amount of information you will have available during the smulation. Reduced feedback increases realism.</p>
-							<select v-model="settings.feedback_level" class="form-control">
-								<option value="1">Realistic (You will receive no feedback during the simulation)</option>
-								<option value="2">Instant feedback (You will receive instant feedback after each experiment decision)</option>
-								<option value="3">God-mode (Hidden parameters of the simulation are exposed)</option>
-							</select>
+						<div class="well">
+							<div class="form-group">
+								<label>Feedback level</label>
+								<p class="form-text text-muted">The amount of information you will have available during the smulation. Reduced feedback increases realism.</p>
+								<select v-model.number="settings.feedback_level" class="form-control">
+									<option value="1">Realistic (You will receive no feedback during the simulation)</option>
+									<option value="2">Instant feedback (You will receive instant feedback after each experiment decision)</option>
+									<option value="3">God-mode (Hidden parameters of the simulation are exposed)</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Game duration</label>
+								<p class="form-text text-muted">Longer play increases the opportunity to uncover the underlying simulation parameters through experimentation.</p>
+								<select v-model.number="settings.game_duration" class="form-control">
+									<option value="28">28 days (Barely enough time to run a few experiments)</option>
+									<option value="91">91 days (13 weeks. A single quarter. Enough time to explore)</option>
+									<option value="364">364 days (52 weeks. A whole year. Almost enough time to get bored)</option>
+								</select>
+							</div>
 						</div>
 					</p>
 					<p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
@@ -71,9 +97,12 @@
 			<div v-if="game_state == 'play'">
 				<!-- Scores header for Simulation-mode. -->
 				<div class="row">
-					<div class="col-md-4 text-center"><h2>Day {{day}}</h2></div>
+					<div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
 					<div class="col-md-4 text-center"><h2>Score {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}</h2></div>
-					<div class="col-md-4 text-center"><h2><button type="button" class="btn btn-primary" v-on:click="next_round_sim()">Proceed to next day</button></h2></div>
+					<div class="col-md-4 text-center"><h2>
+						<button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
+						<button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
+					</h2></div>
 				</div>
 
 				<!-- Nav tabs -->
@@ -206,7 +235,8 @@
 					history: [[],[]],
 
 					settings: {
-						feedback_level: 2
+						feedback_level: 2,
+						game_duration: 91,
 					},
 					message: {},
 				},
@@ -217,11 +247,6 @@
 					complexity_colors: function() {
 						return this.backlog_complexities.map(function(e,i){return d3.schemeCategory20c[3-i]});
 					},
-				},
-				mounted: function() {
-					for (i = 0; i <= 6; ++i) {
-						this.add_random_task();
-					}
 				},
 				methods: {
 					update_summary_statistics: function() {
@@ -326,6 +351,15 @@
 						// Initialise experiment data.
 						e = new Array();
 						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
+						this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
+						for (i = 0; i <= 6; ++i) {
+							this.add_random_task();
+						}
+						this.update_summary_statistics();
+					},
+					end_sim_game: function() {
+						$('#end_game').modal('show');
+						this.game_state = '';
 					},
 					sim_choose_exp: function(exp, fullon) {
 						// apply change to conversion
