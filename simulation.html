@@ -107,8 +107,16 @@
 
 				<!-- Nav tabs -->
 				<ul class="nav nav-tabs" role="tablist">
-					<li role="presentation"><a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab">Backlog</a></li>
-					<li role="presentation" class="active"><a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab">Experiments</a></li>
+					<li role="presentation">
+						<a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab">
+							Backlog <span class="badge">{{backlog[1].length}}</span>
+						</a>
+					</li>
+					<li role="presentation" class="active">
+						<a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab">
+							Experiments <span class="badge" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
+						</a>
+					</li>
 					<li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
 				</ul>
 
