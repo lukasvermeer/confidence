@@ -47,7 +47,7 @@
 					<div class="modal-content">
 						<div class="modal-body">
 							<h1 class="text-center">The game is over</h1>
-							<p class="text-center lead">Your final score was {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}.</p>
+							<p class="text-center lead">Your final score was {{format_number(conversions)}}.</p>
 							<p class="text-justify">There is no prize ... yet. I did warn you this game was not finished, didn't I? Come back later; I'm sure there will be more.</p>
 						</div>
 						<div class="modal-footer">
@@ -98,7 +98,7 @@
 				<!-- Scores header for Simulation-mode. -->
 				<div class="row">
 					<div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
-					<div class="col-md-4 text-center"><h2>Score {{conversions.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.')}}</h2></div>
+					<div class="col-md-4 text-center"><h2>Score {{format_number(conversions)}}</h2></div>
 					<div class="col-md-4 text-center"><h2>
 						<button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
 						<button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
@@ -378,7 +378,10 @@
 
 						e[exp].end_experiment();
 						this.history[0+fullon].push(e.splice(exp,1)[0]);
-					}
+					},
+					format_number: function(n) {
+						return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.');
+					},
 				}
 			});
 		</script>
