@@ -47,8 +47,19 @@
 					<div class="modal-content">
 						<div class="modal-body">
 							<h1 class="text-center">The game is over</h1>
-							<p class="text-center lead">Your final score was {{format_number(conversions)}}.</p>
-							<p class="text-justify">There is no prize ... yet. I did warn you this game was not finished, didn't I? Come back later; I'm sure there will be more.</p>
+							<p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
+							<experiment-table :e="overall_performance"></experiment-table>
+							<p class="text-center lead">
+								<span v-if="overall_performance.is_significant()">
+									This is significantly
+									<b v-if="overall_performance.get_relative_effect(1)[0] > 0">better</b>
+									<b v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</b>
+									than would have been expected if there had been no product changes made at all.
+								</span>
+								<span v-if="!overall_performance.is_significant()">
+									This is not significantly different from what would have been expected if there had been no product changes made at all.
+								</span>
+							</p>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
@@ -98,7 +109,7 @@
 				<!-- Scores header for Simulation-mode. -->
 				<div class="row">
 					<div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
-					<div class="col-md-4 text-center"><h2>Score {{format_number(conversions)}}</h2></div>
+					<div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
 					<div class="col-md-4 text-center"><h2>
 						<button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
 						<button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
@@ -228,6 +239,7 @@
 					DEV_CAPACITY: 2,
 
 					summary_statistics: [],
+					overall_performance: new Experiment(-1),
 					day: 0,
 					conversion: 0,
 					conversions: 0,
@@ -264,6 +276,7 @@
 						for (var i = 0; i < this.summary_statistics.length; ++i) {
 							this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
 						}
+						this.overall_performance.visits.splice(0,1,this.overall_performance.visits[0]);
 					},
 					add_random_task: function() {
 						var e = new Experiment(++this.backlog_index);
@@ -348,6 +361,11 @@
 								if (b) e[i].conversions[a[i]]++;
 							}
 						}
+
+						this.overall_performance.visits[0]++;
+						this.overall_performance.conversions[0] += this.CONVERSION_RATE;
+						this.overall_performance.visits[1]++;
+						if (b) this.overall_performance.conversions[1]++;
 					},
 					run_experiments: function(v) {
 						for (var i = 0; i < v; ++i) { this.sim_visitor(); }
@@ -358,6 +376,7 @@
 
 						// Initialise experiment data.
 						e = new Array();
+						this.overall_performance = new Experiment(-1);
 						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
 						this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
 						for (i = 0; i <= 6; ++i) {
@@ -381,6 +400,9 @@
 					},
 					format_number: function(n) {
 						return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.');
+					},
+					format_percent: function(n) {
+						return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
 					},
 				}
 			});
