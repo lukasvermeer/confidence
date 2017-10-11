@@ -7,59 +7,59 @@
         <script type="text/javascript" src="vue/vue.js"></script>
         <script type="text/javascript" src="jstat/jstat.min.js"></script>
         <script type="text/javascript" src="experiment.js"></script>
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-			ga('create', 'UA-105998856-2', 'auto');
-			ga('send', 'pageview');
-		</script>
+      ga('create', 'UA-105998856-2', 'auto');
+      ga('send', 'pageview');
+    </script>
     </head>
     <body>
-    	<div id="app-tester" class="container">
-    		<center>
-				<h1>AB Result Display Scratchpad</h1>
+      <div id="app-tester" class="container">
+        <center>
+        <h1>AB Result Display Scratchpad</h1>
 
-				<p>
-					B traffic <input v-model="input.b.traffic" type="number"/> 
-					B conversions <input v-model="input.b.conversions" type="number"/>
-				</p>
-				<p>
-					V traffic <input v-model="input.v.traffic" type="number"/> 
-					V conversions <input v-model="input.v.conversions" type="number"/>
-				</p>
-			
-				<div class="col-md-offset-3 col-md-6">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<b>Experiment</b>
-						</div>
-						<experiment-table :e="experiment"></experiment-table>
-					</div>
-				</div>
-			</center>
-		</div>
+        <p>
+          B traffic <input v-model="input.b.traffic" type="number"/> 
+          B conversions <input v-model="input.b.conversions" type="number"/>
+        </p>
+        <p>
+          V traffic <input v-model="input.v.traffic" type="number"/> 
+          V conversions <input v-model="input.v.conversions" type="number"/>
+        </p>
+
+        <div class="col-md-offset-3 col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <b>Experiment</b>
+            </div>
+            <experiment-table :e="experiment"></experiment-table>
+          </div>
+        </div>
+      </center>
+    </div>
 
         <script type="text/javascript">
-			tester = new Vue({
-				el: '#app-tester',
-				data: {
-					input: {
-						b: { traffic: 10000, conversions: 500 },
-						v: { traffic: 10000, conversions: 560 }
-					},
-					e: new Experiment(0)
-				},
-				computed: {
-					experiment: function(val) {
-						this.e.visits = [parseInt(this.input.b.traffic), parseInt(this.input.v.traffic)];
-						this.e.conversions = [parseInt(this.input.b.conversions), parseInt(this.input.v.conversions)];
-						return this.e;
-					}
-				}
-			});
-		</script>
+      tester = new Vue({
+        el: '#app-tester',
+        data: {
+          input: {
+            b: { traffic: 10000, conversions: 500 },
+            v: { traffic: 10000, conversions: 560 }
+          },
+          e: new Experiment(0)
+        },
+        computed: {
+          experiment: function(val) {
+            this.e.visits = [parseInt(this.input.b.traffic), parseInt(this.input.v.traffic)];
+            this.e.conversions = [parseInt(this.input.b.conversions), parseInt(this.input.v.conversions)];
+            return this.e;
+          }
+        }
+      });
+    </script>
     </body>
 </html>

@@ -1,409 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-		<title>So You Think You Can Test? - Simulation-mode</title>
+    <title>So You Think You Can Test? - Simulation-mode</title>
 
-		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="confidence.css">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="confidence.css">
 
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-			ga('create', 'UA-105998856-2', 'auto');
-			ga('send', 'pageview');
-		</script>
-	</head>
-	<body>
-		<div id="app-confidence" class="container">
-			<div class="modal" id="decision" tabindex="-1" role="dialog">
-				<div class="modal-dialog" role="document" v-if="message.type == 'decision'">
-					<div class="modal-content">
-						<div class="modal-body" v-if="message.fullon">
-							<h1 class="text-center">You shipped {{message.exp.name}}.</h1>
-							<experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
-							<p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
-						</div>
-						<div class="modal-body" v-if="!message.fullon">
-							<h1 class="text-center">You stopped {{message.exp.name}}.</h1>
-							<experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
-							<p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
-						</div>
-					</div>
-				</div>
-			</div>
+      ga('create', 'UA-105998856-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <div id="app-confidence" class="container">
+      <div class="modal" id="decision" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" v-if="message.type == 'decision'">
+          <div class="modal-content">
+            <div class="modal-body" v-if="message.fullon">
+              <h1 class="text-center">You shipped {{message.exp.name}}.</h1>
+              <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
+              <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+            </div>
+            <div class="modal-body" v-if="!message.fullon">
+              <h1 class="text-center">You stopped {{message.exp.name}}.</h1>
+              <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
+              <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-			<div class="modal" id="end_game" tabindex="-1" role="dialog">
-				<div class="modal-dialog" role="document">
-					<div class="modal-content">
-						<div class="modal-body">
-							<h1 class="text-center">The game is over</h1>
-							<p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
-							<experiment-table :e="overall_performance"></experiment-table>
-							<p class="text-center lead">
-								<span v-if="overall_performance.is_significant()">
-									This is significantly
-									<b v-if="overall_performance.get_relative_effect(1)[0] > 0">better</b>
-									<b v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</b>
-									than would have been expected if there had been no product changes made at all.
-								</span>
-								<span v-if="!overall_performance.is_significant()">
-									This is not significantly different from what would have been expected if there had been no product changes made at all.
-								</span>
-							</p>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
-						</div>
-					</div>
-				</div>
-			</div>
+      <div class="modal" id="end_game" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h1 class="text-center">The game is over</h1>
+              <p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
+              <experiment-table :e="overall_performance"></experiment-table>
+              <p class="text-center lead">
+                <span v-if="overall_performance.is_significant()">
+                  This is significantly
+                  <b v-if="overall_performance.get_relative_effect(1)[0] > 0">better</b>
+                  <b v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</b>
+                  than would have been expected if there had been no product changes made at all.
+                </span>
+                <span v-if="!overall_performance.is_significant()">
+                  This is not significantly different from what would have been expected if there had been no product changes made at all.
+                </span>
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-			<div v-if="game_state != 'play'" class="row">
-				<!-- A general introduction to the game. -->
-				<div class="col-md-offset-2 col-md-8">
-					<h1>So You Think You Can Test?</h1>
-					<p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
-					<h2>Simulation-mode</h2>
-					<p class="text-justify">You control the backlog and experiments for a small development team. Your objective is to maximise total sales.</p>
-					<p>
-						<div class="well">
-							<div class="form-group">
-								<label>Feedback level</label>
-								<p class="form-text text-muted">The amount of information you will have available during the smulation. Reduced feedback increases realism.</p>
-								<select v-model.number="settings.feedback_level" class="form-control">
-									<option value="1">Realistic (You will receive no feedback during the simulation)</option>
-									<option value="2">Instant feedback (You will receive instant feedback after each experiment decision)</option>
-									<option value="3">God-mode (Hidden parameters of the simulation are exposed)</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Game duration</label>
-								<p class="form-text text-muted">Longer play increases the opportunity to uncover the underlying simulation parameters through experimentation.</p>
-								<select v-model.number="settings.game_duration" class="form-control">
-									<option value="28">28 days (Barely enough time to run a few experiments)</option>
-									<option value="91">91 days (13 weeks. A single quarter. Enough time to explore)</option>
-									<option value="364">364 days (52 weeks. A whole year. Almost enough time to get bored)</option>
-								</select>
-							</div>
-						</div>
-					</p>
-					<p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
-					<p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
-					<p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
-				</div>
-			</div>
+      <div v-if="game_state != 'play'" class="row">
+        <!-- A general introduction to the game. -->
+        <div class="col-md-offset-2 col-md-8">
+          <h1>So You Think You Can Test?</h1>
+          <p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
+          <h2>Simulation-mode</h2>
+          <p class="text-justify">You control the backlog and experiments for a small development team. Your objective is to maximise total sales.</p>
+          <p>
+            <div class="well">
+              <div class="form-group">
+                <label>Feedback level</label>
+                <p class="form-text text-muted">The amount of information you will have available during the smulation. Reduced feedback increases realism.</p>
+                <select v-model.number="settings.feedback_level" class="form-control">
+                  <option value="1">Realistic (You will receive no feedback during the simulation)</option>
+                  <option value="2">Instant feedback (You will receive instant feedback after each experiment decision)</option>
+                  <option value="3">God-mode (Hidden parameters of the simulation are exposed)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Game duration</label>
+                <p class="form-text text-muted">Longer play increases the opportunity to uncover the underlying simulation parameters through experimentation.</p>
+                <select v-model.number="settings.game_duration" class="form-control">
+                  <option value="28">28 days (Barely enough time to run a few experiments)</option>
+                  <option value="91">91 days (13 weeks. A single quarter. Enough time to explore)</option>
+                  <option value="364">364 days (52 weeks. A whole year. Almost enough time to get bored)</option>
+                </select>
+              </div>
+            </div>
+          </p>
+          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
+          <p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
+          <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
+        </div>
+      </div>
 
-			<div v-if="game_state == 'play'">
-				<!-- Scores header for Simulation-mode. -->
-				<div class="row">
-					<div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
-					<div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
-					<div class="col-md-4 text-center"><h2>
-						<button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
-						<button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
-					</h2></div>
-				</div>
+      <div v-if="game_state == 'play'">
+        <!-- Scores header for Simulation-mode. -->
+        <div class="row">
+          <div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
+          <div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
+          <div class="col-md-4 text-center"><h2>
+            <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
+            <button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
+          </h2></div>
+        </div>
 
-				<!-- Nav tabs -->
-				<ul class="nav nav-tabs" role="tablist">
-					<li role="presentation">
-						<a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab">
-							Backlog <span class="badge">{{backlog[1].length}}</span>
-						</a>
-					</li>
-					<li role="presentation" class="active">
-						<a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab">
-							Experiments <span class="badge" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
-						</a>
-					</li>
-					<li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
-				</ul>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation">
+            <a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab">
+              Backlog <span class="badge">{{backlog[1].length}}</span>
+            </a>
+          </li>
+          <li role="presentation" class="active">
+            <a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab">
+              Experiments <span class="badge" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
+            </a>
+          </li>
+          <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+        </ul>
 
-				<div class="tab-content">
-					<!-- Backlog pane -->
-					<div role="tabpanel" class="tab-pane row" id="backlog">
-						<div class="col-md-4" v-for="(b,i) in backlog">
-							<p class="text-center lead">{{backlog_headings[i]}}</p>
-							<div v-for="(e,j) in b">
-								<div class="panel panel-default">
-									<div class="panel-heading">
-										{{e.name}}
-										<span class="label label-default" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
-										<span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
-										<div class="btn-toolbar pull-right">
-											<div class="btn-group btn-group-xs" v-if="i == 0">
-												<button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
-											</div>
-											<div class="btn-group btn-group-xs">
-												<button type="button" class="btn btn-default" @click="delete_task(j,i)">Delete</button>
-											</div>
-										</div>
-									</div>
-									<div class="panel-body">
-										<div class="progress" v-if="(e.progress/e.effort*100).toFixed(0) > 0" style="height: 2px">
-											<div class="progress-bar" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
-										</div>
-										<dl class="dl-horizontal" v-if="settings.feedback_level > 2">
-											<span><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
-											<span><dt>Effort</dt><dd>{{(e.effort).toLocaleString('en')}}</dd></span>
-										</dl>
-										{{e.description}}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+        <div class="tab-content">
+          <!-- Backlog pane -->
+          <div role="tabpanel" class="tab-pane row" id="backlog">
+            <div class="col-md-4" v-for="(b,i) in backlog">
+              <p class="text-center lead">{{backlog_headings[i]}}</p>
+              <div v-for="(e,j) in b">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    {{e.name}}
+                    <span class="label label-default" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
+                    <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
+                    <div class="btn-toolbar pull-right">
+                      <div class="btn-group btn-group-xs" v-if="i == 0">
+                        <button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
+                      </div>
+                      <div class="btn-group btn-group-xs">
+                        <button type="button" class="btn btn-default" @click="delete_task(j,i)">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="panel-body">
+                    <div class="progress" v-if="(e.progress/e.effort*100).toFixed(0) > 0" style="height: 2px">
+                      <div class="progress-bar" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
+                    </div>
+                    <dl class="dl-horizontal" v-if="settings.feedback_level > 2">
+                      <span><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
+                      <span><dt>Effort</dt><dd>{{(e.effort).toLocaleString('en')}}</dd></span>
+                    </dl>
+                    {{e.description}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-					<!-- Experiments pane -->
-					<div role="tabpanel" class="tab-pane active row" id="experiments">
-						<!-- Experiments display for Simulation-mode. -->
-						<div class="col-md-12" v-if="summary_statistics.length == 0">
-							<div class="alert alert-info text-center" role="alert">There are currently no experiments running. Use the navigation above to switch to the <mark>backlog</mark> tab to prioritize their development.</div>
-						</div>
-						<div class="col-md-6" v-for="(exp,i) in summary_statistics">
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<b>Experiment {{exp.experiment_id}}</b>
-									<span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
-									<span>(running for {{ exp.days }} days)</span>
-									<div class="btn-toolbar pull-right">
-										<div class="btn-group btn-group-xs">
-											<button type="button" class="btn btn-danger" v-on:click="sim_choose_exp(i, false)">Stop</button>
-										</div>
-										<div class="btn-group btn-group-xs">
-											<button type="button" class="btn btn-success" v-on:click="sim_choose_exp(i, true)">Ship</button>
-										</div>
-									</div>
-								</div>
-								<experiment-table :e="exp" :ci_scale_min="0.1"></experiment-table>
-								<p class="text-center lead" v-if="settings.feedback_level > 2">The real effect of this experiment is {{((exp.effect[1]-1)*100).toFixed(2)}}%.</p>
-							</div>
-						</div>
-					</div>
+          <!-- Experiments pane -->
+          <div role="tabpanel" class="tab-pane active row" id="experiments">
+            <!-- Experiments display for Simulation-mode. -->
+            <div class="col-md-12" v-if="summary_statistics.length == 0">
+              <div class="alert alert-info text-center" role="alert">There are currently no experiments running. Use the navigation above to switch to the <mark>backlog</mark> tab to prioritize their development.</div>
+            </div>
+            <div class="col-md-6" v-for="(exp,i) in summary_statistics">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <b>Experiment {{exp.experiment_id}}</b>
+                  <span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
+                  <span>(running for {{ exp.days }} days)</span>
+                  <div class="btn-toolbar pull-right">
+                    <div class="btn-group btn-group-xs">
+                      <button type="button" class="btn btn-danger" v-on:click="sim_choose_exp(i, false)">Stop</button>
+                    </div>
+                    <div class="btn-group btn-group-xs">
+                      <button type="button" class="btn btn-success" v-on:click="sim_choose_exp(i, true)">Ship</button>
+                    </div>
+                  </div>
+                </div>
+                <experiment-table :e="exp" :ci_scale_min="0.1"></experiment-table>
+                <p class="text-center lead" v-if="settings.feedback_level > 2">The real effect of this experiment is {{((exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+              </div>
+            </div>
+          </div>
 
-					<div role="tabpanel" class="tab-pane row" id="history">
-						<div class="col-md-12" v-if="history[0].length == 0 && history[1].length == 0">
-							<div class="alert alert-info text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
-						</div>
-						<div class="col-md-6" v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
-							<p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
-							<div v-for="(e,j) in h" class="panel panel-default">
-								<div class="panel-heading">
-									<b>Experiment {{e.experiment_id}}</b>
-									<span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
-									<span>(running for {{ e.days }} days)</span>
-								</div>
-								<experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
-								<p class="text-center lead">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+          <div role="tabpanel" class="tab-pane row" id="history">
+            <div class="col-md-12" v-if="history[0].length == 0 && history[1].length == 0">
+              <div class="alert alert-info text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
+            </div>
+            <div class="col-md-6" v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
+              <p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
+              <div v-for="(e,j) in h" class="panel panel-default">
+                <div class="panel-heading">
+                  <b>Experiment {{e.experiment_id}}</b>
+                  <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
+                  <span>(running for {{ e.days }} days)</span>
+                </div>
+                <experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
+                <p class="text-center lead">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
-		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="vue/vue.js"></script>
-		<script type="text/javascript" src="d3/d3.min.js"></script>
-		<script type="text/javascript" src="jstat/jstat.min.js"></script>
-		<script type="text/javascript" src="experiment.js"></script>
+    <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="vue/vue.js"></script>
+    <script type="text/javascript" src="d3/d3.min.js"></script>
+    <script type="text/javascript" src="jstat/jstat.min.js"></script>
+    <script type="text/javascript" src="experiment.js"></script>
 
-		<script type="text/javascript">
-			//
-			// Decision making under uncertainty is complicated business. This game aims to make
-			// decision makers more aware of the complex trade off between indecision and acting
-			// on insufficient information.
-			//
-			var e = [];
+    <script type="text/javascript">
+      //
+      // Decision making under uncertainty is complicated business. This game aims to make
+      // decision makers more aware of the complex trade off between indecision and acting
+      // on insufficient information.
+      //
+      var e = [];
 
-			confidence = new Vue({
-				el: '#app-confidence',
-				data: {
-					VISITORS_PER_DAY_SIM: 100000,
-					CONVERSION_RATE: 0.05,
-					AVERAGE_EFFECT: -0.25,
-					AVERAGE_EFFECT_STDDEV: 0.5,
-					DEV_CAPACITY: 2,
+      confidence = new Vue({
+        el: '#app-confidence',
+        data: {
+          VISITORS_PER_DAY_SIM: 100000,
+          CONVERSION_RATE: 0.05,
+          AVERAGE_EFFECT: -0.25,
+          AVERAGE_EFFECT_STDDEV: 0.5,
+          DEV_CAPACITY: 2,
 
-					summary_statistics: [],
-					overall_performance: new Experiment(-1),
-					day: 0,
-					conversion: 0,
-					conversions: 0,
-					game_state: '',
+          summary_statistics: [],
+          overall_performance: new Experiment(-1),
+          day: 0,
+          conversion: 0,
+          conversions: 0,
+          game_state: '',
 
-					backlog: [[],[],[],],
-					backlog_headings: ['To be prioritized','Prioritized','In progress'],
-					backlog_topics: ['A','B','C','D','E'],
-					backlog_complexities: ['Low','Medium','High'],
-					backlog_index: 0,
+          backlog: [[],[],[],],
+          backlog_headings: ['To be prioritized','Prioritized','In progress'],
+          backlog_topics: ['A','B','C','D','E'],
+          backlog_complexities: ['Low','Medium','High'],
+          backlog_index: 0,
 
-					history_headings: ['Stopped', 'Shipped'],
-					history: [[],[]],
+          history_headings: ['Stopped', 'Shipped'],
+          history: [[],[]],
 
-					settings: {
-						feedback_level: 2,
-						game_duration: 91,
-					},
-					message: {},
-				},
-				computed: {
-					backlog_colors: function() {
-						return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
-					},
-					complexity_colors: function() {
-						return this.backlog_complexities.map(function(e,i){return d3.schemeCategory20c[3-i]});
-					},
-				},
-				methods: {
-					update_summary_statistics: function() {
-						this.summary_statistics = e;
+          settings: {
+            feedback_level: 2,
+            game_duration: 91,
+          },
+          message: {},
+        },
+        computed: {
+          backlog_colors: function() {
+            return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
+          },
+          complexity_colors: function() {
+            return this.backlog_complexities.map(function(e,i){return d3.schemeCategory20c[3-i]});
+          },
+        },
+        methods: {
+          update_summary_statistics: function() {
+            this.summary_statistics = e;
 
-						// This is super nasty. I wish there was a nicer way to ensure Vue updates.
-						for (var i = 0; i < this.summary_statistics.length; ++i) {
-							this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
-						}
-						this.overall_performance.visits.splice(0,1,this.overall_performance.visits[0]);
-					},
-					add_random_task: function() {
-						var e = new Experiment(++this.backlog_index);
-						e.metadata['Topic'] = Math.floor(Math.random() * this.backlog_topics.length);
-						var effort = Math.floor(Math.random() * this.backlog_complexities.length);
-						e.metadata['Complexity'] = effort;
-						e.effort = 50 + effort * 100;
-						e.reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
-						this.backlog[0].push(e);
-					},
-					prioritize_task: function(i) {
-						if (this.backlog[0][i]) {
-							this.backlog[1].push(this.backlog[0].splice(i,1)[0]);
-						}
-					},
-					delete_task: function(i,b) {
-						if (this.backlog[b][i]) {
-							this.backlog[b].splice(i,1)[0];
-							this.add_random_task();
-						}
-					},
-					next_round_sim: function() {
-						setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
-					},
-					next_round_sim_deferred: function() {
-						var dc = this.DEV_CAPACITY;
+            // This is super nasty. I wish there was a nicer way to ensure Vue updates.
+            for (var i = 0; i < this.summary_statistics.length; ++i) {
+              this.summary_statistics[i].visits.splice(0,1,this.summary_statistics[i].visits[0]);
+            }
+            this.overall_performance.visits.splice(0,1,this.overall_performance.visits[0]);
+          },
+          add_random_task: function() {
+            var e = new Experiment(++this.backlog_index);
+            e.metadata['Topic'] = Math.floor(Math.random() * this.backlog_topics.length);
+            var effort = Math.floor(Math.random() * this.backlog_complexities.length);
+            e.metadata['Complexity'] = effort;
+            e.effort = 50 + effort * 100;
+            e.reset(1 + jStat.normal.sample(this.AVERAGE_EFFECT, this.AVERAGE_EFFECT_STDDEV) / 100);
+            this.backlog[0].push(e);
+          },
+          prioritize_task: function(i) {
+            if (this.backlog[0][i]) {
+              this.backlog[1].push(this.backlog[0].splice(i,1)[0]);
+            }
+          },
+          delete_task: function(i,b) {
+            if (this.backlog[b][i]) {
+              this.backlog[b].splice(i,1)[0];
+              this.add_random_task();
+            }
+          },
+          next_round_sim: function() {
+            setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
+          },
+          next_round_sim_deferred: function() {
+            var dc = this.DEV_CAPACITY;
 
-						// Simulate developers.
-						for (var i = 0; i < dc; ++i) {
-							var dp = 20 + (Math.random()*20); // Developer points per developer per round.
-							while (dp > 0) {
-								if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress > 0) {
-									// There is a task and it needs work.
-									var t = Math.min(dp, this.backlog[2][i].effort - this.backlog[2][i].progress);
-									this.backlog[2][i].progress += t;
-									dp -= t;
-								} else {
-									if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress <= 0) {
-										// Task done.
-										e.push(this.backlog[2].splice(i,1)[0]);
-										// Add new task.
-										this.add_random_task();
-									}
-									// Pick up new task. Prefer prioritized tasks.
-									var new_task = this.backlog[1].shift() || this.backlog[0].shift();
-									if (new_task) {
-										this.backlog[2].splice(i,0,new_task);
-									} else {
-										// Nothing to do.
-										dp = 0;
-									}
-								}
-							}
-						}
+            // Simulate developers.
+            for (var i = 0; i < dc; ++i) {
+              var dp = 20 + (Math.random()*20); // Developer points per developer per round.
+              while (dp > 0) {
+                if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress > 0) {
+                  // There is a task and it needs work.
+                  var t = Math.min(dp, this.backlog[2][i].effort - this.backlog[2][i].progress);
+                  this.backlog[2][i].progress += t;
+                  dp -= t;
+                } else {
+                  if (this.backlog[2][i] && this.backlog[2][i].effort - this.backlog[2][i].progress <= 0) {
+                    // Task done.
+                    e.push(this.backlog[2].splice(i,1)[0]);
+                    // Add new task.
+                    this.add_random_task();
+                  }
+                  // Pick up new task. Prefer prioritized tasks.
+                  var new_task = this.backlog[1].shift() || this.backlog[0].shift();
+                  if (new_task) {
+                    this.backlog[2].splice(i,0,new_task);
+                  } else {
+                    // Nothing to do.
+                    dp = 0;
+                  }
+                }
+              }
+            }
 
-						this.run_experiments(this.VISITORS_PER_DAY_SIM);
-						this.day++;
+            this.run_experiments(this.VISITORS_PER_DAY_SIM);
+            this.day++;
 
-						for (var i = 0; i < e.length; ++i) {
-							if (e[i].active) {
-								e[i].days++;
-							}
-						}
-					},
-					sim_visitor: function() {
-						var c = this.conversion;
+            for (var i = 0; i < e.length; ++i) {
+              if (e[i].active) {
+                e[i].days++;
+              }
+            }
+          },
+          sim_visitor: function() {
+            var c = this.conversion;
 
-						// assign to treatment for each exp and calculate aggregate effect size.
-						var a = [];
-						for (var i = 0; i < e.length; ++i) {
-							a[i] = e[i].assign_variant();
-							c = c * e[i].effect[a[i]];
-						}
+            // assign to treatment for each exp and calculate aggregate effect size.
+            var a = [];
+            for (var i = 0; i < e.length; ++i) {
+              a[i] = e[i].assign_variant();
+              c = c * e[i].effect[a[i]];
+            }
 
-						// converted or not.
-						b = false; if (Math.random() <= c) { b = true; this.conversions++; }
+            // converted or not.
+            b = false; if (Math.random() <= c) { b = true; this.conversions++; }
 
-						// update exps to reflect.
-						for (var i = 0; i < e.length; ++i) {
-							if (e[i].active) {
-								e[i].visits[a[i]]++;
-								if (b) e[i].conversions[a[i]]++;
-							}
-						}
+            // update exps to reflect.
+            for (var i = 0; i < e.length; ++i) {
+              if (e[i].active) {
+                e[i].visits[a[i]]++;
+                if (b) e[i].conversions[a[i]]++;
+              }
+            }
 
-						this.overall_performance.visits[0]++;
-						this.overall_performance.conversions[0] += this.CONVERSION_RATE;
-						this.overall_performance.visits[1]++;
-						if (b) this.overall_performance.conversions[1]++;
-					},
-					run_experiments: function(v) {
-						for (var i = 0; i < v; ++i) { this.sim_visitor(); }
-						this.update_summary_statistics();
-					},
-					start_sim_game: function() {
-						this.game_state = 'play';
+            this.overall_performance.visits[0]++;
+            this.overall_performance.conversions[0] += this.CONVERSION_RATE;
+            this.overall_performance.visits[1]++;
+            if (b) this.overall_performance.conversions[1]++;
+          },
+          run_experiments: function(v) {
+            for (var i = 0; i < v; ++i) { this.sim_visitor(); }
+            this.update_summary_statistics();
+          },
+          start_sim_game: function() {
+            this.game_state = 'play';
 
-						// Initialise experiment data.
-						e = new Array();
-						this.overall_performance = new Experiment(-1);
-						this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
-						this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
-						for (i = 0; i <= 6; ++i) {
-							this.add_random_task();
-						}
-						this.update_summary_statistics();
-					},
-					end_sim_game: function() {
-						$('#end_game').modal('show');
-						this.game_state = '';
-					},
-					sim_choose_exp: function(exp, fullon) {
-						// apply change to conversion
-						if (fullon) { this.conversion = e[exp].effect[1] * this.conversion; }
+            // Initialise experiment data.
+            e = new Array();
+            this.overall_performance = new Experiment(-1);
+            this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
+            this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
+            for (i = 0; i <= 6; ++i) {
+              this.add_random_task();
+            }
+            this.update_summary_statistics();
+          },
+          end_sim_game: function() {
+            $('#end_game').modal('show');
+            this.game_state = '';
+          },
+          sim_choose_exp: function(exp, fullon) {
+            // apply change to conversion
+            if (fullon) { this.conversion = e[exp].effect[1] * this.conversion; }
 
-						this.message = {type: 'decision', fullon: fullon, exp: e[exp]};
-						$('#decision').modal('show');
+            this.message = {type: 'decision', fullon: fullon, exp: e[exp]};
+            $('#decision').modal('show');
 
-						e[exp].end_experiment();
-						this.history[0+fullon].push(e.splice(exp,1)[0]);
-					},
-					format_number: function(n) {
-						return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.');
-					},
-					format_percent: function(n) {
-						return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
-					},
-				}
-			});
-		</script>
-	</body>
+            e[exp].end_experiment();
+            this.history[0+fullon].push(e.splice(exp,1)[0]);
+          },
+          format_number: function(n) {
+            return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.');
+          },
+          format_percent: function(n) {
+            return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
+          },
+        }
+      });
+    </script>
+  </body>
 </html>
