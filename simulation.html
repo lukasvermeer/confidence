@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <div v-if="game_state != 'play'" class="row">
+      <div v-if="!game_state.playing" class="row">
         <!-- A general introduction to the game. -->
         <div class="col-md-offset-2 col-md-8">
           <h1>So You Think You Can Test?</h1>
@@ -103,13 +103,13 @@
         </div>
       </div>
 
-      <div v-if="game_state == 'play'">
+      <div v-if="game_state.playing">
         <!-- Scores header for Simulation-mode. -->
         <div class="row">
           <div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
           <div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
           <div class="col-md-4 text-center"><h2>
-            <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" v-on:click="next_round_sim()">Proceed to next day</button>
+            <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" :disabled="game_state.computing" v-on:click="next_round_sim()">Proceed to next day</button>
             <button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
           </h2></div>
         </div>
@@ -241,7 +241,10 @@
           day: 0,
           conversion: 0,
           conversions: 0,
-          game_state: '',
+          game_state: {
+            playing: false,
+            computing: false,
+          },
 
           backlog: [[],[],[],],
           backlog_headings: ['To be prioritized','Prioritized','In progress'],
@@ -297,7 +300,10 @@
             }
           },
           next_round_sim: function() {
-            setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
+            if (!this.game_state.computing) {
+              this.game_state.computing = true;
+              setTimeout(function() { confidence.next_round_sim_deferred(); }, 10);
+            }
           },
           next_round_sim_deferred: function() {
             var dc = this.DEV_CAPACITY;
@@ -338,6 +344,7 @@
                 e[i].days++;
               }
             }
+            this.game_state.computing = false;
           },
           sim_visitor: function() {
             var c = this.conversion;
@@ -370,7 +377,7 @@
             this.update_summary_statistics();
           },
           start_sim_game: function() {
-            this.game_state = 'play';
+            this.game_state.playing = true;;
 
             // Initialise experiment data.
             e = new Array();
@@ -384,7 +391,7 @@
           },
           end_sim_game: function() {
             $('#end_game').modal('show');
-            this.game_state = '';
+            this.game_state.playing = false;
           },
           sim_choose_exp: function(exp, fullon) {
             // apply change to conversion
