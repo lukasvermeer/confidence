@@ -230,7 +230,6 @@
       confidence = new Vue({
         el: '#app-confidence',
         data: {
-          CONVERSION_RATE: 0.05,
           AVERAGE_EFFECT: -0.25,
           AVERAGE_EFFECT_STDDEV: 0.5,
           DEV_CAPACITY: 2,
@@ -258,6 +257,7 @@
             feedback_level: 2,
             game_duration: 91,
             visitors_per_day: 100000,
+            conversion_rate: 0.05,
           },
           message: {},
         },
@@ -368,7 +368,7 @@
             }
 
             this.overall_performance.visits[0]++;
-            this.overall_performance.conversions[0] += this.CONVERSION_RATE;
+            this.overall_performance.conversions[0] += this.settings.conversion_rate;
             this.overall_performance.visits[1]++;
             if (b) this.overall_performance.conversions[1]++;
           },
@@ -382,7 +382,7 @@
             // Initialise experiment data.
             e = new Array();
             this.overall_performance = new Experiment(-1);
-            this.conversions = 0; this.day = 0; this.conversion = this.CONVERSION_RATE;
+            this.conversions = 0; this.day = 0; this.conversion = this.settings.conversion_rate;
             this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
             for (i = 0; i <= 6; ++i) {
               this.add_random_task();
