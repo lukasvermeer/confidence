@@ -230,7 +230,6 @@
       confidence = new Vue({
         el: '#app-confidence',
         data: {
-          VISITORS_PER_DAY_SIM: 100000,
           CONVERSION_RATE: 0.05,
           AVERAGE_EFFECT: -0.25,
           AVERAGE_EFFECT_STDDEV: 0.5,
@@ -258,6 +257,7 @@
           settings: {
             feedback_level: 2,
             game_duration: 91,
+            visitors_per_day: 100000,
           },
           message: {},
         },
@@ -336,7 +336,7 @@
               }
             }
 
-            this.run_experiments(this.VISITORS_PER_DAY_SIM);
+            this.run_experiments(this.settings.visitors_per_day);
             this.day++;
 
             for (var i = 0; i < e.length; ++i) {
