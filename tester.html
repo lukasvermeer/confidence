@@ -38,6 +38,13 @@
             </div>
             <experiment-table :e="experiment"></experiment-table>
           </div>
+
+          <div class="alert alert-warning" v-if="experiment.get_srm_p(1) < 0.05">
+            <em>Warning.</em> Possible sample ration mismatch detected ({{ display_srm_p }}).
+            The observed ratio of visitors in base does not match the expected ratio of 50% of traffic.
+            This is an indicator for randomisation failure or missing data issues.
+            <b>Computed statistics may be invalid as a result.</b>
+          </div>
         </div>
       </center>
     </div>
@@ -57,6 +64,13 @@
             this.e.visits = [parseInt(this.input.b.traffic), parseInt(this.input.v.traffic)];
             this.e.conversions = [parseInt(this.input.b.conversions), parseInt(this.input.v.conversions)];
             return this.e;
+          },
+          display_srm_p: function() {
+            if (this.e.get_srm_p(1) < 0.0001) {
+              return "p < 0.0001";
+            } else {
+              return "p = " + this.e.get_srm_p(1).toFixed(4);
+            }
           }
         }
       });
