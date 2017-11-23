@@ -1,6 +1,6 @@
 var Experiment = function(id) {
   this.experiment_id = id;
-  this.variants = 2;
+  this.variants = [0.5, 0.5];
   this.effect = [1,1];
   this.visits = [0,0];
   this.conversions = [0,0];
@@ -18,7 +18,7 @@ var Experiment = function(id) {
 
   this.assign_variant = function() {
     if (!this.active) return 0;
-    return Math.floor(Math.random() * this.variants);
+    return Math.floor(Math.random() * this.variants.length);
   }
 
   this.end_experiment = function() {
@@ -35,7 +35,7 @@ var Experiment = function(id) {
 
   this.get_g_test = function() {
     var data_all = [];
-    for (var i = 0; i < this.variants; i++) {
+    for (var i = 0; i < this.variants.length; i++) {
       data_all.push( [this.visits[i]-this.conversions[i], this.conversions[i]] );
     }
     return calculate_g_test(data_all);
@@ -46,7 +46,7 @@ var Experiment = function(id) {
   };
 
   this.get_p = function() {
-    return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants - 1));
+    return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants.length - 1));
   };
 
   this.get_certainty = function() {
@@ -93,6 +93,13 @@ var Experiment = function(id) {
     var range = Math.sqrt(q) / y;
     var fieller =[ x/y - range - 1, x/y + range - 1 ];
     return avg_base >= 0 ? [estimate, fieller] : [estimate, fieller.map(function(x){return -x})];
+  }
+
+  this.get_srm_p = function(i) {
+    var n = this.visits[0] + this.visits[i];
+    var p = this.visits[0] / n;
+    var e = this.variants[0] / (this.variants[0] + this.variants[i]);
+    return jStat.ztest(p, e, Math.sqrt(p*(1-p)/n));
   }
 };
 
@@ -153,7 +160,7 @@ Vue.component('experiment-table', {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(v,i) in e.variants">
+        <tr v-for="(v,i) in e.variants.length">
           <th v-if="i == 0">Base</th>
           <th v-if="i > 0">Var {{i}}</th>
           <td width="90">{{ e.visits[i].toLocaleString() }}</td>
