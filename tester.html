@@ -39,7 +39,10 @@
             <experiment-table :e="experiment"></experiment-table>
           </div>
 
-          <div class="alert alert-warning" v-if="experiment.get_srm_p(1) < 0.05">
+          <div v-if="experiment.get_srm_p(1) >= 0.005">
+            <small class="text-muted">No indication of sample ration mismatch ({{ display_srm_p }}).</small>
+          </div>
+          <div class="alert alert-warning" v-if="experiment.get_srm_p(1) < 0.005">
             <em>Warning.</em> Possible sample ration mismatch detected ({{ display_srm_p }}).
             The observed ratio of visitors in base does not match the expected ratio of 50% of traffic.
             This is an indicator for randomisation failure or missing data issues.
