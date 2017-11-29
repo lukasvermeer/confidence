@@ -25,38 +25,53 @@
     </head>
     <body>
       <div id="app-tester" class="container">
-        <center>
-        <h1>AB Result Display Scratchpad</h1>
-
-        <p>
-          B traffic <input v-model="input.b.traffic" type="number"/> 
-          B conversions <input v-model="input.b.conversions" type="number"/>
-        </p>
-        <p>
-          V traffic <input v-model="input.v.traffic" type="number"/> 
-          V conversions <input v-model="input.v.conversions" type="number"/>
-        </p>
-
-        <div class="col-md-offset-3 col-md-6">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <b>Experiment</b>
+        <br />
+        <div class="row">
+          <div class="col-md-offset-3 col-md-6">
+            <div class="jumbotron">
+              <h2>A/B Testing Significance</h2>
             </div>
-            <experiment-table :e="experiment"></experiment-table>
-          </div>
 
-          <div v-if="experiment.get_srm_p(1) >= 0.005">
-            <small class="text-muted">No indication of sample ration mismatch ({{ display_srm_p }}).</small>
-          </div>
-          <div class="alert alert-warning" v-if="experiment.get_srm_p(1) < 0.005">
-            <em>Warning.</em> Possible sample ration mismatch detected ({{ display_srm_p }}).
-            The observed ratio of visitors in base does not match the expected ratio of 50% of traffic.
-            This is an indicator for randomisation failure or missing data issues.
-            <b>Computed statistics may be invalid as a result.</b>
+            <form class="form-inline">
+              <div class="form-group">
+                <label for="atraffic">A traffic</label>
+                <input v-model="input.b.traffic" type="number" class="form-control" id="atraffic" placeholder="Number of visitors in A"/> 
+              </div>
+              <div class="form-group">
+                <label for="aconv">A conversions</label>
+                <input v-model="input.b.conversions" type="number" class="form-control" id="aconv" placeholder="Number of conversions in A"/>
+              </div>
+              <div class="form-group">
+                <label for="btraffic">B traffic</label>
+                <input v-model="input.v.traffic" type="number" class="form-control" id="btraffic" placeholder="Number of visitors in B"/> 
+              </div>
+              <div class="form-group">
+                <label for="bconv">B conversions</label>
+                <input v-model="input.v.conversions" type="number" class="form-control" id="bconv" placeholder="Number of conversions in B"/>
+              </div>
+            </form>
+            <br />
+
+            <div class="alert alert-warning" v-if="experiment.get_srm_p(1) < 0.005">
+              <em>Warning.</em> Possible sample ration mismatch detected ({{ display_srm_p }}).
+              The observed ratio of visitors in base does not match the expected ratio of 50% of traffic.
+              This is an indicator for randomisation failure or missing data issues.
+              <b>Computed statistics may be invalid as a result.</b>
+            </div>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <b>Experiment</b>
+              </div>
+              <experiment-table :e="experiment"></experiment-table>
+            </div>
+
+            <div class="text-center" v-if="experiment.get_srm_p(1) >= 0.005">
+              <small class="text-muted">No indication of sample ration mismatch ({{ display_srm_p }}).</small>
+            </div>
           </div>
         </div>
-      </center>
-    </div>
+      </div>
 
         <script type="text/javascript">
       tester = new Vue({
