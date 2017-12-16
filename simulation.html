@@ -47,6 +47,10 @@
           <div class="modal-content">
             <div class="modal-body">
               <h1 class="text-center">The game is over</h1>
+              <p class="text-center">
+                <span class="text-muted label label-info">{{feedback_levels[settings.feedback_level]}}</span>
+                <span class="text-muted label label-info">{{settings.game_duration}} days</span>
+              </p>
               <p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
               <experiment-table :e="overall_performance"></experiment-table>
               <p class="text-center lead">
@@ -252,6 +256,8 @@
 
           history_headings: ['Stopped', 'Shipped'],
           history: [[],[]],
+
+          feedback_levels: ['','Realistic','Instant feedback','God-mode'],
 
           settings: {
             feedback_level: 2,
