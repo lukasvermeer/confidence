@@ -293,7 +293,8 @@
             var effort = Math.floor(Math.random() * this.backlog_complexities.length);
             e.metadata['Complexity'] = effort;
             e.effort = 50 + effort * 100;
-            e.reset(1 + jStat.normal.sample(this.settings.topic_effects[topic][0], this.settings.topic_effects[topic][1]) / 100);
+            var effect = 1 + jStat.normal.sample(this.settings.topic_effects[topic][0], this.settings.topic_effects[topic][1] * (effort+1)) / 100;
+            e.reset(effect);
             this.backlog[0].push(e);
           },
           prioritize_task: function(i) {
