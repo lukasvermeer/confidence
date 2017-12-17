@@ -22,6 +22,68 @@
   </head>
   <body>
     <div id="app-confidence" class="container">
+      <div class="modal" id="help" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h1 class="text-center">How to play</h1>
+              <div class="alert alert-warning">
+                <p class="text-justify"><b>Warning:</b> This game is still in active development. Your experience may change as I add new functionality and tweak features to enhance realism. I will strive to keep these instructions updated as the game evolves.</p>
+                <p class="text-center"><a href="http://lukasvermeer.nl/#contact" target="_blank">Feedback or ideas are very welcome. <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></p>
+              </div>
+              <h3>Objective</h3>
+              <p class="text-justify">You control the backlog and running experiments for a small development team. Each day you make decisions that impact product development and overall sales.</p>
+              <p class="text-justify">Your current progress is displayed at the top of the screen. Once you are done for the day, click <button type="button" class="btn btn-primary btn-xs">proceed to next day</button> to move the simulation forward.</p>
+              <p class="text-justify">After <code>{{settings.game_duration}}</code> days, the game is over and your final score is computed based on total sales.</p>
+              <p class="text-center lead">Your objective is to maximise total sales.</p>
+              <h3>Backlog</h3>
+              <p class="text-justify">Your teams maintains a simplified backlog. Different tasks can be prioritised or deleted entirely. If nothing is prioritised, your team will pick up a random task when needed.</p>
+              <p class="text-justify">Each task has visible and invisible properties, depending on the <code>feedback level</code>.</p>
+              <dl>
+                <dt>Topics</dt>
+                <dd>
+                  <p class="text-justify">Each task is related to one of 5 different topics:
+                    <span class="label label-primary" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span>,
+                    <span class="label label-primary" :style="{ background: backlog_colors[1] }">{{backlog_topics[1]}}</span>,
+                    <span class="label label-primary" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span>,
+                    <span class="label label-primary" :style="{ background: backlog_colors[3] }">{{backlog_topics[3]}}</span>, or
+                    <span class="label label-primary" :style="{ background: backlog_colors[4] }">{{backlog_topics[4]}}</span>.
+                    Different topics share different underlying probabilities of success and effect sizes.
+                  <p class="text-justify">
+                    This means that all tasks of topic <span class="label label-primary" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span> will tend to show similar results.
+                    These settings are randomised each playthrough, so that <span class="label label-primary" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span> might be a promising topic in one playthrough, but disastrous in another.
+                  </p>
+                  <p class="text-center lead">Exploration through experimentation in order to figure out which topics to exploit is the core challenge in this game.</p>
+                </dd>
+                <dt>Effort</dt>
+                <dd>
+                  <p class="text-justify">Each task requires a certain amount of effort to implement. There are 3 levels of complexity:
+                    <span class="label label-default" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span>,
+                    <span class="label label-default" :style="{ background: complexity_colors[1] }">{{backlog_complexities[1]}}</span>, and
+                    <span class="label label-default" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span>.
+                  </p>
+                  <p class="text-justify">
+                    Increased complexity also results in higher risk or reward. Experiments that result from tasks of <span class="label label-default" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span> complexity tend to have larger effect sizes, in either direction, than those of <span class="label label-default" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span> complexity.
+                  </p>
+                </dd>
+              </dl>
+              <h3>Experiments</h3>
+              <p class="text-justify">Once a task is complete, a new experiment will be started. Each day, new users will be exposed to the experiment and statistics will be computed.</p>
+              <p class="text-justify">At any given moment, you can decide to either
+                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-danger">Stop</button></span> or
+                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-success">Ship</button></span> an experiment.
+                Stopped experiments are removed from the game. Shipping an experiment will cause all future users to be exposed to this change.
+              </p>
+              <p class="text-justify">You can review past experimental results and decisions in the <code>history</code> tab.</p>
+              <p class="text-center lead">This is a game of chance, but not of chance alone. The faster you learn, the more you will earn. Good luck!</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="modal" id="decision" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document" v-if="message.type == 'decision'">
           <div class="modal-content">
@@ -78,7 +140,6 @@
           <h1>So You Think You Can Test?</h1>
           <p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
           <h2>Simulation-mode</h2>
-          <p class="text-justify">You control the backlog and experiments for a small development team. Your objective is to maximise total sales.</p>
           <p>
             <div class="well">
               <div class="form-group">
@@ -102,6 +163,7 @@
             </div>
           </p>
           <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><b>Read instructions</b><br /><small>some words on how to play</small></button></p>
           <p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
         </div>
@@ -113,6 +175,7 @@
           <div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
           <div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
           <div class="col-md-4 text-center"><h2>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#help">Instructions</button>
             <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" :disabled="game_state.computing" v-on:click="next_round_sim()">Proceed to next day</button>
             <button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
           </h2></div>
