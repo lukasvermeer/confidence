@@ -170,7 +170,7 @@
               <h2>Leaderboard</h2>
               <p v-if="leaderboard.length == 0" class="text-muted text-center">*crickets*</p>
               <dl class="dl-horizontal">
-                <span v-for="(i, l) in leaderboard_reversed">
+                <span v-for="(l, i) in leaderboard_reversed">
                   <dt><span class="badge">#{{i}}</span> {{l.username}}</dt>
                   <dd>
                     {{format_number(l.score)}}
