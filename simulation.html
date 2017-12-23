@@ -350,16 +350,14 @@
           }.bind(this))
         },
         created: function() {
-          this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
+          this.bind_leaderboard;
         },
         watch: {
           'settings.feedback_level': function (val) {
-            this.$unbind('leaderboard');
-            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
+            this.rebind_leaderboard;
           },
           'settings.game_duration': function (val) {
-            this.$unbind('leaderboard');
-            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
+            this.rebind_leaderboard;
           },
         },
         data: {
@@ -544,6 +542,7 @@
                 photoURL: firebase.auth().currentUser.photoURL,
                 score: this.conversions,
                 timestamp: firebase.database.ServerValue.TIMESTAMP } );
+              this.rebind_leaderboard;
             }
             this.game_state.playing = false;
           },
@@ -573,7 +572,14 @@
               // An error happened.
               console.log('ERROR: '+error);
             });
-          }
+          },
+          rebind_leaderboard: function() {
+            this.$unbind('leaderboard');
+            this.bind_leaderboard();
+          },
+          bind_leaderboard: function() {
+            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
+          },
         }
       });
     </script>
