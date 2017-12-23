@@ -389,7 +389,7 @@
         },
         computed: {
           leaderboard_reversed: function() {
-            return this.leaderboard.reverse();
+            return (this.leaderboard).reverse();
           },
           backlog_colors: function() {
             return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
