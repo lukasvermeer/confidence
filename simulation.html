@@ -281,6 +281,7 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
     <script>
       // Initialize Firebase
       var config = {
@@ -294,10 +295,12 @@
       firebase.initializeApp(config);
 
       var provider = new firebase.auth.TwitterAuthProvider();
+      var db = firebase.database()
 
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
         // The signed-in user info.
+        console.log(result);
       }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
