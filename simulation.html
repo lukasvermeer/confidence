@@ -349,10 +349,14 @@
           this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
         },
         watch: {
-          settings: function (val) {
+          'settings.feedback_level': function (val) {
             this.$unbind('leaderboard');
             this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
-          }
+          },
+          'settings.game_duration': function (val) {
+            this.$unbind('leaderboard');
+            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+          },
         },
         data: {
           user: {},
