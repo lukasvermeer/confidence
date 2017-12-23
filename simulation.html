@@ -531,6 +531,7 @@
               leaderboard.push( {
                 username: firebase.auth().currentUser.displayName,
                 uid: firebase.auth().currentUser.uid,
+                photoURL: firebase.auth().currentUser.photoURL,
                 score: this.conversions,
                 feedback_level: this.settings.feedback_level,
                 game_duration: this.settings.game_duration,
