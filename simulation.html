@@ -538,7 +538,7 @@
           end_sim_game: function() {
             $('#end_game').modal('show');
             if (firebase.auth().currentUser) {
-              this.leaderboard.push( {
+              db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
                 username: firebase.auth().currentUser.displayName,
                 uid: firebase.auth().currentUser.uid,
                 photoURL: firebase.auth().currentUser.photoURL,
