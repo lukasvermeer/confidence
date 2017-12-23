@@ -174,8 +174,6 @@
                   <dt><span class="badge">#{{i+1}}</span> {{l.username}}</dt>
                   <dd>
                     {{format_number(l.score)}}
-                    <span class="text-muted label label-info">{{feedback_levels[l.feedback_level]}}</span>
-                    <span class="text-muted label label-info">{{l.game_duration}} days</span>
                   </dd>
                 </span>
               </dl>
@@ -328,7 +326,6 @@
 
       var provider = new firebase.auth.TwitterAuthProvider();
       var db = firebase.database();
-      var leaderboard = db.ref('leaderboard');
 
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
@@ -384,7 +381,7 @@
           message: {},
         },
         firebase: {
-          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
+          leaderboard: db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10),
         },
         computed: {
           leaderboard_reversed: function() {
@@ -523,13 +520,11 @@
           end_sim_game: function() {
             $('#end_game').modal('show');
             if (firebase.auth().currentUser) {
-              leaderboard.push( {
+              db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
                 username: firebase.auth().currentUser.displayName,
                 uid: firebase.auth().currentUser.uid,
                 photoURL: firebase.auth().currentUser.photoURL,
                 score: this.conversions,
-                feedback_level: this.settings.feedback_level,
-                game_duration: this.settings.game_duration,
                 timestamp: firebase.database.ServerValue.TIMESTAMP } );
             }
             this.game_state.playing = false;
