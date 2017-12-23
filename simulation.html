@@ -333,7 +333,6 @@
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
         // The signed-in user info.
-        console.log(result);
       }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
