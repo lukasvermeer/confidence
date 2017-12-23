@@ -295,25 +295,25 @@
 
       var provider = new firebase.auth.TwitterAuthProvider();
 
+      // Get user data (if logged in).
+      firebase.auth().getRedirectResult().then(function(result) {
+        // The signed-in user info.
+        user = result;
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log('ERROR '+errorCode+': '+errorMessage);
+      });
+
       function login() {
-        firebase.auth().signInWithPopup(provider).then(function(result) {
-          // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
-          // You can use these server side with your app's credentials to access the Twitter API.
-          var token = result.credential.accessToken;
-          var secret = result.credential.secret;
-          // The signed-in user info.
-          var user = result.user;
-        }).catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          console.log('ERROR '+errorCode+': '+errorMessage);
-        });
+        firebase.auth().signInWithRedirect(provider);
       }
 
       function logout() {
         firebase.auth().signOut().then(function() {
           // Sign-out successful.
+          user = undefined;
         }).catch(function(error) {
           // An error happened.
           console.log('ERROR: '+error);
