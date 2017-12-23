@@ -165,9 +165,10 @@
           </p>
           <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
           <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><b>Login with Twitter</b><br /><small>to compete on the leaderboard</small></button></p>
-          <div class="row" v-if="leaderboard.length > 0">
+          <div class="row" v-if="user != null">
             <div class="col-md-offset-2 col-md-8 text-center">
               <h2>Leaderboard</h2>
+              <p v-if="leaderboard.length == 0" class="text-muted text-center">*crickets*</p>
               <dl class="dl-horizontal">
                 <span v-for="l in leaderboard_reversed">
                   <dt>{{l.username}}</dt>
