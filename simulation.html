@@ -523,6 +523,14 @@
           },
           end_sim_game: function() {
             $('#end_game').modal('show');
+            if (firebase.auth().currentUser) {
+              leaderboard.push( {
+                username: firebase.auth().currentUser.displayName,
+                score: this.conversions,
+                feedback_level: this.feedback_level,
+                game_duration: this.game_duration,
+                timestamp: firebase.database.ServerValue.TIMESTAMP } );
+            }
             this.game_state.playing = false;
           },
           sim_choose_exp: function(exp, fullon) {
