@@ -171,7 +171,10 @@
               <h2>Leaderboard</h2>
               <dl class="dl-horizontal">
                 <span v-for="l in leaderboard_reversed">
-                  <dt>{{l.username}}</dt>
+                  <dt>{{l.username}}
+                    <span class="text-muted label label-info">{{feedback_levels[l.feedback_level]}}</span>
+                    <span class="text-muted label label-info">{{l.game_duration}} days</span>
+                  </dt>
                   <dd>{{format_number(l.score)}}</dd>
                 </span>
               </dl>
