@@ -353,7 +353,13 @@
 
       confidence = new Vue({
         el: '#app-confidence',
+        beforeCreate: function() {
+          firebase.auth().onAuthStateChanged(function(user) {
+            this.user = user
+          }.bind(this))
+        },
         data: {
+          user: {},
           AVERAGE_EFFECT: -0.25,
           AVERAGE_EFFECT_STDDEV: 0.5,
           DEV_CAPACITY: 2,
