@@ -350,14 +350,14 @@
           }.bind(this))
         },
         created: function() {
-          this.bind_leaderboard;
+          this.bind_leaderboard();
         },
         watch: {
           'settings.feedback_level': function (val) {
-            this.rebind_leaderboard;
+            this.rebind_leaderboard();
           },
           'settings.game_duration': function (val) {
-            this.rebind_leaderboard;
+            this.rebind_leaderboard();
           },
         },
         data: {
@@ -542,7 +542,7 @@
                 photoURL: firebase.auth().currentUser.photoURL,
                 score: this.conversions,
                 timestamp: firebase.database.ServerValue.TIMESTAMP } );
-              this.rebind_leaderboard;
+              this.rebind_leaderboard();
             }
             this.game_state.playing = false;
           },
