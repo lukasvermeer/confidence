@@ -164,8 +164,7 @@
             </div>
           </p>
           <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><b>Read instructions</b><br /><small>some words on how to play</small></button></p>
-          <p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
+          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><b>Login with Twitter</b><br /><small>to compete on the leaderboard</small></button></p>
           <div class="row" v-if="leaderboard.length > 0">
             <div class="col-md-offset-2 col-md-8 text-center">
               <h2>Leaderboard</h2>
@@ -181,6 +180,9 @@
               </dl>
             </div>
           </div>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><b>Log out of Twitter</b><br /><small>to play a noncompetitive game</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><b>Read instructions</b><br /><small>some words on how to play</small></button></p>
+          <p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
         </div>
       </div>
@@ -337,19 +339,6 @@
         var errorMessage = error.message;
         console.log('ERROR '+errorCode+': '+errorMessage);
       });
-
-      function login() {
-        firebase.auth().signInWithRedirect(provider);
-      }
-
-      function logout() {
-        firebase.auth().signOut().then(function() {
-          // Sign-out successful.
-        }).catch(function(error) {
-          // An error happened.
-          console.log('ERROR: '+error);
-        });
-      }
 
       confidence = new Vue({
         el: '#app-confidence',
@@ -561,6 +550,17 @@
           format_percent: function(n) {
             return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
           },
+          login: function() {
+            firebase.auth().signInWithRedirect(provider);
+          },
+          logout: function() {
+            firebase.auth().signOut().then(function() {
+              // Sign-out successful.
+            }).catch(function(error) {
+              // An error happened.
+              console.log('ERROR: '+error);
+            });
+          }
         }
       });
     </script>
