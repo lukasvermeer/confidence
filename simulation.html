@@ -166,6 +166,17 @@
           <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
           <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><b>Read instructions</b><br /><small>some words on how to play</small></button></p>
           <p><a href="index.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
+          <div class="row" v-if="leaderboard.length > 0">
+            <div class="col-md-offset-4 col-md-4 text-center">
+              <h2>Leaderboard</h2>
+              <dl class="dl-horizontal">
+                <span v-for="l in leaderboard">
+                  <dt>{{l.username}}</dt>
+                  <dd>{{l.score}}</dd>
+                </span>
+              </dl>
+            </div>
+          </div>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
         </div>
       </div>
@@ -310,6 +321,7 @@
 
       var provider = new firebase.auth.TwitterAuthProvider();
       var db = firebase.database();
+      var leaderboard = db.ref('leaderboard');
 
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
@@ -373,7 +385,7 @@
           message: {},
         },
         firebase: {
-          leaderboard: db.ref('leaderboard'),
+          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
         },
         computed: {
           backlog_colors: function() {
