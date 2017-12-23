@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<eDOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -170,7 +170,7 @@
             <div class="col-md-offset-4 col-md-4 text-center">
               <h2>Leaderboard</h2>
               <dl class="dl-horizontal">
-                <span v-for="l in leaderboard">
+                <span v-for="l in leaderboard.reverse()">
                   <dt>{{l.username}}</dt>
                   <dd>{{l.score}}</dd>
                 </span>
@@ -385,7 +385,7 @@
           message: {},
         },
         firebase: {
-          leaderboard: leaderboard.orderByChild('score').limitToLast(10).reverse(),
+          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
         },
         computed: {
           backlog_colors: function() {
