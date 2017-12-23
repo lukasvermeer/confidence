@@ -326,7 +326,7 @@
 
       var provider = new firebase.auth.TwitterAuthProvider();
       var db = firebase.database();
-      var leaderboard = db.ref('leaderboard');
+      var leaderboard = db.ref('leaderboard/2/91');
 
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
@@ -347,6 +347,12 @@
         },
         created: function() {
           this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+        },
+        watch: {
+          settings: function (val) {
+            this.$unbind('leaderboard');
+            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+          }
         },
         data: {
           user: {},
