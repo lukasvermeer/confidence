@@ -350,16 +350,16 @@
           }.bind(this))
         },
         created: function() {
-          this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+          this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
         },
         watch: {
           'settings.feedback_level': function (val) {
             this.$unbind('leaderboard');
-            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
           },
           'settings.game_duration': function (val) {
             this.$unbind('leaderboard');
-            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+            this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
           },
         },
         data: {
