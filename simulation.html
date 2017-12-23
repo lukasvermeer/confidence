@@ -385,7 +385,7 @@
           message: {},
         },
         firebase: {
-          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
+          leaderboard: leaderboard.orderByChild('score').limitToLast(10).reverse(),
         },
         computed: {
           backlog_colors: function() {
