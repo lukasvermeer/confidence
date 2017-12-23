@@ -170,7 +170,7 @@
             <div class="col-md-offset-4 col-md-4 text-center">
               <h2>Leaderboard</h2>
               <dl class="dl-horizontal">
-                <span v-for="l in leaderboard">
+                <span v-for="l in leaderboard_reversed">
                   <dt>{{l.username}}</dt>
                   <dd>{{l.score}}</dd>
                 </span>
@@ -388,6 +388,9 @@
           leaderboard: leaderboard.orderByChild('score').limitToLast(10),
         },
         computed: {
+          leaderboard_reversed: function() {
+            return leaderboard.reverse();
+          },
           backlog_colors: function() {
             return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
           },
