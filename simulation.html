@@ -298,7 +298,6 @@
       // Get user data (if logged in).
       firebase.auth().getRedirectResult().then(function(result) {
         // The signed-in user info.
-        user = result;
       }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -313,7 +312,6 @@
       function logout() {
         firebase.auth().signOut().then(function() {
           // Sign-out successful.
-          user = undefined;
         }).catch(function(error) {
           // An error happened.
           console.log('ERROR: '+error);
