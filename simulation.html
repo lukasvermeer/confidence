@@ -346,7 +346,7 @@
           }.bind(this))
         },
         created: function() {
-          this.$bindAsArray('board', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
+          this.$bindAsArray('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration));
         },
         data: {
           user: {},
