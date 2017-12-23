@@ -172,7 +172,7 @@
               <dl class="dl-horizontal">
                 <span v-for="l in leaderboard_reversed">
                   <dt>{{l.username}}</dt>
-                  <dd>{{l.score}}</dd>
+                  <dd>{{format_number(l.score)}}</dd>
                 </span>
               </dl>
             </div>
