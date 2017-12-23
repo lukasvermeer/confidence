@@ -374,6 +374,9 @@
           },
           message: {},
         },
+        firebase: {
+          leaderboard: db.ref('leaderboard'),
+        },
         computed: {
           backlog_colors: function() {
             return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
