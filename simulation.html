@@ -280,6 +280,47 @@
       </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDZepeGLJDBlYRhw7jxf-kPa3Telk2tFWA",
+        authDomain: "confidence-app.firebaseapp.com",
+        databaseURL: "https://confidence-app.firebaseio.com",
+        projectId: "confidence-app",
+        storageBucket: "",
+        messagingSenderId: "122184836654"
+      };
+      firebase.initializeApp(config);
+
+      var provider = new firebase.auth.TwitterAuthProvider();
+
+      function login() {
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+          // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
+          // You can use these server side with your app's credentials to access the Twitter API.
+          var token = result.credential.accessToken;
+          var secret = result.credential.secret;
+          // The signed-in user info.
+          var user = result.user;
+        }).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.log('ERROR '+errorCode+': '+errorMessage);
+        });
+      }
+
+      function logout() {
+        firebase.auth().signOut().then(function() {
+          // Sign-out successful.
+        }).catch(function(error) {
+          // An error happened.
+          console.log('ERROR: '+error);
+        });
+      }
+    </script>
+
     <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="vue/vue.js"></script>
