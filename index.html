@@ -1,4 +1,4 @@
-<eDOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -28,7 +28,7 @@
             <div class="modal-body">
               <h1 class="text-center">How to play</h1>
               <div class="alert alert-warning">
-                <p class="text-justify"><b>Warning:</b> This game is still in active development. Your experience may change as I add new functionality and tweak features to enhance realism. I will strive to keep these instructions updated as the game evolves.</p>
+                <p class="text-justify"><strong>Warning:</strong> This game is still in active development. Your experience may change as I add new functionality and tweak features to enhance realism. I will strive to keep these instructions updated as the game evolves.</p>
                 <p class="text-center"><a href="http://lukasvermeer.nl/#contact" target="_blank">Feedback or ideas are very welcome. <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></p>
               </div>
               <h3>Objective</h3>
@@ -78,7 +78,7 @@
               <p class="text-center lead">This is a game of chance, but not of chance alone. The faster you learn, the more you will earn. Good luck!</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@
               <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
             </div>
           </div>
         </div>
@@ -118,8 +118,8 @@
               <p class="text-center lead">
                 <span v-if="overall_performance.is_significant()">
                   This is significantly
-                  <b v-if="overall_performance.get_relative_effect(1)[0] > 0">better</b>
-                  <b v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</b>
+                  <strong v-if="overall_performance.get_relative_effect(1)[0] > 0">better</strong>
+                  <strong v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</strong>
                   than would have been expected if there had been no product changes made at all.
                 </span>
                 <span v-if="!overall_performance.is_significant()">
@@ -128,8 +128,8 @@
               </p>
             </div>
             <div class="modal-footer">
-              <a href="http://grnh.se/s3cdil" class="btn btn-lg btn-default btn-block" target="_blank"><small>Want to get paid to run experiments?</small><br /><b>Apply for a job at Booking.com</b></a>
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><b>Close</b></button>
+              <a href="http://grnh.se/s3cdil" class="btn btn-lg btn-default btn-block" target="_blank"><small>Want to get paid to run experiments?</small><br /><strong>Apply for a job at Booking.com</strong></a>
+              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
             </div>
           </div>
         </div>
@@ -163,8 +163,8 @@
               </div>
             </div>
           </p>
-          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><b>Start simulation-mode</b><br /><small>realistic turn-based simulation</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><b>Login with Twitter</b><br /><small>to view and compete on the leaderboard</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><strong>Start simulation-mode</strong><br /><small>realistic turn-based simulation</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
           <div class="row" v-if="user != null">
             <div class="col-md-offset-2 col-md-8 text-center">
               <h2>Leaderboard</h2>
@@ -183,9 +183,9 @@
               </dl>
             </div>
           </div>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><b>Log out of Twitter</b><br /><small>you are signed in as {{user.displayName}}</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><b>Read instructions</b><br /><small>some words on how to play</small></button></p>
-          <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><b>Switch to arcade-mode</b><br /><small>fast-paced time-based action</small></a></p>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><strong>Read instructions</strong><br /><small>some words on how to play</small></button></p>
+          <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
         </div>
       </div>
@@ -261,7 +261,7 @@
             <div class="col-md-6" v-for="(exp,i) in summary_statistics">
               <div class="panel panel-default">
                 <div class="panel-heading">
-                  <b>Experiment {{exp.experiment_id}}</b>
+                  <strong>Experiment {{exp.experiment_id}}</strong>
                   <span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
                   <span>(running for {{ exp.days }} days)</span>
                   <div class="btn-toolbar pull-right">
@@ -287,7 +287,7 @@
               <p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
               <div v-for="(e,j) in h" class="panel panel-default">
                 <div class="panel-heading">
-                  <b>Experiment {{e.experiment_id}}</b>
+                  <strong>Experiment {{e.experiment_id}}</strong>
                   <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
                   <span>(running for {{ e.days }} days)</span>
                 </div>
