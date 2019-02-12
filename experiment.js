@@ -13,8 +13,11 @@ var Experiment = function(id) {
   this.effort = 100;
   this.progress = 0;
 
-  this.P_VALUE = 0.1;
-  this.GTEST_CUTOFF = jStat.chisquare.inv((1-this.P_VALUE), 1);
+  this.set_pval = function(p) {
+    this.P_VALUE = p;
+    this.GTEST_CUTOFF = jStat.chisquare.inv((1-this.P_VALUE), 1);
+  }
+  this.set_pval(0.1);
 
   this.assign_variant = function() {
     if (!this.active) return 0;

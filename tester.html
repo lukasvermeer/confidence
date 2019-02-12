@@ -49,6 +49,10 @@
                 <label for="bconv">B conversions</label>
                 <input v-model="input.v.conversions" type="number" class="form-control" id="bconv" placeholder="Number of conversions in B"/>
               </div>
+              <div class="form-group">
+                <label for="pval">Significance threshold (p-value)</label>
+                <input v-model="input.pval" type="number" class="form-control" id="pval" placeholder="Significance threshold (p-value)"/>
+              </div>
             </form>
             <br />
 
@@ -79,12 +83,14 @@
         data: {
           input: {
             b: { traffic: 10000, conversions: 500 },
-            v: { traffic: 10000, conversions: 560 }
+            v: { traffic: 10000, conversions: 560 },
+            pval: 0.1,
           },
           e: new Experiment(0)
         },
         computed: {
           experiment: function(val) {
+            this.e.set_pval(this.input.pval);
             this.e.visits = [parseInt(this.input.b.traffic), parseInt(this.input.v.traffic)];
             this.e.conversions = [parseInt(this.input.b.conversions), parseInt(this.input.v.conversions)];
             return this.e;
