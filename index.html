@@ -164,6 +164,26 @@
             </div>
           </p>
           <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><strong>Start simulation-mode</strong><br /><small>realistic turn-based simulation</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
+          <div class="row" v-if="user != null">
+            <div class="col-md-offset-2 col-md-8 text-center">
+              <h2>Leaderboard</h2>
+              <p>
+                <span class="text-muted label label-info">{{feedback_levels[settings.feedback_level]}}</span>
+                <span class="text-muted label label-info">{{settings.game_duration}} days</span>
+              </p>
+              <p v-if="leaderboard.length == 0" class="text-muted text-center">*crickets*</p>
+              <dl class="dl-horizontal">
+                <span v-for="(l, i) in leaderboard_reversed">
+                  <dt><span class="badge">#{{i+1}}</span> {{l.username}}</dt>
+                  <dd>
+                    {{format_number(l.score)}}
+                  </dd>
+                </span>
+              </dl>
+            </div>
+          </div>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p>
           <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><strong>Read instructions</strong><br /><small>some words on how to play</small></button></p>
           <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
@@ -282,7 +302,9 @@
 
     <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
     <script type="text/javascript" src="d3/d3.min.js"></script>
     <script type="text/javascript" src="jstat/jstat.min.js"></script>
     <script type="text/javascript" src="experiment.js"></script>
@@ -295,9 +317,52 @@
       //
       var e = [];
 
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDZepeGLJDBlYRhw7jxf-kPa3Telk2tFWA",
+        authDomain: "confidence-app.firebaseapp.com",
+        databaseURL: "https://confidence-app.firebaseio.com",
+        projectId: "confidence-app",
+        storageBucket: "",
+        messagingSenderId: "122184836654"
+      };
+      firebase.initializeApp(config);
+
+      var provider = new firebase.auth.TwitterAuthProvider();
+      var db = firebase.database();
+      var leaderboard = db.ref('leaderboard/2/91');
+
+      // Get user data (if logged in).
+      firebase.auth().getRedirectResult().then(function(result) {
+        // The signed-in user info.
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log('ERROR '+errorCode+': '+errorMessage);
+      });
+
       confidence = new Vue({
         el: '#app-confidence',
+        beforeCreate: function() {
+          firebase.auth().onAuthStateChanged(function(user) {
+            this.user = user
+          }.bind(this))
+        },
+        created: function() {
+          this.bind_leaderboard();
+        },
+        watch: {
+          'settings.feedback_level': function (val) {
+            this.rebind_leaderboard();
+          },
+          'settings.game_duration': function (val) {
+            this.rebind_leaderboard();
+          },
+        },
         data: {
+          leaderboard: [],
+          user: {},
           AVERAGE_EFFECT: -0.25,
           AVERAGE_EFFECT_STDDEV: 0.5,
           DEV_CAPACITY: 2,
@@ -332,7 +397,13 @@
           },
           message: {},
         },
+        firebase: {
+          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
+        },
         computed: {
+          leaderboard_reversed: function() {
+            return (this.leaderboard).reverse();
+          },
           backlog_colors: function() {
             return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
           },
@@ -465,6 +536,15 @@
           },
           end_sim_game: function() {
             $('#end_game').modal('show');
+            if (firebase.auth().currentUser) {
+              db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
+                username: firebase.auth().currentUser.displayName,
+                uid: firebase.auth().currentUser.uid,
+                photoURL: firebase.auth().currentUser.photoURL,
+                score: this.conversions,
+                timestamp: firebase.database.ServerValue.TIMESTAMP } );
+              this.rebind_leaderboard();
+            }
             this.game_state.playing = false;
           },
           sim_choose_exp: function(exp, fullon) {
@@ -482,6 +562,24 @@
           },
           format_percent: function(n) {
             return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
+          },
+          login: function() {
+            firebase.auth().signInWithRedirect(provider);
+          },
+          logout: function() {
+            firebase.auth().signOut().then(function() {
+              // Sign-out successful.
+            }).catch(function(error) {
+              // An error happened.
+              console.log('ERROR: '+error);
+            });
+          },
+          rebind_leaderboard: function() {
+            this.$unbind('leaderboard');
+            this.bind_leaderboard();
+          },
+          bind_leaderboard: function() {
+            this.$rtdbBind('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
           },
         }
       });
