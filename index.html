@@ -214,7 +214,7 @@
               Experiments <span class="badge" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
             </a>
           </li>
-          <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+          <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"  v-on:click="fake_resize">History</a></li>
         </ul>
 
         <div class="tab-content">
@@ -283,6 +283,9 @@
             <div class="col-md-12" v-if="history[0].length == 0 && history[1].length == 0">
               <div class="alert alert-info text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
             </div>
+            <div class="col-md-12">
+              <reactive-chart :chart="chart"></reactive-chart>
+            </div>
             <div class="col-md-6" v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
               <p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
               <div v-for="(e,j) in h" class="panel panel-default">
@@ -302,6 +305,7 @@
 
     <script type="text/javascript" src="jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-1.49.4.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
@@ -398,6 +402,27 @@
             topic_effects: [[-0.5,0.5],[-0.25,0.5],[0,0],[0.25,0.5],[0.5,0.5],],
           },
           message: {},
+          chart: {
+                      uuid: "boxplot",
+                      traces: [
+                          { y: [], type: 'box', name: 'A' },
+                          { y: [], type: 'box', name: 'B' },
+                          { y: [], type: 'box', name: 'C' },
+                          { y: [], type: 'box', name: 'D' },
+                          { y: [], type: 'box', name: 'E' },
+                      ],
+                      layout: {
+                          title: {
+                              text: 'Observed Effects by Category',
+                              font: {
+                                  family: 'Arial',
+                                  size: 24,
+                              },
+                          },
+                          autosize: true,
+                          margin: true,
+                      },
+                },
         },
         firebase: {
           leaderboard: leaderboard.orderByChild('score').limitToLast(10),
@@ -557,6 +582,13 @@
             $('#decision').modal('show');
 
             e[exp].end_experiment();
+            
+            // apply change to box plot
+            // calculate relative effect (struggled getting the existing here, feel free to replace)
+            var relativeEffectWorkaround = ((((e[exp]["conversions"][1] / e[exp]["visits"][1]) / (e[exp]["conversions"][0] / e[exp]["visits"][0])) - 1) * 100).toFixed(2);
+            // update box plots with observed effects, metadata.topic puts them into the correct bucket
+            this.chart.layout.datarevision = this.chart["traces"][e[exp]["metadata"]["Topic"]].y.push(relativeEffectWorkaround);
+            
             this.history[0+fullon].push(e.splice(exp,1)[0]);
           },
           format_number: function(n) {
@@ -583,8 +615,36 @@
           bind_leaderboard: function() {
             this.$rtdbBind('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
           },
+          fake_resize: function () {
+             var resizeEvent = window.document.createEvent('UIEvents');
+             resizeEvent.initUIEvent('resize', true, false, window, 0);
+             window.dispatchEvent(resizeEvent);
+          },
         }
       });
+      
+          // Reactive Box Plot Component
+          Vue.component("reactive-chart", {
+              props: ["chart"],
+              template: '<div :ref="chart.uuid"></div>',
+              mounted() {
+                  Plotly.plot(this.$refs[this.chart.uuid], this.chart.traces, this.chart.layout, { responsive: true });
+              },
+              watch: {
+                  chart: {
+                      handler: function () {
+                          Plotly.react(
+                              this.$refs[this.chart.uuid],
+                              this.chart.traces,
+                              this.chart.layout,
+                              { responsive: true }
+                          );
+                      },
+                      deep: true,
+                  },
+              },
+          });
+      
     </script>
   </body>
 </html>
