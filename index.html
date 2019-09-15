@@ -582,13 +582,8 @@
             $('#decision').modal('show');
 
             e[exp].end_experiment();
-            
-            // apply change to box plot
-            // calculate relative effect (struggled getting the existing here, feel free to replace)
-            var relativeEffectWorkaround = ((((e[exp]["conversions"][1] / e[exp]["visits"][1]) / (e[exp]["conversions"][0] / e[exp]["visits"][0])) - 1) * 100).toFixed(2);
             // update box plots with observed effects, metadata.topic puts them into the correct bucket
-            this.chart.layout.datarevision = this.chart["traces"][e[exp]["metadata"]["Topic"]].y.push(relativeEffectWorkaround);
-            
+            this.chart.layout.datarevision = this.chart["traces"][e[exp]["metadata"]["Topic"]].y.push(e[exp].get_relative_effect(1)[0] * 100);
             this.history[0+fullon].push(e.splice(exp,1)[0]);
           },
           format_number: function(n) {
