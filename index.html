@@ -583,7 +583,7 @@
 
             e[exp].end_experiment();
             // update box plots with observed effects, metadata.topic puts them into the correct bucket
-            this.chart.layout.datarevision = this.chart["traces"][e[exp]["metadata"]["Topic"]].y.push(e[exp].get_relative_effect(1)[0] * 100);
+            this.chart.layout.datarevision = this.chart["traces"][e[exp]["metadata"]["Topic"]].y.push((e[exp].get_relative_effect(1)[0] * 100).toFixed(2));
             this.history[0+fullon].push(e.splice(exp,1)[0]);
           },
           format_number: function(n) {
