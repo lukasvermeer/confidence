@@ -52,6 +52,17 @@ var Experiment = function(id) {
     return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants.length - 1));
   };
 
+  this.get_p_string = function() {
+    const precision = 4;
+    const smallest_display = 1/(10**precision);
+    const p = this.get_p();
+    if (p < smallest_display) {
+      return "< " + smallest_display;
+    } else {
+      return "" + p.toFixed(4);
+    }
+  };
+
   this.get_certainty = function() {
     return (100 * (1-this.get_p())).toFixed(2);
   };
@@ -159,7 +170,7 @@ Vue.component('experiment-table', {
           <th>Sales</th>
           <th>Rate</th>
           <th>Change</th>
-          <th>Sig.</th>
+          <th>P-value</th>
         </tr>
       </thead>
       <tbody>
@@ -184,8 +195,7 @@ Vue.component('experiment-table', {
             </span>
           </td>
           <td v-if="i > 0">
-            {{e.is_significant() ? 'Yes' : 'No' }}<br />
-            <small><span class="text-muted">{{ Math.round(e.get_certainty()) }}%</span></small>
+            <span v-bind:class="{'text-muted':!e.is_significant()}">{{ e.get_p_string() }}</span>
           </td>
         </tr>
       </tbody>
