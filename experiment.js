@@ -1,14 +1,16 @@
 var Experiment = function(id) {
   this.experiment_id = id;
   this.variants = [0.5, 0.5];
-  this.effect = [1,1];
+  this.effect = [1,1,1];
   this.visits = [0,0];
   this.conversions = [0,0];
   this.active = true;
   this.days = 0;
+  // Add adjustment for visitors & conversion rate, for visitors multiply by adjustment, for conversion rate divide by adjustment
+  this.adjustment = 1;
 
   this.name = 'Experiment '+this.experiment_id;
-  this.description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  this.description = 'No test description';
   this.metadata = {};
   this.effort = 100;
   this.progress = 0;
@@ -19,9 +21,13 @@ var Experiment = function(id) {
   }
   this.set_pval(0.1);
 
-  this.assign_variant = function() {
+  this.assign_variant = function(prob) {
     if (!this.active) return 0;
-    return Math.floor(Math.random() * this.variants.length);
+    if (prob <= this.adjustment) {
+      return Math.floor(Math.random() * this.variants.length);
+    } else {
+      return 2;
+    }
   }
 
   this.end_experiment = function() {
@@ -52,16 +58,23 @@ var Experiment = function(id) {
     return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants.length - 1));
   };
 
-  this.get_p_string = function() {
-    const precision = 4;
-    const smallest_display = 1/(10**precision);
-    const p = this.get_p();
-    if (p < smallest_display) {
-      return "< " + smallest_display;
-    } else {
-      return "" + p.toFixed(4);
-    }
-  };
+  // this.get_p_string = function() {
+  //   const precision = 4;
+  //   const smallest_display = 1/(10**precision);
+  //   const p = this.get_p();
+  //   if (p < smallest_display) {
+  //     return "< " + smallest_display;
+  //   } else {
+  //     return "" + p.toFixed(4);
+  //   }
+  // };
+
+// Updated to return confidence instead of p-value  
+this.get_p_string = function() {
+  const p = this.get_p();
+  const certainty = (1 - p) * 100;
+  return certainty.toFixed(1) + "%";
+};
 
   this.get_certainty = function() {
     return (100 * (1-this.get_p())).toFixed(2);
@@ -107,6 +120,15 @@ var Experiment = function(id) {
     var range = Math.sqrt(q) / y;
     var fieller =[ x/y - range - 1, x/y + range - 1 ];
     return avg_base >= 0 ? [estimate, fieller] : [estimate, fieller.map(function(x){return -x})];
+  }
+
+  // Added this function to calculate revenue difference based on a static AOV
+  this.get_revenue_diff = function() {
+    var rev_base = this.conversions[0] * 380;
+    var rev_var = this.conversions[1] * 380;
+    var rev_diff = rev_var - rev_base;
+    // Format rev_diff as currency with no decimal places
+    return rev_diff.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0});
   }
 
   this.get_srm_p = function(i) {
@@ -160,6 +182,7 @@ function calculate_g_test (data) {
   return g_test;
 }
 
+// Added revenue diff in the change column below
 Vue.component('experiment-table', {
   template: `
     <table class="table table-condensed table-striped">
@@ -167,10 +190,10 @@ Vue.component('experiment-table', {
         <tr>
           <th></th>
           <th>Users</th>
-          <th>Sales</th>
-          <th>Rate</th>
+          <th>Purchases</th>
+          <th>CVR</th>
           <th>Change</th>
-          <th>P-value</th>
+          <th>Confidence</th>
         </tr>
       </thead>
       <tbody>
@@ -179,8 +202,8 @@ Vue.component('experiment-table', {
           <th v-if="i > 0">Var {{i}}</th>
           <td width="90">{{ e.visits[i].toLocaleString() }}</td>
           <td width="90">{{ e.conversions[i].toLocaleString() }}</td>
-          <td width="90">{{ (e.get_mean(i)[0]*100).toFixed(2) }}%</td>
-          <td v-if="i == 0" class="text-muted">-</td>
+          <td width="90">{{ (e.get_mean(i)[0]*100).toFixed(1) }}%</td>
+          <td v-if="i == 0" class="text-muted">{{e.get_revenue_diff()}}</td>
           <td v-if="i == 0" class="text-muted">-</td>
           <td v-if="i > 0">
             <span class="confidence-interval-display">
@@ -191,7 +214,7 @@ Vue.component('experiment-table', {
                 <rect v-if="can_do_ci(i)" :x="transpose(ci_scale(i), ci(i)[0])" :width="transpose(ci_scale(i), ci(i)[1])-transpose(ci_scale(i), ci(i)[0])" y="3" height="12" rx="2" ry="2" :class="{ ci_svg:1, ci_significant_ugly:e.is_significant(),ci_inconclusive:!e.is_significant() }"></rect>
                 <circle v-if="can_do_mle(i)" r="1.5" :cx="transpose(ci_scale(i), e.get_relative_effect(i)[0])" :cy="ci_height/2" class="est"></circle>
               </svg>
-              <div><small>{{ (e.get_relative_effect(i)[0]*100).toFixed(2) }}% [<span class="text-muted" v-for="(ci,i) in e.get_relative_effect(i)[1]"><span v-if="i>0">,</span>{{(ci*100).toFixed(2)}}</span>]</small></div>
+              <div><small><b>{{ (e.get_relative_effect(i)[0]*100).toFixed(1) }}% </b>[<span class="text-muted" v-for="(ci,i) in e.get_relative_effect(i)[1]"><span v-if="i>0"> to </span>{{(ci*100).toFixed(1)}}%</span>]</small></div>
             </span>
           </td>
           <td v-if="i > 0">

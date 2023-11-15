@@ -60,8 +60,8 @@
               <h3>Experiments</h3>
               <p class="text-justify">Once a task is complete, a new experiment will be started. Each day, new users will be exposed to the experiment and statistics will be computed.</p>
               <p class="text-justify">At any given moment, you can decide to either
-                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-danger">Stop</button></span> or
-                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-success">Ship</button></span> an experiment.
+                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-danger">Loser</button></span> or
+                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-success">Winner</button></span> an experiment.
                 Stopped experiments are removed from the game. Shipping an experiment will cause all future users to be exposed to this change.
               </p>
               <p class="text-justify">You can review past experimental results and decisions in the <code>history</code> tab.</p>
@@ -79,11 +79,13 @@
           <div class="modal-content">
             <div class="modal-body" v-if="message.fullon">
               <h1 class="text-center">You shipped {{message.exp.name}}.</h1>
+              <!--Experiment card after test declared a winner-->
               <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
               <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
             </div>
             <div class="modal-body" v-if="!message.fullon">
               <h1 class="text-center">You stopped {{message.exp.name}}.</h1>
+              <!--Experiment card after test declared a loser-->
               <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
               <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
             </div>
@@ -118,7 +120,7 @@
               </p>
             </div>
             <div class="modal-footer">
-              <a href="http://grnh.se/s3cdil" class="btn btn-lg btn-default btn-block" target="_blank"><small>Want to get paid to run experiments?</small><br /><strong>Apply for a job at Booking.com</strong></a>
+              <!-- <a href="http://grnh.se/s3cdil" class="btn btn-lg btn-default btn-block" target="_blank"><small>Want to get paid to run experiments?</small><br /><strong>Apply for a job at Booking.com</strong></a> -->
               <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
             </div>
           </div>
@@ -127,10 +129,17 @@
 
       <div v-if="!game_state.playing" class="row">
         <!-- A general introduction to the game. -->
+        <!-- Primary game intro screen -->
         <div class="col-md-offset-2 col-md-8">
           <h1>So You Think You Can Test?</h1>
+          <div style="display: flex;">
+            <div style="display: flex; padding: 8px;">
+              <img src="/breeze.png" style="height: 40px; vertical-align: bottom;">
+            </div>
+            <h2 style="color:#1F74DF; margin-left: 10px;"><em>Edition</em></h2>
+          </div>
           <p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
-          <h2>Simulation-mode</h2>
+          <!-- <h2>Simulation-mode</h2> -->
           <p>
             <div class="well">
               <div class="form-group">
@@ -153,8 +162,8 @@
               </div>
             </div>
           </p>
-          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><strong>Start simulation-mode</strong><br /><small>realistic turn-based simulation</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><strong>Start the game</strong><br /><small>realistic turn-based simulation</small></button></p>
+          <!-- <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
           <div class="row" v-if="user != null">
             <div class="col-md-offset-2 col-md-8 text-center">
               <h2>Leaderboard</h2>
@@ -173,10 +182,10 @@
               </dl>
             </div>
           </div>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p>
+          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p> -->
           <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><strong>Read instructions</strong><br /><small>some words on how to play</small></button></p>
-          <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p>
-          <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
+          <!-- <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p> -->
+          <p class="text-center"><small>Originally created by <a href="http://www.lukasvermeer.nl/confidence/">Lukas Vermeer</a> &mdash; (<a href="https://github.com/lukasvermeer/confidence">GitHub repository</a></small>)</p>
         </div>
       </div>
 
@@ -184,7 +193,7 @@
         <!-- Scores header for Simulation-mode. -->
         <div class="row">
           <div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
-          <div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
+          <!-- <div class="col-md-4 text-center"><h2>Purchases {{format_number(conversions)}}</h2></div> -->
           <div class="col-md-4 text-center"><h2>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#help">Instructions</button>
             <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" :disabled="game_state.computing" v-on:click="next_round_sim()">Proceed to next day</button>
@@ -256,19 +265,21 @@
                   <span>(running for {{ exp.days }} days)</span>
                   <div class="btn-toolbar pull-right">
                     <div class="btn-group btn-group-xs">
-                      <button type="button" class="btn btn-danger" v-on:click="sim_choose_exp(i, false)">Stop</button>
+                      <button type="button" class="btn btn-danger" v-on:click="sim_choose_exp(i, false)">Loser</button>
                     </div>
                     <div class="btn-group btn-group-xs">
-                      <button type="button" class="btn btn-success" v-on:click="sim_choose_exp(i, true)">Ship</button>
+                      <button type="button" class="btn btn-success" v-on:click="sim_choose_exp(i, true)">Winner</button>
                     </div>
                   </div>
                 </div>
+                <!--Experiment card on Experiments tab while tests running-->
                 <experiment-table :e="exp" :ci_scale_min="0.1"></experiment-table>
                 <p class="text-center lead" v-if="settings.feedback_level > 2">The real effect of this experiment is {{((exp.effect[1]-1)*100).toFixed(2)}}%.</p>
               </div>
             </div>
           </div>
 
+          <!-- History pane -->
           <div role="tabpanel" class="tab-pane row" id="history">
             <div class="col-md-12" v-if="history[0].length == 0 && history[1].length == 0">
               <div class="alert alert-info text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
@@ -278,11 +289,12 @@
             </div>
             <div class="col-md-6" v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
               <p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
+              <!--Experiment card on History tab-->
               <div v-for="(e,j) in h" class="panel panel-default">
                 <div class="panel-heading">
                   <strong>Experiment {{e.experiment_id}}</strong>
                   <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
-                  <span>(running for {{ e.days }} days)</span>
+                  <span>(ran for {{ e.days }} days)</span>
                 </div>
                 <experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
                 <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((e.effect[1]-1)*100).toFixed(2)}}%.</p>
@@ -311,7 +323,7 @@
       // decision makers more aware of the complex trade off between indecision and acting
       // on insufficient information.
       //
-      var e = [];
+      var e = []; // Active experiments array
 
       // Initialize Firebase
       var config = {
@@ -324,19 +336,19 @@
       };
       firebase.initializeApp(config);
 
-      var provider = new firebase.auth.TwitterAuthProvider();
-      var db = firebase.database();
-      var leaderboard = db.ref('leaderboard/2/91');
+      // var provider = new firebase.auth.TwitterAuthProvider();
+      // var db = firebase.database();
+      // var leaderboard = db.ref('leaderboard/2/91');
 
-      // Get user data (if logged in).
-      firebase.auth().getRedirectResult().then(function(result) {
-        // The signed-in user info.
-      }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log('ERROR '+errorCode+': '+errorMessage);
-      });
+      // // Get user data (if logged in).
+      // firebase.auth().getRedirectResult().then(function(result) {
+      //   // The signed-in user info.
+      // }).catch(function(error) {
+      //   // Handle Errors here.
+      //   var errorCode = error.code;
+      //   var errorMessage = error.message;
+      //   console.log('ERROR '+errorCode+': '+errorMessage);
+      // });
 
       Vue.use(Vuefire.rtdbPlugin);
 
@@ -347,23 +359,23 @@
             this.user = user
           }.bind(this))
         },
-        created: function() {
-          this.bind_leaderboard();
-        },
-        watch: {
-          'settings.feedback_level': function (val) {
-            this.rebind_leaderboard();
-          },
-          'settings.game_duration': function (val) {
-            this.rebind_leaderboard();
-          },
-        },
+        // created: function() {
+        //   this.bind_leaderboard();
+        // },
+        // watch: {
+        //   'settings.feedback_level': function (val) {
+        //     this.rebind_leaderboard();
+        //   },
+        //   'settings.game_duration': function (val) {
+        //     this.rebind_leaderboard();
+        //   },
+        // },
         data: {
-          leaderboard: [],
+          // leaderboard: [],
           user: {},
-          AVERAGE_EFFECT: -0.25,
-          AVERAGE_EFFECT_STDDEV: 0.5,
-          DEV_CAPACITY: 2,
+          AVERAGE_EFFECT: 0,
+          AVERAGE_EFFECT_STDDEV: 0.75,
+          DEV_CAPACITY: 1,
 
           summary_statistics: [],
           overall_performance: new Experiment(-1),
@@ -377,11 +389,12 @@
 
           backlog: [[],[],[],],
           backlog_headings: ['To be prioritized','Prioritized','In progress'],
-          backlog_topics: ['A','B','C','D','E'],
+          backlog_topics: ['Home','Availability','Seats','Bags','Payments'],
+          cvr_adjustment: [1,.35,.2,.17,.1], // Added this, didn't exist before
           backlog_complexities: ['Low','Medium','High'],
           backlog_index: 0,
 
-          history_headings: ['Stopped', 'Shipped'],
+          history_headings: ['Losers', 'Winners'],
           history: [[],[]],
 
           feedback_levels: ['','Realistic','Instant feedback','God-mode'],
@@ -389,19 +402,19 @@
           settings: {
             feedback_level: 2,
             game_duration: 91,
-            visitors_per_day: 100000,
-            conversion_rate: 0.05,
-            topic_effects: [[-0.5,0.5],[-0.25,0.5],[0,0],[0.25,0.5],[0.5,0.5],],
+            visitors_per_day: 75000,
+            conversion_rate: 0.04, // Base conversion rate, will be modified by backlog_topic
+            topic_effects: [[0,1],[0,0.7],[0,0.6],[0,0.4],[0,0.2],],
           },
           message: {},
           chart: {
                       uuid: "boxplot",
                       traces: [
-                          { y: [], type: 'box', name: 'A' },
-                          { y: [], type: 'box', name: 'B' },
-                          { y: [], type: 'box', name: 'C' },
-                          { y: [], type: 'box', name: 'D' },
-                          { y: [], type: 'box', name: 'E' },
+                          { y: [], type: 'box', name: 'Home' },
+                          { y: [], type: 'box', name: 'Availability' },
+                          { y: [], type: 'box', name: 'Seats' },
+                          { y: [], type: 'box', name: 'Bags' },
+                          { y: [], type: 'box', name: 'Payments' },
                       ],
                       layout: {
                           title: {
@@ -416,13 +429,13 @@
                       },
                 },
         },
-        firebase: {
-          leaderboard: leaderboard.orderByChild('score').limitToLast(10),
-        },
+        // firebase: {
+        //   leaderboard: leaderboard.orderByChild('score').limitToLast(10),
+        // },
         computed: {
-          leaderboard_reversed: function() {
-            return (this.leaderboard).reverse();
-          },
+          // leaderboard_reversed: function() {
+          //   return (this.leaderboard).reverse();
+          // },
           backlog_colors: function() {
             return this.backlog_topics.map(function(e,i){return d3.schemeCategory10[i]});
           },
@@ -444,9 +457,13 @@
             var e = new Experiment(++this.backlog_index);
             var topic = Math.floor(Math.random() * this.backlog_topics.length);
             e.metadata['Topic'] = topic;
+            // Randomly sets effort to 0, 1, or 2
             var effort = Math.floor(Math.random() * this.backlog_complexities.length);
             e.metadata['Complexity'] = effort;
+            // Applies function to effort
             e.effort = 50 + effort * 100;
+            e.adjustment = this.cvr_adjustment[topic]; // Aded this, didn't exist before
+            // Randomly generates an effect based on mean and stddev set in topic_effects with multiplier according to effort
             var effect = 1 + jStat.normal.sample(this.settings.topic_effects[topic][0], this.settings.topic_effects[topic][1] * (effort+1)) / 100;
             e.reset(effect);
             this.backlog[0].push(e);
@@ -509,24 +526,34 @@
             }
             this.game_state.computing = false;
           },
-          sim_visitor: function() {
+          sim_visitor: function() { // SIMULATE EVERY SINGLE VISITOR AND ASSIGN TO A VARIANT IN EVERY RUNNING TEST
             var c = this.conversion;
 
             // assign to treatment for each exp and calculate aggregate effect size.
             var a = [];
+            var d = 1; // adjustment to conversion rate
+            var f = Math.random();
+
             for (var i = 0; i < e.length; ++i) {
-              a[i] = e[i].assign_variant();
-              c = c * e[i].effect[a[i]];
+              a[i] = e[i].assign_variant(f);
+              if (a[i] < 2) {
+                e[i].visits[a[i]]++;
+                c = c * e[i].effect[a[i]];
+                // Set d to min of d and e[i].adjustment
+                // d = Math.min(d, e[i].adjustment);
+              }
             }
+// NOT WORKING RIGHT, I THINK I'VE GOT TO GENERATE A SINGLE RANDOM NUMBER PER VISITOR (CURRENTLY ASSIGNED 2, 1 HERE AND 1 IN ASSIGN VARIANT FUNCTION IN JS FILE)
+// TRY ASSIGNING RANDOM NUMBER, THEN USING IT TO DETERMINE IF IT SHOULD GET ASSIGNED, THEN USE THE SAME TO DETERMINE CONVERSION RATE
+            //c = c/d;
 
             // converted or not.
-            b = false; if (Math.random() <= c) { b = true; this.conversions++; }
+            b = false; if (f <= c) { b = true; this.conversions++; }
 
             // update exps to reflect.
             for (var i = 0; i < e.length; ++i) {
-              if (e[i].active) {
-                e[i].visits[a[i]]++;
-                if (b) e[i].conversions[a[i]]++;
+              if (b && a[i] < 2) {                
+                e[i].conversions[a[i]]++;
               }
             }
 
@@ -545,7 +572,8 @@
             // Initialise experiment data.
             e = new Array();
             this.overall_performance = new Experiment(-1);
-            this.conversions = 0; this.day = 0; this.conversion = this.settings.conversion_rate;
+            this.conversions = 0; this.day = 0; 
+            this.conversion = this.settings.conversion_rate;
             this.backlog = [[],[],[],]; this.backlog_index = 0; this.history = [[],[]];
             this.settings.topic_effects = d3.shuffle(this.settings.topic_effects);
             for (i = 0; i <= 6; ++i) {
@@ -555,15 +583,15 @@
           },
           end_sim_game: function() {
             $('#end_game').modal('show');
-            if (firebase.auth().currentUser) {
-              db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
-                username: firebase.auth().currentUser.displayName,
-                uid: firebase.auth().currentUser.uid,
-                photoURL: firebase.auth().currentUser.photoURL,
-                score: this.conversions,
-                timestamp: firebase.database.ServerValue.TIMESTAMP } );
-              this.rebind_leaderboard();
-            }
+            // if (firebase.auth().currentUser) {
+            //   db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
+            //     username: firebase.auth().currentUser.displayName,
+            //     uid: firebase.auth().currentUser.uid,
+            //     photoURL: firebase.auth().currentUser.photoURL,
+            //     score: this.conversions,
+            //     timestamp: firebase.database.ServerValue.TIMESTAMP } );
+            //   // this.rebind_leaderboard();
+            // }
             this.game_state.playing = false;
           },
           sim_choose_exp: function(exp, fullon) {
@@ -579,29 +607,29 @@
             this.history[0+fullon].push(e.splice(exp,1)[0]);
           },
           format_number: function(n) {
-            return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&.');
+            return n.toFixed().replace(/\d(?=(\d{3})+$)/g, '$&,');
           },
           format_percent: function(n) {
             return n.toLocaleString('en',{style:'percent',minimumFractionDigits:2});
           },
-          login: function() {
-            firebase.auth().signInWithRedirect(provider);
-          },
-          logout: function() {
-            firebase.auth().signOut().then(function() {
-              // Sign-out successful.
-            }).catch(function(error) {
-              // An error happened.
-              console.log('ERROR: '+error);
-            });
-          },
-          rebind_leaderboard: function() {
-            this.$rtdbUnbind('leaderboard');
-            this.bind_leaderboard();
-          },
-          bind_leaderboard: function() {
-            this.$rtdbBind('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
-          },
+          // login: function() {
+          //   firebase.auth().signInWithRedirect(provider);
+          // },
+          // logout: function() {
+          //   firebase.auth().signOut().then(function() {
+          //     // Sign-out successful.
+          //   }).catch(function(error) {
+          //     // An error happened.
+          //     console.log('ERROR: '+error);
+          //   });
+          // },
+          // rebind_leaderboard: function() {
+          //   this.$rtdbUnbind('leaderboard');
+          //   this.bind_leaderboard();
+          // },
+          // bind_leaderboard: function() {
+          //   this.$rtdbBind('leaderboard', db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).orderByChild('score').limitToLast(10));
+          // },
           fake_resize: function () {
              var resizeEvent = window.document.createEvent('UIEvents');
              resizeEvent.initUIEvent('resize', true, false, window, 0);
@@ -633,7 +661,7 @@
       });
     </script>
 
-    <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
+    <!-- <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript> -->
   </body>
 </html>
