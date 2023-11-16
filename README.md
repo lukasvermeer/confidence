@@ -10,4 +10,5 @@ It's a game, created by Lukas Vermeer. You can see the original over at https://
 - Added some branding
 - Turned topics into site areas and gave them their own traffic volumes and conversion rates
 - Added revenue delta to experiments based on a standard AOV
+- Minor style changes
 - In my weakness, I turned p-values into a confidence calculation, forgive me stats gods
