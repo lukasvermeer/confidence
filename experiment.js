@@ -1,33 +1,64 @@
+/**
+ * Experiment class simulates an A/B test experiment with variants, conversions, and statistical calculations.
+ * @param {number} id - Unique identifier for the experiment.
+ */
 var Experiment = function(id) {
+  /** Unique experiment identifier */
   this.experiment_id = id;
+  /** Array of variant splits */
   this.variants = [0.5, 0.5];
+  /** Effect size for each variant */
   this.effect = [1,1];
+  /** Number of visits per variant */
   this.visits = [0,0];
+  /** Number of conversions per variant */
   this.conversions = [0,0];
+  /** Whether the experiment is active */
   this.active = true;
+  /** Number of days the experiment has run */
   this.days = 0;
 
+  /** Name of the experiment */
   this.name = 'Experiment '+this.experiment_id;
+  /** Description of the experiment */
   this.description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  /** Metadata object for additional info */
   this.metadata = {};
+  /** Effort required for the experiment */
   this.effort = 100;
+  /** Progress of the experiment */
   this.progress = 0;
 
+  /**
+   * Set the p-value threshold for significance and update G-test cutoff.
+   * @param {number} p - p-value threshold
+   */
   this.set_pval = function(p) {
     this.P_VALUE = p;
     this.GTEST_CUTOFF = jStat.chisquare.inv((1-this.P_VALUE), 1);
   }
   this.set_pval(0.1);
 
+  /**
+   * Randomly assign a variant to a user if experiment is active.
+   * @returns {number} Index of assigned variant
+   */
   this.assign_variant = function() {
     if (!this.active) return 0;
     return Math.floor(Math.random() * this.variants.length);
   }
 
+  /**
+   * End the experiment (set active to false).
+   */
   this.end_experiment = function() {
     this.active = false;
   }
 
+  /**
+   * Reset the experiment with a new effect for variant 1.
+   * @param {number} e - New effect for variant 1
+   */
   this.reset = function(e) {
     this.active = true;
     this.effect[1] = e;
@@ -36,6 +67,10 @@ var Experiment = function(id) {
     this.days = 0;
   }
 
+  /**
+   * Calculate the G-test statistic for the experiment data.
+   * @returns {number} G-test value
+   */
   this.get_g_test = function() {
     var data_all = [];
     for (var i = 0; i < this.variants.length; i++) {
@@ -44,14 +79,26 @@ var Experiment = function(id) {
     return calculate_g_test(data_all);
   };
 
+  /**
+   * Check if the experiment result is statistically significant.
+   * @returns {boolean}
+   */
   this.is_significant = function() {
     return this.get_g_test() >= this.GTEST_CUTOFF;
   };
 
+  /**
+   * Get the p-value for the experiment result.
+   * @returns {number} p-value
+   */
   this.get_p = function() {
     return (1-jStat.chisquare.cdf(this.get_g_test(), this.variants.length - 1));
   };
 
+  /**
+   * Get the p-value as a formatted string for display.
+   * @returns {string}
+   */
   this.get_p_string = function() {
     const precision = 4;
     const smallest_display = 1/(10**precision);
@@ -63,10 +110,13 @@ var Experiment = function(id) {
     }
   };
 
-  this.get_certainty = function() {
-    return (100 * (1-this.get_p())).toFixed(2);
-  };
+  // ...existing code...
 
+  /**
+   * Get the mean conversion rate and confidence interval for a variant.
+   * @param {number} i - Variant index
+   * @returns {[number, [number, number]]} Mean and confidence interval
+   */
   this.get_mean = function(i) {
     var p = this.conversions[i]/this.visits[i];
     var q = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( p * ( 1 - p ) / this.visits[i] );
@@ -74,6 +124,11 @@ var Experiment = function(id) {
     return [p, [p - q, p + q]];
   }
 
+  /**
+   * Get the absolute effect and confidence interval for a variant compared to base.
+   * @param {number} i - Variant index
+   * @returns {[number, [number, number]]} Effect and confidence interval
+   */
   this.get_absolute_effect = function(i) {
     var p = this.get_mean(i);
     var q = this.get_mean(0);
@@ -82,6 +137,11 @@ var Experiment = function(id) {
     return [ p - q, [p - q - z, p - q + z]];
   }
 
+  /**
+   * Get the relative effect and Fieller confidence interval for a variant compared to base.
+   * @param {number} i - Variant index
+   * @returns {[number, [number, number]]} Relative effect and confidence interval
+   */
   this.get_relative_effect = function(i) {
     var avg_base = this.get_mean(0)[0];
     var obs_base = this.visits[0];
@@ -109,6 +169,11 @@ var Experiment = function(id) {
     return avg_base >= 0 ? [estimate, fieller] : [estimate, fieller.map(function(x){return -x})];
   }
 
+  /**
+   * Get the SRM (Sample Ratio Mismatch) p-value for a variant.
+   * @param {number} i - Variant index
+   * @returns {number} SRM p-value
+   */
   this.get_srm_p = function(i) {
     var n = this.visits[0] + this.visits[i];
     var p = this.visits[0] / n;
@@ -117,8 +182,11 @@ var Experiment = function(id) {
   }
 };
 
-// This takes an array of arrays of any size, and calculates
-// the raw g-test value.  It assumes a square matrix of arguments.
+/**
+ * Calculate the raw G-test value for a contingency table.
+ * @param {Array<Array<number>>} data - 2D array of observed counts
+ * @returns {number} G-test statistic
+ */
 function calculate_g_test (data) {
   var rows = data.length;
   var columns = data[0].length;
@@ -160,6 +228,14 @@ function calculate_g_test (data) {
   return g_test;
 }
 
+/**
+ * Vue component for displaying experiment results in a table.
+ * Props:
+ *   e: Experiment object
+ *   ci_width: Width of confidence interval SVG
+ *   ci_height: Height of confidence interval SVG
+ *   ci_scale_min: Minimum scale for CI
+ */
 Vue.component('experiment-table', {
   template: `
     <table class="table table-condensed table-striped">
