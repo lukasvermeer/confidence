@@ -110,8 +110,6 @@ var Experiment = function(id) {
     }
   };
 
-  // ...existing code...
-
   /**
    * Get the mean conversion rate and confidence interval for a variant.
    * @param {number} i - Variant index
