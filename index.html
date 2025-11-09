@@ -7,23 +7,23 @@
 
     <title>So You Think You Can Test? - Simulation-mode</title>
 
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" type="text/css" href="confidence.css">
   </head>
   <body>
-    <div id="app-confidence" class="container">
-      <div class="modal" id="help" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
+    <div id="app-confidence" class="container mx-auto">
+      <div v-if="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="help" tabindex="-1" role="dialog">
+        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" role="document">
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
               <h1 class="text-center">How to play</h1>
-              <div class="alert alert-warning">
+              <div class="rounded-md bg-yellow-50 p-4">
                 <p class="text-justify"><strong>Warning:</strong> This game is still in active development. Your experience may change as I add new functionality and tweak features to enhance realism. I will strive to keep these instructions updated as the game evolves.</p>
                 <p class="text-center"><a href="http://lukasvermeer.nl/#contact" target="_blank">Feedback or ideas are very welcome. <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></p>
               </div>
               <h3>Objective</h3>
               <p class="text-justify">You control the backlog and running experiments for a small development team. Each day you make decisions that impact product development and overall sales.</p>
-              <p class="text-justify">Your current progress is displayed at the top of the screen. Once you are done for the day, click <button type="button" class="btn btn-primary btn-xs">proceed to next day</button> to move the simulation forward.</p>
+              <p class="text-justify">Your current progress is displayed at the top of the screen. Once you are done for the day, click <button type="button" class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">proceed to next day</button> to move the simulation forward.</p>
               <p class="text-justify">After <code>{{settings.game_duration}}</code> days, the game is over and your final score is computed based on total sales.</p>
               <p class="text-center lead">Your objective is to maximise total sales.</p>
               <h3>Backlog</h3>
@@ -33,122 +33,118 @@
                 <dt>Topics</dt>
                 <dd>
                   <p class="text-justify">Each task is related to one of 5 different topics:
-                    <span class="label label-primary" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span>,
-                    <span class="label label-primary" :style="{ background: backlog_colors[1] }">{{backlog_topics[1]}}</span>,
-                    <span class="label label-primary" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span>,
-                    <span class="label label-primary" :style="{ background: backlog_colors[3] }">{{backlog_topics[3]}}</span>, or
-                    <span class="label label-primary" :style="{ background: backlog_colors[4] }">{{backlog_topics[4]}}</span>.
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span>,
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[1] }">{{backlog_topics[1]}}</span>,
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span>,
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[3] }">{{backlog_topics[3]}}</span>, or
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[4] }">{{backlog_topics[4]}}</span>.
                     Different topics share different underlying probabilities of success and effect sizes.
                   <p class="text-justify">
-                    This means that all tasks of topic <span class="label label-primary" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span> will tend to show similar results.
-                    These settings are randomised each playthrough, so that <span class="label label-primary" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span> might be a promising topic in one playthrough, but disastrous in another.
+                    This means that all tasks of topic <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span> will tend to show similar results.
+                    These settings are randomised each playthrough, so that <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span> might be a promising topic in one playthrough, but disastrous in another.
                   </p>
                   <p class="text-center lead">Exploration through experimentation in order to figure out which topics to exploit is the core challenge in this game.</p>
                 </dd>
                 <dt>Effort</dt>
                 <dd>
                   <p class="text-justify">Each task requires a certain amount of effort to implement. There are 3 levels of complexity:
-                    <span class="label label-default" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span>,
-                    <span class="label label-default" :style="{ background: complexity_colors[1] }">{{backlog_complexities[1]}}</span>, and
-                    <span class="label label-default" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span>.
+                    <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span>,
+                    <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[1] }">{{backlog_complexities[1]}}</span>, and
+                    <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span>.
                   </p>
                   <p class="text-justify">
-                    Increased complexity also results in higher risk or reward. Experiments that result from tasks of <span class="label label-default" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span> complexity tend to have larger effect sizes, in either direction, than those of <span class="label label-default" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span> complexity.
+                    Increased complexity also results in higher risk or reward. Experiments that result from tasks of <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[2] }">{{backlog_complexities[2]}}</span> complexity tend to have larger effect sizes, in either direction, than those of <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[0] }">{{backlog_complexities[0]}}</span> complexity.
                   </p>
                 </dd>
               </dl>
               <h3>Experiments</h3>
               <p class="text-justify">Once a task is complete, a new experiment will be started. Each day, new users will be exposed to the experiment and statistics will be computed.</p>
               <p class="text-justify">At any given moment, you can decide to either
-                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-danger">Stop</button></span> or
-                <span class="btn-group btn-group-xs"><button type="button" class="btn btn-success">Ship</button></span> an experiment.
+                <span class="isolate inline-flex rounded-md shadow-sm"><button type="button" class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">Stop</button></span> or
+                <span class="isolate inline-flex rounded-md shadow-sm"><button type="button" class="rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Ship</button></span> an experiment.
                 Stopped experiments are removed from the game. Shipping an experiment will cause all future users to be exposed to this change.
               </p>
               <p class="text-justify">You can review past experimental results and decisions in the <code>history</code> tab.</p>
               <p class="text-center lead">This is a game of chance, but not of chance alone. The faster you learn, the more you will earn. Good luck!</p>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
+            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto" @click="showModal = false"><strong>Close</strong></button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="modal" id="decision" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document" v-if="message.type == 'decision'">
-          <div class="modal-content">
-            <div class="modal-body" v-if="message.fullon">
-              <h1 class="text-center">You shipped {{message.exp.name}}.</h1>
-              <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
-              <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
-            </div>
-            <div class="modal-body" v-if="!message.fullon">
-              <h1 class="text-center">You stopped {{message.exp.name}}.</h1>
-              <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
-              <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
-            </div>
+      <div v-if="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="decision" tabindex="-1" role="dialog">
+        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" role="document" v-if="message.type == 'decision'">
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" v-if="message.fullon">
+            <h1 class="text-center">You shipped {{message.exp.name}}.</h1>
+            <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
+            <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+          </div>
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4" v-if="!message.fullon">
+            <h1 class="text-center">You stopped {{message.exp.name}}.</h1>
+            <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
+            <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto" @click="showModal = false"><strong>Close</strong></button>
           </div>
         </div>
       </div>
 
-      <div class="modal" id="end_game" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h1 class="text-center">The game is over</h1>
-              <p class="text-center">
-                <span class="text-muted label label-info">{{feedback_levels[settings.feedback_level]}}</span>
-                <span class="text-muted label label-info">{{settings.game_duration}} days</span>
-              </p>
-              <p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
-              <experiment-table :e="overall_performance"></experiment-table>
-              <p class="text-center lead">
-                <span v-if="overall_performance.is_significant()">
-                  This is significantly
-                  <strong v-if="overall_performance.get_relative_effect(1)[0] > 0">better</strong>
-                  <strong v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</strong>
-                  than would have been expected if there had been no product changes made at all.
-                </span>
-                <span v-if="!overall_performance.is_significant()">
-                  This is not significantly different from what would have been expected if there had been no product changes made at all.
-                </span>
-              </p>
-            </div>
-            <div class="modal-footer">
-              <a href="http://lukasvermeer.nl/" class="btn btn-lg btn-default btn-block" target="_blank">
-                <small>Want to level up your experimentation game?</small><br />
-                <strong>Book Lukas Vermeer for consulting or speaking!</strong>
-              </a>
-              <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
-            </div>
+      <div v-if="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="end_game" tabindex="-1" role="dialog">
+        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" role="document">
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <h1 class="text-center">The game is over</h1>
+            <p class="text-center">
+              <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">{{feedback_levels[settings.feedback_level]}}</span>
+              <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">{{settings.game_duration}} days</span>
+            </p>
+            <p class="text-center lead">Your final score is {{format_percent(overall_performance.get_relative_effect(1)[0])}}.</p>
+            <experiment-table :e="overall_performance"></experiment-table>
+            <p class="text-center lead">
+              <span v-if="overall_performance.is_significant()">
+                This is significantly
+                <strong v-if="overall_performance.get_relative_effect(1)[0] > 0">better</strong>
+                <strong v-if="overall_performance.get_relative_effect(1)[0] < 0">worse</strong>
+                than would have been expected if there had been no product changes made at all.
+              </span>
+              <span v-if="!overall_performance.is_significant()">
+                This is not significantly different from what would have been expected if there had been no product changes made at all.
+              </span>
+            </p>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <a href="http://lukasvermeer.nl/" class="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" target="_blank">
+              <small>Want to level up your experimentation game?</small><br />
+              <strong>Book Lukas Vermeer for consulting or speaking!</strong>
+            </a>
+            <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto" @click="showModal = false"><strong>Close</strong></button>
           </div>
         </div>
       </div>
 
-      <div v-if="!game_state.playing" class="row">
+      <div v-if="!game_state.playing" class="grid grid-cols-1 gap-4">
         <!-- A general introduction to the game. -->
-        <div class="col-md-offset-2 col-md-8">
+        <div class="col-span-1">
           <h1>So You Think You Can Test?</h1>
           <p class="text-justify lead">Decision making under uncertainty is complicated business. This game aims to make decision makers more aware of the complex trade off between indecision and acting on insufficient information.</p>
           <h2>Simulation-mode</h2>
           <p>
-            <div class="well">
-              <div class="form-group">
+            <div class="rounded-md bg-gray-50 p-4">
+              <div class="mb-4">
                 <label>Feedback level</label>
-                <p class="form-text text-muted">The amount of information you will have available during the simulation. Reduced feedback increases realism.</p>
-                <select v-model.number="settings.feedback_level" class="form-control">
+                <p class="text-sm text-gray-500">The amount of information you will have available during the simulation. Reduced feedback increases realism.</p>
+                <select v-model.number="settings.feedback_level" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                   <option value="1">Realistic (You will receive no feedback during the simulation)</option>
                   <option value="2">Instant feedback (You will receive instant feedback after each experiment decision)</option>
                   <option value="3">God-mode (Hidden parameters of the simulation are exposed)</option>
                 </select>
               </div>
-              <div class="form-group">
+              <div>
                 <label>Game duration</label>
-                <p class="form-text text-muted">Longer play increases the opportunity to uncover the underlying simulation parameters through experimentation.</p>
-                <select v-model.number="settings.game_duration" class="form-control">
+                <p class="text-sm text-gray-500">Longer play increases the opportunity to uncover the underlying simulation parameters through experimentation.</p>
+                <select v-model.number="settings.game_duration" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                   <option value="28">28 days (Barely enough time to run a few experiments)</option>
                   <option value="91">91 days (13 weeks. A single quarter. Enough time to explore)</option>
                   <option value="364">364 days (52 weeks. A whole year. Almost enough time to get bored)</option>
@@ -156,19 +152,19 @@
               </div>
             </div>
           </p>
-          <p><button type="button" class="btn btn-lg btn-primary btn-block" v-on:click="start_sim_game"><strong>Start simulation-mode</strong><br /><small>realistic turn-based simulation</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-warning btn-block" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
-          <div class="row" v-if="user != null">
-            <div class="col-md-offset-2 col-md-8 text-center">
+          <p><button type="button" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-white shadow-sm hover:bg-indigo-500" v-on:click="start_sim_game"><strong>Start simulation-mode</strong><br /><small>realistic turn-based simulation</small></button></p>
+          <p><button type="button" class="w-full rounded-md bg-yellow-500 px-4 py-2 text-white shadow-sm hover:bg-yellow-400" v-if="user == null" v-on:click="login"><strong>Login with Twitter</strong><br /><small>to view and compete on the leaderboard</small></button></p>
+          <div class="grid grid-cols-1 gap-4" v-if="user != null">
+            <div class="col-span-1 text-center">
               <h2>Leaderboard</h2>
               <p>
-                <span class="text-muted label label-info">{{feedback_levels[settings.feedback_level]}}</span>
-                <span class="text-muted label label-info">{{settings.game_duration}} days</span>
+                <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">{{feedback_levels[settings.feedback_level]}}</span>
+                <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">{{settings.game_duration}} days</span>
               </p>
-              <p v-if="leaderboard.length == 0" class="text-muted text-center">*crickets*</p>
-              <dl class="dl-horizontal">
+              <p v-if="leaderboard.length == 0" class="text-center text-gray-500">*crickets*</p>
+              <dl>
                 <span v-for="(l, i) in leaderboard_reversed">
-                  <dt><span class="badge">#{{i+1}}</span> {{l.username}}</dt>
+                  <dt><span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">#{{i+1}}</span> {{l.username}}</dt>
                   <dd>
                     {{format_number(l.score)}}
                   </dd>
@@ -176,65 +172,67 @@
               </dl>
             </div>
           </div>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p>
-          <p><button type="button" class="btn btn-lg btn-default btn-block" data-toggle="modal" data-target="#help"><strong>Read instructions</strong><br /><small>some words on how to play</small></button></p>
-          <p><a href="arcade.html" class="btn btn-lg btn-default btn-block"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p>
+          <p><button type="button" class="w-full rounded-md bg-white px-4 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" v-if="user != null" v-on:click="logout"><strong>Log out of Twitter</strong><br /><small>you are signed in as {{user.displayName}}</small></button></p>
+          <p><button type="button" class="w-full rounded-md bg-white px-4 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" data-toggle="modal" data-target="#help"><strong>Read instructions</strong><br /><small>some words on how to play</small></button></p>
+          <p><a href="arcade.html" class="w-full block rounded-md bg-white px-4 py-2 text-center text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"><strong>Switch to arcade-mode</strong><br /><small>fast-paced time-based action</small></a></p>
           <p class="text-center"><small>Created by <a href="http://www.lukasvermeer.nl">Lukas Vermeer</a> &mdash; Make this more awesome on <a href="https://github.com/lukasvermeer/confidence">GitHub</a></small></p>
         </div>
       </div>
 
       <div v-if="game_state.playing">
         <!-- Scores header for Simulation-mode. -->
-        <div class="row">
-          <div class="col-md-4 text-center"><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
-          <div class="col-md-4 text-center"><h2>Sales {{format_number(conversions)}}</h2></div>
-          <div class="col-md-4 text-center"><h2>
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#help">Instructions</button>
-            <button type="button" class="btn btn-primary" v-if="day<settings.game_duration" :disabled="game_state.computing" v-on:click="next_round_sim()">Proceed to next day</button>
-            <button type="button" class="btn btn-danger" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><h2>Day {{day}}/{{settings.game_duration}}</h2></div>
+          <div><h2>Sales {{format_number(conversions)}}</h2></div>
+          <div><h2>
+            <button type="button" class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" data-toggle="modal" data-target="#help">Instructions</button>
+            <button type="button" class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" v-if="day<settings.game_duration" :disabled="game_state.computing" v-on:click="next_round_sim()">Proceed to next day</button>
+            <button type="button" class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" v-if="day>=settings.game_duration" v-on:click="end_sim_game()">End game</button>
           </h2></div>
         </div>
 
         <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation">
-            <a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab">
-              Backlog <span class="badge">{{backlog[1].length}}</span>
-            </a>
-          </li>
-          <li role="presentation" class="active">
-            <a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab">
-              Experiments <span class="badge" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
-            </a>
-          </li>
-          <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"  v-on:click="fake_resize">History</a></li>
-        </ul>
+        <div class="border-b border-gray-200">
+          <ul class="-mb-px flex items-center gap-4 text-sm font-medium" role="tablist">
+            <li role="presentation">
+              <a href="#backlog" aria-controls="backlog" role="tab" data-toggle="tab" class="inline-flex items-center gap-2 px-1 py-3 text-gray-500 hover:text-indigo-600">
+                Backlog <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">{{backlog[1].length}}</span>
+              </a>
+            </li>
+            <li role="presentation" class="active">
+              <a href="#experiments" aria-controls="experiments" role="tab" data-toggle="tab" class="inline-flex items-center gap-2 px-1 py-3 text-indigo-600">
+                Experiments <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" v-if="summary_statistics.length > 0">{{summary_statistics.length}}</span>
+              </a>
+            </li>
+            <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab"  v-on:click="fake_resize" class="inline-flex items-center gap-2 px-1 py-3 text-gray-500 hover:text-indigo-600">History</a></li>
+          </ul>
+        </div>
 
-        <div class="tab-content">
+        <div>
           <!-- Backlog pane -->
-          <div role="tabpanel" class="tab-pane row" id="backlog">
-            <div class="col-md-4" v-for="(b,i) in backlog">
+          <div role="tabpanel" class="grid grid-cols-3 gap-4" id="backlog">
+            <div v-for="(b,i) in backlog">
               <p class="text-center lead">{{backlog_headings[i]}}</p>
               <div v-for="(e,j) in b">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
+                <div class="rounded-lg bg-white shadow-md">
+                  <div class="border-b border-gray-200 px-4 py-2">
                     {{e.name}}
-                    <span class="label label-default" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
-                    <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
-                    <div class="btn-toolbar pull-right">
-                      <div class="btn-group btn-group-xs" v-if="i == 0">
-                        <button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
+                    <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
+                    <div class="float-right">
+                      <div class="isolate inline-flex rounded-md shadow-sm" v-if="i == 0">
+                        <button type="button" class="relative inline-flex items-center rounded-l-md bg-white px-2 py-1 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10" @click="prioritize_task(j)">Prioritize</button>
                       </div>
-                      <div class="btn-group btn-group-xs">
-                        <button type="button" class="btn btn-default" @click="delete_task(j,i)">Delete</button>
+                      <div class="isolate inline-flex rounded-md shadow-sm">
+                        <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-2 py-1 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10" @click="delete_task(j,i)">Delete</button>
                       </div>
                     </div>
                   </div>
-                  <div class="panel-body">
-                    <div class="progress" v-if="(e.progress/e.effort*100).toFixed(0) > 0" style="height: 2px">
-                      <div class="progress-bar" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
+                  <div class="p-4">
+                    <div class="h-1 w-full bg-gray-200" v-if="(e.progress/e.effort*100).toFixed(0) > 0">
+                      <div class="h-1 bg-indigo-600" role="progressbar" :aria-valuenow="(e.progress/e.effort*100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" :style="{ width: (e.progress/e.effort*100).toFixed(0)+'%' }"></div>
                     </div>
-                    <dl class="dl-horizontal" v-if="settings.feedback_level > 2">
+                    <dl class="grid grid-cols-2 gap-4" v-if="settings.feedback_level > 2">
                       <span><dt>Effect</dt><dd>{{(e.effect[1]-1).toLocaleString('en',{style:'percent',minimumFractionDigits:2})}}</dd></span>
                       <span><dt>Effort</dt><dd>{{(e.effort).toLocaleString('en')}}</dd></span>
                     </dl>
@@ -246,23 +244,23 @@
           </div>
 
           <!-- Experiments pane -->
-          <div role="tabpanel" class="tab-pane active row" id="experiments">
+          <div role="tabpanel" class="grid grid-cols-2 gap-4" id="experiments">
             <!-- Experiments display for Simulation-mode. -->
-            <div class="col-md-12" v-if="summary_statistics.length == 0">
-              <div class="alert alert-info text-center" role="alert">There are currently no experiments running. Use the navigation above to switch to the <mark>backlog</mark> tab to prioritize their development.</div>
+            <div class="col-span-2" v-if="summary_statistics.length == 0">
+              <div class="rounded-md bg-blue-50 p-4 text-center" role="alert">There are currently no experiments running. Use the navigation above to switch to the <mark>backlog</mark> tab to prioritize their development.</div>
             </div>
-            <div class="col-md-6" v-for="(exp,i) in summary_statistics">
-              <div class="panel panel-default">
-                <div class="panel-heading">
+            <div v-for="(exp,i) in summary_statistics">
+              <div class="rounded-lg bg-white shadow-md">
+                <div class="border-b border-gray-200 px-4 py-2">
                   <strong>Experiment {{exp.experiment_id}}</strong>
-                  <span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
+                  <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
                   <span>(running for {{ exp.days }} days)</span>
-                  <div class="btn-toolbar pull-right">
-                    <div class="btn-group btn-group-xs">
-                      <button type="button" class="btn btn-danger" v-on:click="sim_choose_exp(i, false)">Stop</button>
+                  <div class="float-right">
+                    <div class="isolate inline-flex rounded-md shadow-sm">
+                      <button type="button" class="relative inline-flex items-center rounded-l-md bg-red-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:z-10" v-on:click="sim_choose_exp(i, false)">Stop</button>
                     </div>
-                    <div class="btn-group btn-group-xs">
-                      <button type="button" class="btn btn-success" v-on:click="sim_choose_exp(i, true)">Ship</button>
+                    <div class="isolate inline-flex rounded-md shadow-sm">
+                      <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-green-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:z-10" v-on:click="sim_choose_exp(i, true)">Ship</button>
                     </div>
                   </div>
                 </div>
@@ -272,19 +270,19 @@
             </div>
           </div>
 
-          <div role="tabpanel" class="tab-pane row" id="history">
-            <div class="col-md-12" v-if="history[0].length == 0 && history[1].length == 0">
-              <div class="alert alert-info text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
+          <div role="tabpanel" class="grid grid-cols-2 gap-4" id="history">
+            <div class="col-span-2" v-if="history[0].length == 0 && history[1].length == 0">
+              <div class="rounded-md bg-blue-50 p-4 text-center" role="alert">No experiment decisions have been made so far. Use the navigation above to switch to the <mark>experiments</mark> tab to make some.</div>
             </div>
-            <div class="col-md-12">
+            <div class="col-span-2">
               <reactive-chart :chart="chart"></reactive-chart>
             </div>
-            <div class="col-md-6" v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
+            <div v-for="(h,i) in history" v-if="history[0].length > 0 || history[1].length > 0">
               <p class="text-center lead">{{history_headings[i]}}: {{history[i].length}}</p>
-              <div v-for="(e,j) in h" class="panel panel-default">
-                <div class="panel-heading">
+              <div v-for="(e,j) in h" class="rounded-lg bg-white shadow-md">
+                <div class="border-b border-gray-200 px-4 py-2">
                   <strong>Experiment {{e.experiment_id}}</strong>
-                  <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
+                  <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
                   <span>(running for {{ e.days }} days)</span>
                 </div>
                 <experiment-table :e="e" :ci_scale_min="0.1"></experiment-table>
@@ -397,6 +395,7 @@
             topic_effects: [[-0.5,0.5],[-0.25,0.5],[0,0],[0.25,0.5],[0.5,0.5],],
           },
           message: {},
+          showModal: false,
           chart: {
                       uuid: "boxplot",
                       traces: [
@@ -557,7 +556,7 @@
             this.update_summary_statistics();
           },
           end_sim_game: function() {
-            $('#end_game').modal('show');
+            this.showModal = true;
             if (firebase.auth().currentUser) {
               db.ref('leaderboard/'+this.settings.feedback_level+'/'+this.settings.game_duration).push( {
                 username: firebase.auth().currentUser.displayName,
@@ -574,7 +573,7 @@
             if (fullon) { this.conversion = e[exp].effect[1] * this.conversion; }
 
             this.message = {type: 'decision', fullon: fullon, exp: e[exp]};
-            $('#decision').modal('show');
+            this.showModal = true;
 
             e[exp].end_experiment();
             // update box plots with observed effects, metadata.topic puts them into the correct bucket
