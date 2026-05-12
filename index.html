@@ -43,6 +43,12 @@
                     This means that all tasks of topic <span class="label label-primary" :style="{ background: backlog_colors[0] }">{{backlog_topics[0]}}</span> will tend to show similar results.
                     These settings are randomised each playthrough, so that <span class="label label-primary" :style="{ background: backlog_colors[2] }">{{backlog_topics[2]}}</span> might be a promising topic in one playthrough, but disastrous in another.
                   </p>
+                  <p class="text-justify">
+                    Once you have learned enough about a topic through experimentation, you can stop new tickets from being generated for it.
+                    Use the topic checkboxes at the top of the backlog to control which topics new tickets are added for.
+                    Unchecking a topic will not affect tasks already in the backlog, but no new tasks for that topic will be added.
+                    This is useful when you have determined that a topic is not worth investing in, and want to focus your team's efforts elsewhere.
+                  </p>
                   <p class="text-center lead">Exploration through experimentation in order to figure out which topics to exploit is the core challenge in this game.</p>
                 </dd>
                 <dt>Effort</dt>
@@ -196,6 +202,16 @@
         <div class="tab-content">
           <!-- Backlog pane -->
           <div role="tabpanel" class="tab-pane row" id="backlog">
+            <div class="col-md-12">
+              <p class="text-muted" style="margin-bottom: 4px"><small>Allow new tickets for topics:</small>
+                <span v-for="(topic, i) in backlog_topics" style="margin-left: 6px">
+                  <label style="font-weight: normal; cursor: pointer">
+                    <input type="checkbox" v-model="settings.topic_filter[i]">
+                    <span class="label label-primary" :style="{ background: backlog_colors[i] }">{{topic}}</span>
+                  </label>
+                </span>
+              </p>
+            </div>
             <div class="col-md-4" v-for="(b,i) in backlog">
               <p class="text-center lead">{{backlog_headings[i]}}</p>
               <div v-for="(e,j) in b">
@@ -331,6 +347,7 @@
             visitors_per_day: 100000,
             conversion_rate: 0.05,
             topic_effects: [[-0.5,0.5],[-0.25,0.5],[0,0],[0.25,0.5],[0.5,0.5],],
+            topic_filter: [true, true, true, true, true],
           },
           message: {},
           chart: {
@@ -375,7 +392,9 @@
           },
           add_random_task: function() {
             var e = new Experiment(++this.backlog_index);
-            var topic = Math.floor(Math.random() * this.backlog_topics.length);
+            var enabled_topics = this.backlog_topics.map(function(t,i){return i;}).filter(function(i){ return confidence.settings.topic_filter[i]; });
+            if (enabled_topics.length === 0) enabled_topics = this.backlog_topics.map(function(t,i){return i;});
+            var topic = enabled_topics[Math.floor(Math.random() * enabled_topics.length)];
             e.metadata['Topic'] = topic;
             var effort = Math.floor(Math.random() * this.backlog_complexities.length);
             e.metadata['Complexity'] = effort;
