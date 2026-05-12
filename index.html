@@ -64,6 +64,7 @@
                 <span class="btn-group btn-group-xs"><button type="button" class="btn btn-success">Ship</button></span> an experiment.
                 Stopped experiments are removed from the game. Shipping an experiment will cause all future users to be exposed to this change.
               </p>
+              <p class="text-justify">Occasionally, an experiment may contain a bug that causes a very negative impact on sales, regardless of topic. These bugs are rare, but can significantly hurt your score if shipped. Note that leaving a buggy experiment running too long also hurts your score, as users in the experiment are exposed to the negative effect every day it runs.</p>
               <p class="text-justify">You can review past experimental results and decisions in the <code>history</code> tab.</p>
               <p class="text-center lead">This is a game of chance, but not of chance alone. The faster you learn, the more you will earn. Good luck!</p>
             </div>
@@ -81,11 +82,13 @@
               <h1 class="text-center">You shipped {{message.exp.name}}.</h1>
               <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
               <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+              <p class="text-center lead text-danger" v-if="settings.feedback_level > 1 && message.exp.metadata.Bug">This experiment contained a bug.</p>
             </div>
             <div class="modal-body" v-if="!message.fullon">
               <h1 class="text-center">You stopped {{message.exp.name}}.</h1>
               <experiment-table :e="message.exp" :ci_scale_min="0.1"></experiment-table>
               <p class="text-center lead" v-if="settings.feedback_level > 1">The real effect of this experiment was {{((message.exp.effect[1]-1)*100).toFixed(2)}}%.</p>
+              <p class="text-center lead text-danger" v-if="settings.feedback_level > 1 && message.exp.metadata.Bug">This experiment contained a bug.</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-lg btn-primary btn-block" data-dismiss="modal"><strong>Close</strong></button>
@@ -201,6 +204,7 @@
                     {{e.name}}
                     <span class="label label-default" :style="{ background: complexity_colors[e.metadata.Complexity] }">{{backlog_complexities[e.metadata.Complexity]}}</span>
                     <span class="label label-primary" :style="{ background: backlog_colors[e.metadata.Topic] }">{{backlog_topics[e.metadata.Topic]}}</span>
+                    <span class="label label-danger" v-if="settings.feedback_level > 2 && e.metadata.Bug">Bug</span>
                     <div class="btn-toolbar pull-right">
                       <div class="btn-group btn-group-xs" v-if="i == 0">
                         <button type="button" class="btn btn-default" @click="prioritize_task(j)">Prioritize</button>
@@ -236,6 +240,7 @@
                 <div class="panel-heading">
                   <strong>Experiment {{exp.experiment_id}}</strong>
                   <span class="label label-primary" :style="{ background: backlog_colors[exp.metadata.Topic] }">{{backlog_topics[exp.metadata.Topic]}}</span>
+                  <span class="label label-danger" v-if="settings.feedback_level > 2 && exp.metadata.Bug">Bug</span>
                   <span>(running for {{ exp.days }} days)</span>
                   <div class="btn-toolbar pull-right">
                     <div class="btn-group btn-group-xs">
@@ -375,7 +380,11 @@
             var effort = Math.floor(Math.random() * this.backlog_complexities.length);
             e.metadata['Complexity'] = effort;
             e.effort = 50 + effort * 100;
-            var effect = 1 + jStat.normal.sample(this.settings.topic_effects[topic][0], this.settings.topic_effects[topic][1] * (effort+1)) / 100;
+            var bug = Math.random() < 0.1;
+            e.metadata['Bug'] = bug;
+            var effect = bug
+              ? 1 + jStat.normal.sample(-15, 10) / 100
+              : 1 + jStat.normal.sample(this.settings.topic_effects[topic][0], this.settings.topic_effects[topic][1] * (effort+1)) / 100;
             e.reset(effect);
             this.backlog[0].push(e);
           },
