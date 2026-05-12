@@ -220,6 +220,7 @@ function calculate_g_test (data) {
       var seen     = data[i][j];
 
       if (seen === 0) continue; // 0 * log(0) is defined as 0 in G-test; skip to avoid NaN
+      if (expected === 0) continue; // skip to avoid log(seen/0) = -Infinity
       g_test      += 2 * seen * Math.log( seen / expected );
     }
   }
