@@ -386,7 +386,7 @@
           },
           delete_task: function(i,b) {
             if (this.backlog[b][i]) {
-              this.backlog[b].splice(i,1)[0];
+              this.backlog[b].splice(i,1);
               this.add_random_task();
             }
           },
