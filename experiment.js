@@ -219,6 +219,7 @@ function calculate_g_test (data) {
       var expected = row_totals[i] * column_totals[j] / total;
       var seen     = data[i][j];
 
+      if (seen === 0) continue; // 0 * log(0) is defined as 0 in G-test; skip to avoid NaN
       g_test      += 2 * seen * Math.log( seen / expected );
     }
   }
