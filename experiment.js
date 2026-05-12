@@ -128,8 +128,8 @@ var Experiment = function(id) {
    * @returns {[number, [number, number]]} Effect and confidence interval
    */
   this.get_absolute_effect = function(i) {
-    var p = this.get_mean(i);
-    var q = this.get_mean(0);
+    var p = this.get_mean(i)[0];
+    var q = this.get_mean(0)[0];
     var z = jStat.studentt.inv(1-this.P_VALUE/2,10000000) * Math.sqrt( (p * ( 1 - p ) / this.visits[i]) + q * ( 1 - q ) / this.visits[0] );
 
     return [ p - q, [p - q - z, p - q + z]];
